@@ -28,7 +28,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_rect_white_rad_five_str_one"
+            android:background="@drawable/bg_rect_white_rad_twelve_str_one"
             android:orientation="vertical"
             android:paddingBottom="@dimen/twenty_two"
             android:paddingEnd="@dimen/sixteen"
@@ -45,10 +45,12 @@
                 android:gravity="center"
                 android:hint="Username"
                 android:imeOptions="actionNext"
+                android:maxLines="1"
                 android:nextFocusDown="@+id/etPasswordLogin"
-                android:padding="@dimen/eight"
+                android:padding="@dimen/four"
+                android:singleLine="true"
                 android:textColor="@color/dark_gray"
-                android:textSize="@dimen/eighteen"
+                android:textSize="@dimen/twenty_three"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <com.codepan.widget.CodePanTextField
@@ -61,9 +63,9 @@
                 android:hint="Password"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:padding="@dimen/eight"
+                android:padding="@dimen/four"
                 android:textColor="@color/dark_gray"
-                android:textSize="@dimen/eighteen"
+                android:textSize="@dimen/twenty_three"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <com.codepan.widget.CodePanLabel
@@ -74,10 +76,10 @@
                 android:layout_marginTop="@dimen/twenty_two"
                 android:background="@drawable/state_rect_green_rad_five"
                 android:gravity="center"
-                android:padding="@dimen/ten"
+                android:padding="@dimen/six"
                 android:text="Login"
                 android:textColor="@color/white"
-                android:textSize="@dimen/fourteen"
+                android:textSize="@dimen/seventeen"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
     </RelativeLayout>
