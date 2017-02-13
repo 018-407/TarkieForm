@@ -3,6 +3,7 @@ package com.mobileoptima.tarkieform;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
 		View view = inflater.inflate(R.layout.login_layout, container, false);
 		etUsernameLogin = (EditText) view.findViewById(R.id.etUsernameLogin);
 		etPasswordLogin = (EditText) view.findViewById(R.id.etPasswordLogin);
+		etPasswordLogin.setTransformationMethod(new PasswordTransformationMethod());
 		btnLogin = (TextView) view.findViewById(R.id.btnLogin);
 		btnLogin.setOnClickListener(this);
 		etPasswordLogin.setOnEditorActionListener(new OnEditorActionListener() {
