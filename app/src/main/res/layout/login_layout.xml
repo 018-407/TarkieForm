@@ -1,0 +1,93 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_bg_login"
+    android:clickable="true"
+    android:paddingEnd="@dimen/fourty_six"
+    android:paddingLeft="@dimen/fourty_six"
+    android:paddingRight="@dimen/fourty_six"
+    android:paddingStart="@dimen/fourty_six">
+
+    <ImageView
+        android:id="@+id/ivCompanyLogo"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/eighty_four"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_logo"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ivPoweredByLogo"
+        android:layout_below="@+id/ivCompanyLogo"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rect_white_rad_five_str_one"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/twenty_two"
+            android:paddingEnd="@dimen/sixteen"
+            android:paddingLeft="@dimen/sixteen"
+            android:paddingRight="@dimen/sixteen"
+            android:paddingStart="@dimen/sixteen"
+            android:paddingTop="@dimen/twenty_two">
+
+            <com.codepan.widget.CodePanTextField
+                android:id="@+id/etUsernameLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/state_rect_light_gray_rad_ten_str_green_one"
+                android:gravity="center"
+                android:hint="Username"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/etPasswordLogin"
+                android:padding="@dimen/eight"
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/eighteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+            <com.codepan.widget.CodePanTextField
+                android:id="@+id/etPasswordLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sixteen"
+                android:background="@drawable/state_rect_light_gray_rad_ten_str_green_one"
+                android:gravity="center"
+                android:hint="Password"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:padding="@dimen/eight"
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/eighteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/btnLogin"
+                android:layout_width="@dimen/one_hundred_sixteen"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/twenty_two"
+                android:background="@drawable/state_rect_green_rad_five"
+                android:gravity="center"
+                android:padding="@dimen/ten"
+                android:text="Login"
+                android:textColor="@color/white"
+                android:textSize="@dimen/fourteen"
+                codePan:typeface="@string/proxima_nova_bold"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/ivPoweredByLogo"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/eighty_four"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/eighteen"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_logo"/>
+</RelativeLayout>
