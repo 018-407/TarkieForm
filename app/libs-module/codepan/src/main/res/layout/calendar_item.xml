@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gvCalendarGrid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:numColumns="7"
+    android:stretchMode="columnWidth"
+    android:scrollbars="none"
+    android:listSelector="@color/transparent"
+    android:horizontalSpacing="@dimen/one"
+    android:verticalSpacing="@dimen/one"
+    android:background="@color/cal_grid"/>
