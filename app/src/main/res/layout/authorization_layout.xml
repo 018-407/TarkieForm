@@ -71,8 +71,10 @@
                 android:text="Authorize"
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty_two"
-                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
+
         </LinearLayout>
+
     </RelativeLayout>
+
 </RelativeLayout>

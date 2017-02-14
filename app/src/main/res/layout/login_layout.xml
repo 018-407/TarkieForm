@@ -99,7 +99,9 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty_two"
                 codePan:typeface="@string/proxima_nova_bold"/>
+
         </LinearLayout>
+
     </RelativeLayout>
 
     <ImageView
@@ -111,4 +113,5 @@
         android:layout_margin="@dimen/eighteen"
         android:scaleType="centerInside"
         android:src="@drawable/ic_logo_powered_by"/>
+
 </RelativeLayout>
