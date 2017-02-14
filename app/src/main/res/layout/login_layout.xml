@@ -1,9 +1,9 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rlMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     android:clickable="true">
 
     <ImageView
@@ -81,7 +81,7 @@
                 android:textSize="@dimen/twenty_three"
                 codePan:typeface="@string/proxima_nova_light"/>
 
-            <com.codepan.widget.CodePanLabel
+            <com.codepan.widget.CodePanButton
                 android:id="@+id/btnAuthorization"
                 android:layout_width="@dimen/one_hundred_sixteen"
                 android:layout_height="wrap_content"
@@ -93,6 +93,7 @@
                 android:text="Login"
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty"
+                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
     </RelativeLayout>
