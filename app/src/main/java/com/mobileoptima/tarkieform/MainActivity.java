@@ -29,9 +29,9 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
-		LoginFragment login = new LoginFragment();
+		AuthorizationFragment authorization = new AuthorizationFragment();
 		transaction = getSupportFragmentManager().beginTransaction();
-		transaction.replace(R.id.rlMain, login);
+		transaction.add(R.id.rlMain, authorization);
 		transaction.addToBackStack(null);
 		transaction.commit();
 	}
