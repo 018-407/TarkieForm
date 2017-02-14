@@ -61,7 +61,7 @@
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnAuthorization"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/one_hundred_thirty_two"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/twenty_two"
