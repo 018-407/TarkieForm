@@ -2,9 +2,11 @@
 <resources>
     <color name="blue">#3396D8</color>
     <color name="green">#27AE60</color>
-    <color name="light_gray">#C8C8C8</color>
-    <color name="gray">#6D6E71</color>
-    <color name="dark_gray">#505050</color>
+    <color name="gray_pri">#6D6E71</color>
+    <color name="gray_sec">#505050</color>
+    <color name="gray_ter">#93B8D1</color>
+    <color name="gray_qua">#C8C8C8</color>
+    <color name="gray_qui">#F1F2F2</color>
+    <color name="gray_sen">#808285</color>
 
-    <color name="dark_white">#f1f2f2</color>
 </resources>
