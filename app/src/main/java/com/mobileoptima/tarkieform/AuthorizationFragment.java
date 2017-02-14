@@ -15,10 +15,14 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.codepan.utils.CodePanUtils;
+import com.codepan.widget.CodePanButton;
+import com.codepan.widget.CodePanLabel;
+import com.codepan.widget.CodePanTextField;
 
 public class AuthorizationFragment extends Fragment implements OnClickListener {
-	private EditText etCodeAuthorization;
-	private TextView btnAuthorization;
+
+	private CodePanButton btnAuthorization;
+	private CodePanTextField etCodeAuthorization;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,9 +32,8 @@ public class AuthorizationFragment extends Fragment implements OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.authorization_layout, container, false);
-		view.findViewById(R.id.rlMain).setOnClickListener(this);
-		etCodeAuthorization = (EditText) view.findViewById(R.id.etCodeAuthorization);
-		btnAuthorization = (TextView) view.findViewById(R.id.btnAuthorization);
+		etCodeAuthorization = (CodePanTextField) view.findViewById(R.id.etCodeAuthorization);
+		btnAuthorization = (CodePanButton) view.findViewById(R.id.btnAuthorization);
 		btnAuthorization.setOnClickListener(this);
 		etCodeAuthorization.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -51,7 +54,6 @@ public class AuthorizationFragment extends Fragment implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		CodePanUtils.hideKeyboard(v, getActivity());
 		switch(v.getId()) {
 			case R.id.btnAuthorization:
 				String code = etCodeAuthorization.getText().toString().trim();

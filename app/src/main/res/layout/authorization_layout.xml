@@ -1,9 +1,9 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rlMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     android:clickable="true">
 
     <ImageView
@@ -29,12 +29,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ivLogoAuthorization"
-            android:layout_marginTop="@dimen/thirty"
             android:layout_marginBottom="@dimen/eighty_four"
             android:layout_marginEnd="@dimen/fourty_six"
             android:layout_marginLeft="@dimen/fourty_six"
             android:layout_marginRight="@dimen/fourty_six"
             android:layout_marginStart="@dimen/fourty_six"
+            android:layout_marginTop="@dimen/thirty"
             android:background="@drawable/bg_rect_white_rad_twelve_str_one"
             android:orientation="vertical"
             android:paddingBottom="@dimen/twenty_two"
@@ -58,7 +58,7 @@
                 android:textSize="@dimen/twenty_three"
                 codePan:typeface="@string/proxima_nova_light"/>
 
-            <com.codepan.widget.CodePanLabel
+            <com.codepan.widget.CodePanButton
                 android:id="@+id/btnAuthorization"
                 android:layout_width="@dimen/one_hundred_sixteen"
                 android:layout_height="wrap_content"
@@ -70,6 +70,7 @@
                 android:text="Authorize"
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty"
+                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
     </RelativeLayout>
