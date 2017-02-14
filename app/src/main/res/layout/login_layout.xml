@@ -3,8 +3,8 @@
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusableInTouchMode="true"
-    android:clickable="true">
+    android:clickable="true"
+    android:focusableInTouchMode="true">
 
     <ImageView
         android:layout_width="match_parent"
@@ -60,10 +60,11 @@
                 android:inputType="text"
                 android:maxLines="1"
                 android:nextFocusDown="@+id/etPasswordLogin"
-                android:padding="@dimen/four"
+                android:padding="@dimen/six"
                 android:singleLine="true"
                 android:textColor="@color/dark_gray"
                 android:textSize="@dimen/twenty_three"
+                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <com.codepan.widget.CodePanTextField
@@ -76,9 +77,13 @@
                 android:hint="Password"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:padding="@dimen/four"
+                android:maxLines="1"
+                android:nextFocusDown="@+id/btnAuthorization"
+                android:padding="@dimen/six"
+                android:singleLine="true"
                 android:textColor="@color/dark_gray"
                 android:textSize="@dimen/twenty_three"
+                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <com.codepan.widget.CodePanButton
@@ -92,8 +97,7 @@
                 android:padding="@dimen/six"
                 android:text="Login"
                 android:textColor="@color/white"
-                android:textSize="@dimen/twenty"
-                codePan:autoHideKeyboard="true"
+                android:textSize="@dimen/twenty_two"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
     </RelativeLayout>
