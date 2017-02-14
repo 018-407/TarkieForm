@@ -1,7 +1,6 @@
 package com.mobileoptima.tarkieform;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
@@ -10,12 +9,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanTextField;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -30,7 +27,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
 	private ImageLoader imageLoader;
 
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		imageLoader = ImageLoader.getInstance();
 		imageLoader.init(ImageLoaderConfiguration.createDefault(getActivity()));
@@ -79,8 +76,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
 				String username = etUsernameLogin.getText().toString().trim();
 				String password = etPasswordLogin.getText().toString().trim();
 				getActivity().getSupportFragmentManager().popBackStack();
-				break;
-			default:
 				break;
 		}
 	}

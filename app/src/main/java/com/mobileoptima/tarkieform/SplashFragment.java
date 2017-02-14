@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.codepan.cache.SQLiteCache;
 import com.codepan.callback.Interface.OnCreateDatabaseCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
@@ -16,6 +16,7 @@ import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.callback.Interface.OnUpgradeDatabaseCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
+import com.mobileoptima.cache.SQLiteCache;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
@@ -27,19 +28,14 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		OnUpgradeDatabaseCallback, OnPermissionGrantedCallback, OnFragmentCallback {
 
 	private final int DELAY = 2000;
-	
+
 	private boolean isPause, isPending, isRequired;
 	private OnInitializeCallback initializeCallback;
 	private OnOverrideCallback overrideCallback;
 	private OnRefreshCallback refreshCallback;
+	private FragmentTransaction transaction;
 	private OnLoginCallback loginCallback;
 	private SQLiteAdapter db;
-
-	private static native String getCipherKey();
-
-	static {
-		System.loadLibrary("ndkLib");
-	}
 
 	@Override
 	public void onPause() {
@@ -76,7 +72,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 			@Override
 			public void run() {
 				try {
-					db = SQLiteCache.getDatabase(getActivity(), App.DB, getCipherKey(), null, App.DB_VERSION);
+					db = SQLiteCache.getDatabase(getActivity(), App.DB);
 					db.setOnCreateDatabaseCallback(SplashFragment.this);
 					db.setOnUpgradeDatabaseCallback(SplashFragment.this);
 					db.openConnection();
@@ -163,26 +159,26 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 
 	public void authenticate() {
 		getActivity().getSupportFragmentManager().popBackStack();
-//		if(!TarkieFormLib.isAuthorized(db)){
-//			AuthorizationFragment authorization = new AuthorizationFragment();
+		if(!TarkieFormLib.isAuthorized(db)) {
+			AuthorizationFragment authorization = new AuthorizationFragment();
 //			authorization.setOnOverrideCallback(overrideCallback);
 //			authorization.setOnRefreshCallback(refreshCallback);
-//			transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//			transaction.replace(R.id.rlMain, authorization);
-//			transaction.addToBackStack(null);
-//			transaction.commit();
-//		}
-//		else{
-//			if(!TarkieFormLib.isLoggedIn(db)){
-//				LoginFragment login = new LoginFragment();
+			transaction = getActivity().getSupportFragmentManager().beginTransaction();
+			transaction.replace(R.id.rlMain, authorization);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		}
+		else {
+			if(!TarkieFormLib.isLoggedIn(db)) {
+				LoginFragment login = new LoginFragment();
 //				login.setOnOverrideCallback(overrideCallback);
 //				login.setOnRefreshCallback(refreshCallback);
 //				login.setOnLoginCallback(loginCallback);
-//				transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//				transaction.replace(R.id.rlMain, login);
-//				transaction.addToBackStack(null);
-//				transaction.commit();
-//			}
-//		}
+				transaction = getActivity().getSupportFragmentManager().beginTransaction();
+				transaction.replace(R.id.rlMain, login);
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
+		}
 	}
 }
