@@ -53,9 +53,10 @@
                 android:hint="Authorization Code"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:padding="@dimen/four"
+                android:padding="@dimen/six"
                 android:textColor="@color/dark_gray"
                 android:textSize="@dimen/twenty_three"
+                codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <com.codepan.widget.CodePanButton
@@ -69,7 +70,7 @@
                 android:padding="@dimen/six"
                 android:text="Authorize"
                 android:textColor="@color/white"
-                android:textSize="@dimen/twenty"
+                android:textSize="@dimen/twenty_three"
                 codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
