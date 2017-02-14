@@ -61,7 +61,7 @@
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnAuthorization"
-                android:layout_width="@dimen/one_hundred_sixteen"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/twenty_two"
@@ -70,7 +70,7 @@
                 android:padding="@dimen/six"
                 android:text="Authorize"
                 android:textColor="@color/white"
-                android:textSize="@dimen/twenty_three"
+                android:textSize="@dimen/twenty_two"
                 codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>

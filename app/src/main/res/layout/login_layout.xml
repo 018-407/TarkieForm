@@ -97,7 +97,7 @@
                 android:padding="@dimen/six"
                 android:text="Login"
                 android:textColor="@color/white"
-                android:textSize="@dimen/twenty_three"
+                android:textSize="@dimen/twenty_two"
                 codePan:typeface="@string/proxima_nova_bold"/>
         </LinearLayout>
     </RelativeLayout>
