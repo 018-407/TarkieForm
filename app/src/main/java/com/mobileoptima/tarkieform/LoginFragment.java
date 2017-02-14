@@ -75,7 +75,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
 			case R.id.btnAuthorization:
 				String username = etUsernameLogin.getText().toString().trim();
 				String password = etPasswordLogin.getText().toString().trim();
-				getActivity().getSupportFragmentManager().popBackStack();
 				break;
 		}
 	}

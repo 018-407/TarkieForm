@@ -2,7 +2,6 @@ package com.mobileoptima.tarkieform;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,12 +52,6 @@ public class AuthorizationFragment extends Fragment implements OnClickListener {
 		switch(v.getId()) {
 			case R.id.btnAuthorization:
 				String code = etCodeAuthorization.getText().toString().trim();
-				getActivity().getSupportFragmentManager().popBackStack();
-				LoginFragment login = new LoginFragment();
-				FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-				transaction.add(R.id.rlMain, login);
-				transaction.addToBackStack(null);
-				transaction.commit();
 				break;
 		}
 	}

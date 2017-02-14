@@ -115,4 +115,8 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				break;
 		}
 	}
+
+	public SQLiteAdapter getDatabase() {
+		return this.db;
+	}
 }
