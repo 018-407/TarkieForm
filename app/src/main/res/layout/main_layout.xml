@@ -30,8 +30,8 @@
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnMenuMain"
-                android:layout_width="@dimen/fourty_five"
-                android:layout_height="@dimen/fourty_five"
+                android:layout_width="@dimen/forty_eight"
+                android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
 
         </FrameLayout>
@@ -39,19 +39,21 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/ten"
+            android:layout_marginRight="@dimen/ten"
             android:layout_toLeftOf="@+id/flOptionsMain"
             android:layout_toStartOf="@+id/flOptionsMain">
 
             <ImageView
-                android:layout_width="@dimen/twenty_seven"
-                android:layout_height="@dimen/twenty"
+                android:layout_width="@dimen/thirty"
+                android:layout_height="@dimen/twenty_one"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_sync"/>
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnSyncMain"
-                android:layout_width="@dimen/fourty_five"
-                android:layout_height="@dimen/fourty_five"
+                android:layout_width="@dimen/forty_eight"
+                android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
 
         </FrameLayout>
@@ -67,12 +69,12 @@
                 android:layout_width="@dimen/four"
                 android:layout_height="@dimen/twenty"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_options"/>
+                android:src="@drawable/ic_options_dark"/>
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnOptionsMain"
                 android:layout_width="@dimen/twenty_five"
-                android:layout_height="@dimen/fourty_five"
+                android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
 
         </FrameLayout>
@@ -201,12 +203,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/llTabMain"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/rlMenuMain"
         android:padding="@dimen/thirteen">
 
         <FrameLayout
+            android:id="@+id/flSearchMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -235,6 +239,17 @@
                 android:src="@drawable/ic_search"/>
 
         </FrameLayout>
+
+        <ListView
+            android:id="@+id/lvMain"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/flSearchMain"
+            android:layout_marginTop="@dimen/five"
+            android:divider="@color/transparent"
+            android:listSelector="@color/transparent"
+            android:scrollbarSize="@dimen/three"
+            android:scrollbarThumbVertical="@color/black_trans_forty"/>
 
     </RelativeLayout>
 

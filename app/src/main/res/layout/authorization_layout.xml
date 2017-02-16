@@ -30,10 +30,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/ivLogoAuthorization"
             android:layout_marginBottom="@dimen/eighty_four"
-            android:layout_marginEnd="@dimen/fourty_six"
-            android:layout_marginLeft="@dimen/fourty_six"
-            android:layout_marginRight="@dimen/fourty_six"
-            android:layout_marginStart="@dimen/fourty_six"
+            android:layout_marginEnd="@dimen/forty_six"
+            android:layout_marginLeft="@dimen/forty_six"
+            android:layout_marginRight="@dimen/forty_six"
+            android:layout_marginStart="@dimen/forty_six"
             android:layout_marginTop="@dimen/thirty"
             android:background="@drawable/bg_rect_white_rad_twelve_str_one"
             android:orientation="vertical"
@@ -73,6 +73,9 @@
                 android:textSize="@dimen/twenty_two"
                 codePan:autoHideKeyboard="true"
                 codePan:typeface="@string/proxima_nova_bold"/>
+
         </LinearLayout>
+
     </RelativeLayout>
+
 </RelativeLayout>

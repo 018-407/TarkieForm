@@ -3,19 +3,29 @@ package com.mobileoptima.tarkieform;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
+import com.mobileoptima.adapter.FormAdapter;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.RequestCode;
+import com.mobileoptima.core.Data;
+import com.mobileoptima.object.FormObj;
+
+import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements OnInitializeCallback, OnLoginCallback,
 		OnOverrideCallback, OnRefreshCallback {
@@ -23,12 +33,30 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	private OnPermissionGrantedCallback permissionGrantedCallback;
 	private boolean isInitialized, isOverridden;
 	private FragmentTransaction transaction;
+	private ArrayList<FormObj> formList;
+	private FormAdapter adapter;
 	private SQLiteAdapter db;
+	private ListView lvMain;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
+		lvMain = (ListView) findViewById(R.id.lvMain);
+		lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				FormObj obj =  formList.get(i);
+				FormFragment form = new FormFragment();
+				form.setForm(obj);
+				transaction = getSupportFragmentManager().beginTransaction();
+				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+				transaction.replace(R.id.rlMain, form);
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
+		});
 		init(savedInstanceState);
 	}
 
@@ -73,6 +101,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	public void onInitialize(SQLiteAdapter db) {
 		this.isInitialized = true;
 		this.db = db;
+		loadForms(db);
 	}
 
 	@Override
@@ -119,4 +148,30 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	public SQLiteAdapter getDatabase() {
 		return this.db;
 	}
+
+	public void loadForms(final SQLiteAdapter db) {
+		Thread bg = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					formList = Data.loadForms(db);
+					Thread.sleep(1000);
+					handler.sendMessage(handler.obtainMessage());
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		bg.start();
+	}
+
+	Handler handler = new Handler(new Handler.Callback() {
+		@Override
+		public boolean handleMessage(Message message) {
+			adapter = new FormAdapter(MainActivity.this, formList);
+			lvMain.setAdapter(adapter);
+			return true;
+		}
+	});
 }

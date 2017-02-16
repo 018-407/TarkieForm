@@ -10,10 +10,10 @@ public class TarkieFormLib {
 	}
 
 	public static boolean isAuthorized(SQLiteAdapter db) {
-		return false;
+		return true;
 	}
 
 	public static boolean isLoggedIn(SQLiteAdapter db) {
-		return false;
+		return true;
 	}
 }

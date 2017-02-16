@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/eight">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/state_rect_white_rad_four"
+        android:padding="@dimen/ten">
+
+        <ImageView
+            android:id="@+id/ivForm"
+            android:layout_width="@dimen/forty"
+            android:layout_height="@dimen/forty"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_service"/>
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/ten"
+            android:layout_marginLeft="@dimen/ten"
+            android:layout_marginRight="@dimen/ten"
+            android:layout_marginStart="@dimen/ten"
+            android:layout_toEndOf="@+id/ivForm"
+            android:layout_toLeftOf="@+id/ivNext"
+            android:layout_toRightOf="@+id/ivForm"
+            android:layout_toStartOf="@+id/ivNext"
+            android:text="Service Order Form"
+            android:textSize="@dimen/seventeen"
+            codePan:typeface="@string/proxima_nova_bold"/>
+
+        <ImageView
+            android:id="@+id/ivNext"
+            android:layout_width="@dimen/seven"
+            android:layout_height="@dimen/fifteen"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_next_dark"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
