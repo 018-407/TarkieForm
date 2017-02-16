@@ -732,9 +732,10 @@ public class CodePanUtils {
 	}
 
 	public static String getHttpResponse(String spec, String params, int timeOut) {
+		boolean result = false;
 		StringBuilder response = new StringBuilder();
-		String exception = "";
-		String message = "";
+		String exception = null;
+		String message = null;
 		HttpURLConnection connection = null;
 		try {
 			URL url = new URL(spec);
@@ -758,18 +759,18 @@ public class CodePanUtils {
 			writer.close();
 			if(connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
 				if(!url.getHost().equals(connection.getURL().getHost())) {
-					// we were redirected! Kick the user out to the browser to sign on?
-					Log.e("paul", "login");
+					message = "WiFi authentication required. Please check on your web browser. ";
 				}
-				Reader in = new InputStreamReader(connection.getInputStream());
-				BufferedReader reader = new BufferedReader(in);
-				String line;
-				while((line = reader.readLine()) != null) {
-					response.append(line);
+				else {
+					Reader in = new InputStreamReader(connection.getInputStream());
+					BufferedReader reader = new BufferedReader(in);
+					String line;
+					while((line = reader.readLine()) != null) {
+						response.append(line);
+					}
+					reader.close();
+					result = true;
 				}
-				reader.close();
-				connection.disconnect();
-				return response.toString();
 			}
 		}
 		catch(SocketTimeoutException ste) {
@@ -794,17 +795,19 @@ public class CodePanUtils {
 				connection.disconnect();
 			}
 		}
-		JSONObject error = new JSONObject();
-		try {
-			JSONObject field = new JSONObject();
-			field.put("message", message);
-			field.put("exception", exception);
-			error.put("error", field);
+		if(!result) {
+			try {
+				JSONObject field = new JSONObject();
+				field.put("message", message);
+				field.put("exception", exception);
+				JSONObject error = new JSONObject();
+				error.put("error", field);
+				response.append(error.toString());
+			}
+			catch(JSONException je) {
+				je.printStackTrace();
+			}
 		}
-		catch(JSONException je) {
-			je.printStackTrace();
-		}
-		response.append(error.toString());
 		return response.toString();
 	}
 
