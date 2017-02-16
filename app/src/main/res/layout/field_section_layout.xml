@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.codepan.widget.CodePanLabel
-        android:id="@+id/tvSectionField"
+        android:id="@+id/tvTitleSection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/fifteen"
@@ -15,15 +15,32 @@
         android:paddingRight="@dimen/ten"
         android:paddingStart="@dimen/ten"
         android:paddingTop="@dimen/fifteen"
-        android:text="CUSTOMER INFORMATION"
+        android:text="TITLE"
         android:textColor="@color/gray_sec"
         android:textSize="@dimen/eighteen"
         codePan:typeface="@string/proxima_nova_bold"/>
 
     <View
+        android:id="@+id/vDividerSectionField"
         android:layout_width="match_parent"
         android:layout_height="@dimen/one"
-        android:layout_below="@+id/tvSectionField"
+        android:layout_below="@+id/tvTitleSection"
         android:background="@color/green"/>
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvDescSection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vDividerSectionField"
+        android:paddingBottom="@dimen/five"
+        android:paddingEnd="@dimen/ten"
+        android:paddingLeft="@dimen/ten"
+        android:paddingRight="@dimen/ten"
+        android:paddingStart="@dimen/ten"
+        android:paddingTop="@dimen/fifteen"
+        android:text="Description"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
 
 </RelativeLayout>

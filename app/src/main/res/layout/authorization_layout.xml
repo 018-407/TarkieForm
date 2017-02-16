@@ -48,7 +48,7 @@
                 android:id="@+id/etCodeAuthorization"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/state_rect_gray_qui_rad_ten_str_green_one"
+                android:background="@drawable/state_rect_gray_qui_rad_five"
                 android:gravity="center"
                 android:hint="Authorization Code"
                 android:imeOptions="actionDone"

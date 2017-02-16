@@ -3,7 +3,7 @@ package com.mobileoptima.constant;
 public class FieldType {
 
 	public static final String TEXT = "TEXT";
-	public static final String LTEXT = "TEXT";
+	public static final String LTEXT = "LTEXT";
 	public static final String YON = "YON";
 	public static final String MS = "MS";
 	public static final String DATE = "DATE";

@@ -67,4 +67,8 @@ public class Interface {
 	public interface OnRefreshCallback {
 		void onRefresh();
 	}
+
+	public interface OnBackPressedCallback {
+		void onBackPressed();
+	}
 }

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
@@ -31,6 +32,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 		OnOverrideCallback, OnRefreshCallback {
 
 	private OnPermissionGrantedCallback permissionGrantedCallback;
+	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
 	private FragmentTransaction transaction;
 	private ArrayList<FormObj> formList;
@@ -49,6 +51,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				FormObj obj =  formList.get(i);
 				FormFragment form = new FormFragment();
 				form.setForm(obj);
+				form.setOnOverrideCallback(MainActivity.this);
 				transaction = getSupportFragmentManager().beginTransaction();
 				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
 						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
@@ -174,4 +177,25 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 			return true;
 		}
 	});
+
+	public void setOnBackPressedCallback(OnBackPressedCallback backPressedCallback){
+		this.backPressedCallback = backPressedCallback;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if(isInitialized){
+			if(isOverridden){
+				if(backPressedCallback != null){
+					backPressedCallback.onBackPressed();
+				}
+			}
+			else{
+				super.onBackPressed();
+			}
+		}
+		else{
+			this.finish();
+		}
+	}
 }
