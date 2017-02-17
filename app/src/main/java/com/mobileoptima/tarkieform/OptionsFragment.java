@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
-import com.mobileoptima.object.OptionObj;
+import com.mobileoptima.object.ChoiceObj;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 
 	private OnOptionSelectedCallback optionSelectedCallback;
 	private CodePanLabel tvTitleOptions;
-	private ArrayList<OptionObj> options;
+	private ArrayList<ChoiceObj> items;
 	private RelativeLayout rlOptions;
 	private LinearLayout llOptions;
 	private SQLiteAdapter db;
@@ -41,8 +41,8 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 		tvTitleOptions = (CodePanLabel) view.findViewById(R.id.tvTitleOptions);
 		tvTitleOptions.setText(title);
 		rlOptions.setOnClickListener(this);
-		if(options != null) {
-			for(final OptionObj obj : options) {
+		if(items != null) {
+			for(final ChoiceObj obj : items) {
 				View v = inflater.inflate(R.layout.options_list_row, container, false);
 				CodePanLabel tvItemOptions = (CodePanLabel) v.findViewById(R.id.tvItemOptions);
 				View vDividerOptions = v.findViewById(R.id.vDividerOptions);
@@ -56,7 +56,7 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 						}
 					}
 				});
-				if(options.indexOf(obj) == options.size() - 1) {
+				if(items.indexOf(obj) == items.size() - 1) {
 					vDividerOptions.setVisibility(View.GONE);
 					tvItemOptions.setBackgroundResource(R.drawable.state_rect_trans_rad_five_bot);
 				}
@@ -66,8 +66,8 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 		return view;
 	}
 
-	public void setItems(ArrayList<OptionObj> options, String title) {
-		this.options = options;
+	public void setItems(ArrayList<ChoiceObj> options, String title) {
+		this.items = options;
 		this.title = title;
 	}
 

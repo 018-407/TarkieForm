@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
 import com.codepan.calendar.callback.Interface.OnPickDateCallback;
@@ -25,7 +26,7 @@ import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.object.FieldObj;
-import com.mobileoptima.object.OptionObj;
+import com.mobileoptima.object.ChoiceObj;
 
 import java.util.ArrayList;
 
@@ -79,15 +80,15 @@ public class PageFragment extends Fragment {
 				switch(obj.type) {
 					case FieldType.SEC:
 						view = inflater.inflate(R.layout.field_section_layout, container, false);
-						CodePanLabel tvTitleSection = (CodePanLabel) view.findViewById(R.id.tvTitleSection);
-						CodePanLabel tvDescSection = (CodePanLabel) view.findViewById(R.id.tvDescSection);
-						tvTitleSection.setText(obj.question);
-						if(obj.dDesc != null) {
-							tvDescSection.setText(obj.dDesc);
-							tvDescSection.setVisibility(View.VISIBLE);
+						CodePanLabel tvTitleSec = (CodePanLabel) view.findViewById(R.id.tvTitleSec);
+						CodePanLabel tvDescSec = (CodePanLabel) view.findViewById(R.id.tvDescSec);
+						tvTitleSec.setText(obj.field);
+						if(obj.description != null) {
+							tvDescSec.setText(obj.description);
+							tvDescSec.setVisibility(View.VISIBLE);
 						}
 						else {
-							tvDescSection.setVisibility(View.GONE);
+							tvDescSec.setVisibility(View.GONE);
 						}
 						break;
 					case FieldType.TEXT:
@@ -95,21 +96,21 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionText = (CodePanLabel) view.findViewById(R.id.tvQuestionText);
 						CodePanTextField etAnswerText = (CodePanTextField) view.findViewById(R.id.etAnswerText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionText, obj.question);
+							requiredField(tvQuestionText, obj.field);
 						}
 						else {
-							tvQuestionText.setText(obj.question);
+							tvQuestionText.setText(obj.field);
 						}
 						break;
 					case FieldType.NUM:
 						view = inflater.inflate(R.layout.field_numeric_layout, container, false);
-						CodePanLabel tvQuestionNumeric = (CodePanLabel) view.findViewById(R.id.tvQuestionNumeric);
-						CodePanTextField etAnswerNumeric = (CodePanTextField) view.findViewById(R.id.etAnswerNumeric);
+						CodePanLabel tvQuestionNum = (CodePanLabel) view.findViewById(R.id.tvQuestionNum);
+						CodePanTextField etAnswerNum = (CodePanTextField) view.findViewById(R.id.etAnswerNum);
 						if(obj.isRequired) {
-							requiredField(tvQuestionNumeric, obj.question);
+							requiredField(tvQuestionNum, obj.field);
 						}
 						else {
-							tvQuestionNumeric.setText(obj.question);
+							tvQuestionNum.setText(obj.field);
 						}
 						break;
 					case FieldType.LTEXT:
@@ -117,10 +118,10 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionLText = (CodePanLabel) view.findViewById(R.id.tvQuestionLText);
 						CodePanTextField etAnswerLText = (CodePanTextField) view.findViewById(R.id.etAnswerLText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionLText, obj.question);
+							requiredField(tvQuestionLText, obj.field);
 						}
 						else {
-							tvQuestionLText.setText(obj.question);
+							tvQuestionLText.setText(obj.field);
 						}
 						break;
 					case FieldType.DATE:
@@ -128,10 +129,10 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionDate = (CodePanLabel) view.findViewById(R.id.tvQuestionDate);
 						final CodePanButton btnCalendarDate = (CodePanButton) view.findViewById(R.id.btnCalendarDate);
 						if(obj.isRequired) {
-							requiredField(tvQuestionDate, obj.question);
+							requiredField(tvQuestionDate, obj.field);
 						}
 						else {
-							tvQuestionDate.setText(obj.question);
+							tvQuestionDate.setText(obj.field);
 						}
 						btnCalendarDate.setOnClickListener(new OnClickListener() {
 							@Override
@@ -155,24 +156,24 @@ public class PageFragment extends Fragment {
 						break;
 					case FieldType.DD:
 						view = inflater.inflate(R.layout.field_dropdown_layout, container, false);
-						CodePanLabel tvQuestionDropdown = (CodePanLabel) view.findViewById(R.id.tvQuestionDropdown);
-						final CodePanButton btnOptionsDropdown = (CodePanButton) view.findViewById(R.id.btnOptionsDropdown);
+						CodePanLabel tvQuestionDd = (CodePanLabel) view.findViewById(R.id.tvQuestionDd);
+						final CodePanButton btnOptionsDd = (CodePanButton) view.findViewById(R.id.btnOptionsDd);
 						if(obj.isRequired) {
-							requiredField(tvQuestionDropdown, obj.question);
+							requiredField(tvQuestionDd, obj.field);
 						}
 						else {
-							tvQuestionDropdown.setText(obj.question);
+							tvQuestionDd.setText(obj.field);
 						}
-						btnOptionsDropdown.setOnClickListener(new OnClickListener() {
+						btnOptionsDd.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								ArrayList<OptionObj> items = Data.loadOptions(db);
+								ArrayList<ChoiceObj> items = Data.loadChoices(db);
 								OptionsFragment options = new OptionsFragment();
-								options.setItems(items, obj.question);
+								options.setItems(items, obj.field);
 								options.setOnOptionSelectedCallback(new OnOptionSelectedCallback() {
 									@Override
-									public void onOptionSelected(OptionObj obj) {
-										btnOptionsDropdown.setText(obj.dDesc);
+									public void onOptionSelected(ChoiceObj obj) {
+										btnOptionsDd.setText(obj.dDesc);
 									}
 								});
 								transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -186,29 +187,65 @@ public class PageFragment extends Fragment {
 						break;
 					case FieldType.YON:
 						view = inflater.inflate(R.layout.field_yes_no_layout, container, false);
-						CodePanLabel tvQuestionYesNo = (CodePanLabel) view.findViewById(R.id.tvQuestionYesNo);
-						final CodePanButton btnNo = (CodePanButton) view.findViewById(R.id.btnNo);
-						final CodePanButton btnYes = (CodePanButton) view.findViewById(R.id.btnYes);
+						CodePanLabel tvQuestionYon = (CodePanLabel) view.findViewById(R.id.tvQuestionYon);
+						final CodePanButton btnNoYon = (CodePanButton) view.findViewById(R.id.btnNoYon);
+						final CodePanButton btnYesYon = (CodePanButton) view.findViewById(R.id.btnYesYon);
 						if(obj.isRequired) {
-							requiredField(tvQuestionYesNo, obj.question);
+							requiredField(tvQuestionYon, obj.field);
 						}
 						else {
-							tvQuestionYesNo.setText(obj.question);
+							tvQuestionYon.setText(obj.field);
 						}
-						btnNo.setOnClickListener(new OnClickListener() {
+						btnNoYon.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								btnNo.setEnabled(false);
-								btnYes.setEnabled(true);
+								btnNoYon.setEnabled(false);
+								btnYesYon.setEnabled(true);
 							}
 						});
-						btnYes.setOnClickListener(new OnClickListener() {
+						btnYesYon.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								btnNo.setEnabled(true);
-								btnYes.setEnabled(false);
+								btnNoYon.setEnabled(true);
+								btnYesYon.setEnabled(false);
 							}
 						});
+						break;
+					case FieldType.MS:
+						view = inflater.inflate(R.layout.field_multiple_selection_layout, container, false);
+						CodePanLabel tvQuestionMs = (CodePanLabel) view.findViewById(R.id.tvQuestionMs);
+						LinearLayout llChoicesMs = (LinearLayout) view.findViewById(R.id.llChoicesMs);
+						if(obj.isRequired) {
+							requiredField(tvQuestionMs, obj.field);
+						}
+						else {
+							tvQuestionMs.setText(obj.field);
+						}
+						ArrayList<ChoiceObj> choices = Data.loadChoices(db);
+						for(ChoiceObj choice : choices) {
+							View v = inflater.inflate(R.layout.multiple_selection_item, container, false);
+							LinearLayout llChoiceMs = (LinearLayout) v.findViewById(R.id.llChoiceMs);
+							CodePanLabel tvChoiceMs = (CodePanLabel) v.findViewById(R.id.tvChoiceMs);
+							final CheckBox cbChoiceMs = (CheckBox) v.findViewById(R.id.cbChoiceMs);
+							tvChoiceMs.setText(choice.dDesc);
+							llChoiceMs.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View view) {
+									if(!cbChoiceMs.isChecked()) {
+										cbChoiceMs.setChecked(true);
+									}
+									else {
+										cbChoiceMs.setChecked(false);
+									}
+								}
+							});
+							llChoicesMs.addView(v);
+						}
+						break;
+					case FieldType.LAB:
+						view = inflater.inflate(R.layout.field_label_layout, container, false);
+						CodePanLabel tvDescLabel = (CodePanLabel) view.findViewById(R.id.tvDescLabel);
+						tvDescLabel.setText(obj.field);
 						break;
 				}
 				llPage.addView(view);

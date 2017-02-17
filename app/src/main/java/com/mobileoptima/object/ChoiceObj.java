@@ -1,7 +1,8 @@
 package com.mobileoptima.object;
 
-public class OptionObj {
+public class ChoiceObj {
 
 	public String ID;
 	public String dDesc;
+	public boolean isCheck;
 }

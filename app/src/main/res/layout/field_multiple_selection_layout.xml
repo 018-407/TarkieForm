@@ -4,10 +4,14 @@
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/ten">
+    android:paddingEnd="@dimen/ten"
+    android:paddingLeft="@dimen/ten"
+    android:paddingRight="@dimen/ten"
+    android:paddingStart="@dimen/ten"
+    android:paddingTop="@dimen/ten">
 
     <com.codepan.widget.CodePanLabel
-        android:id="@+id/tvQuestionNum"
+        android:id="@+id/tvQuestionMs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/five"
@@ -16,19 +20,11 @@
         android:textSize="@dimen/seventeen"
         codePan:typeface="@string/proxima_nova_light"/>
 
-    <com.codepan.widget.CodePanTextField
-        android:id="@+id/etAnswerNum"
+    <LinearLayout
+        android:id="@+id/llChoicesMs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvQuestionNum"
-        android:background="@drawable/state_rect_gray_qui_rad_three"
-        android:imeOptions="actionNext"
-        android:inputType="number"
-        android:maxLines="1"
-        android:padding="@dimen/ten"
-        android:singleLine="true"
-        android:textColor="@color/gray_sec"
-        android:textSize="@dimen/seventeen"
-        codePan:typeface="@string/proxima_nova_light"/>
+        android:layout_below="@+id/tvQuestionMs"
+        android:orientation="vertical"/>
 
 </RelativeLayout>

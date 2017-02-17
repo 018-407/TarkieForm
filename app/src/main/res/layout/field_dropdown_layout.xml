@@ -7,7 +7,7 @@
     android:padding="@dimen/ten">
 
     <com.codepan.widget.CodePanLabel
-        android:id="@+id/tvQuestionDropdown"
+        android:id="@+id/tvQuestionDd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/five"
@@ -19,11 +19,11 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvQuestionDropdown"
+        android:layout_below="@+id/tvQuestionDd"
         android:background="@drawable/bg_rect_gray_qui_rad_three">
 
         <com.codepan.widget.CodePanButton
-            android:id="@+id/btnOptionsDropdown"
+            android:id="@+id/btnOptionsDd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/state_rect_trans_rad_three"
