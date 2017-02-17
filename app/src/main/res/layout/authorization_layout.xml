@@ -35,7 +35,7 @@
             android:layout_marginRight="@dimen/forty_six"
             android:layout_marginStart="@dimen/forty_six"
             android:layout_marginTop="@dimen/thirty"
-            android:background="@drawable/bg_rect_white_rad_twelve_str_one"
+            android:background="@drawable/bg_rect_white_rad_twelve_str_gray_pri"
             android:orientation="vertical"
             android:paddingBottom="@dimen/twenty_two"
             android:paddingEnd="@dimen/sixteen"

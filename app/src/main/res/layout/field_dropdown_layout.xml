@@ -7,7 +7,7 @@
     android:padding="@dimen/ten">
 
     <com.codepan.widget.CodePanLabel
-        android:id="@+id/tvQuestionDate"
+        android:id="@+id/tvQuestionDropdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/five"
@@ -19,27 +19,26 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvQuestionDate"
+        android:layout_below="@+id/tvQuestionDropdown"
         android:background="@drawable/bg_rect_gray_qui_rad_three">
 
         <com.codepan.widget.CodePanButton
-            android:id="@+id/btnCalendarDate"
+            android:id="@+id/btnOptionsDropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/state_rect_trans_rad_three"
             android:gravity="left"
             android:padding="@dimen/ten"
-            android:text="@string/date"
             android:textColor="@color/gray_sec"
             android:textSize="@dimen/seventeen"
             codePan:typeface="@string/proxima_nova_light"/>
 
         <ImageView
-            android:layout_width="@dimen/twenty"
-            android:layout_height="@dimen/twenty_one"
+            android:layout_width="@dimen/seventeen"
+            android:layout_height="@dimen/thirteen"
             android:layout_gravity="center_vertical|end"
             android:layout_margin="@dimen/ten"
-            android:src="@drawable/ic_calendar"/>
+            android:src="@drawable/ic_dropdown"/>
 
     </FrameLayout>
 

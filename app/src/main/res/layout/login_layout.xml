@@ -40,7 +40,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_rect_white_rad_twelve_str_one"
+            android:background="@drawable/bg_rect_white_rad_twelve_str_gray_pri"
             android:orientation="vertical"
             android:paddingBottom="@dimen/twenty_two"
             android:paddingEnd="@dimen/sixteen"

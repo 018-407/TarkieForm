@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -20,9 +21,11 @@ import com.codepan.utils.SpannableMap;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CodePanTextField;
+import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.object.FieldObj;
+import com.mobileoptima.object.OptionObj;
 
 import java.util.ArrayList;
 
@@ -72,13 +75,13 @@ public class PageFragment extends Fragment {
 		public boolean handleMessage(Message message) {
 			LayoutInflater inflater = getActivity().getLayoutInflater();
 			View view = null;
-			for(FieldObj obj : fieldList) {
+			for(final FieldObj obj : fieldList) {
 				switch(obj.type) {
 					case FieldType.SEC:
 						view = inflater.inflate(R.layout.field_section_layout, container, false);
 						CodePanLabel tvTitleSection = (CodePanLabel) view.findViewById(R.id.tvTitleSection);
 						CodePanLabel tvDescSection = (CodePanLabel) view.findViewById(R.id.tvDescSection);
-						tvTitleSection.setText(obj.name);
+						tvTitleSection.setText(obj.question);
 						if(obj.dDesc != null) {
 							tvDescSection.setText(obj.dDesc);
 							tvDescSection.setVisibility(View.VISIBLE);
@@ -92,10 +95,10 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionText = (CodePanLabel) view.findViewById(R.id.tvQuestionText);
 						CodePanTextField etAnswerText = (CodePanTextField) view.findViewById(R.id.etAnswerText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionText, obj.name);
+							requiredField(tvQuestionText, obj.question);
 						}
 						else {
-							tvQuestionText.setText(obj.name);
+							tvQuestionText.setText(obj.question);
 						}
 						break;
 					case FieldType.NUM:
@@ -103,10 +106,10 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionNumeric = (CodePanLabel) view.findViewById(R.id.tvQuestionNumeric);
 						CodePanTextField etAnswerNumeric = (CodePanTextField) view.findViewById(R.id.etAnswerNumeric);
 						if(obj.isRequired) {
-							requiredField(tvQuestionNumeric, obj.name);
+							requiredField(tvQuestionNumeric, obj.question);
 						}
 						else {
-							tvQuestionNumeric.setText(obj.name);
+							tvQuestionNumeric.setText(obj.question);
 						}
 						break;
 					case FieldType.LTEXT:
@@ -114,10 +117,10 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionLText = (CodePanLabel) view.findViewById(R.id.tvQuestionLText);
 						CodePanTextField etAnswerLText = (CodePanTextField) view.findViewById(R.id.etAnswerLText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionLText, obj.name);
+							requiredField(tvQuestionLText, obj.question);
 						}
 						else {
-							tvQuestionLText.setText(obj.name);
+							tvQuestionLText.setText(obj.question);
 						}
 						break;
 					case FieldType.DATE:
@@ -125,12 +128,12 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvQuestionDate = (CodePanLabel) view.findViewById(R.id.tvQuestionDate);
 						final CodePanButton btnCalendarDate = (CodePanButton) view.findViewById(R.id.btnCalendarDate);
 						if(obj.isRequired) {
-							requiredField(tvQuestionDate, obj.name);
+							requiredField(tvQuestionDate, obj.question);
 						}
 						else {
-							tvQuestionDate.setText(obj.name);
+							tvQuestionDate.setText(obj.question);
 						}
-						btnCalendarDate.setOnClickListener(new View.OnClickListener() {
+						btnCalendarDate.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								CalendarView calendar = new CalendarView();
@@ -147,6 +150,63 @@ public class PageFragment extends Fragment {
 								transaction.add(R.id.rlMain, calendar);
 								transaction.addToBackStack(null);
 								transaction.commit();
+							}
+						});
+						break;
+					case FieldType.DD:
+						view = inflater.inflate(R.layout.field_dropdown_layout, container, false);
+						CodePanLabel tvQuestionDropdown = (CodePanLabel) view.findViewById(R.id.tvQuestionDropdown);
+						final CodePanButton btnOptionsDropdown = (CodePanButton) view.findViewById(R.id.btnOptionsDropdown);
+						if(obj.isRequired) {
+							requiredField(tvQuestionDropdown, obj.question);
+						}
+						else {
+							tvQuestionDropdown.setText(obj.question);
+						}
+						btnOptionsDropdown.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								ArrayList<OptionObj> items = Data.loadOptions(db);
+								OptionsFragment options = new OptionsFragment();
+								options.setItems(items, obj.question);
+								options.setOnOptionSelectedCallback(new OnOptionSelectedCallback() {
+									@Override
+									public void onOptionSelected(OptionObj obj) {
+										btnOptionsDropdown.setText(obj.dDesc);
+									}
+								});
+								transaction = getActivity().getSupportFragmentManager().beginTransaction();
+								transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+										R.anim.fade_in, R.anim.fade_out);
+								transaction.add(R.id.rlMain, options);
+								transaction.addToBackStack(null);
+								transaction.commit();
+							}
+						});
+						break;
+					case FieldType.YON:
+						view = inflater.inflate(R.layout.field_yes_no_layout, container, false);
+						CodePanLabel tvQuestionYesNo = (CodePanLabel) view.findViewById(R.id.tvQuestionYesNo);
+						final CodePanButton btnNo = (CodePanButton) view.findViewById(R.id.btnNo);
+						final CodePanButton btnYes = (CodePanButton) view.findViewById(R.id.btnYes);
+						if(obj.isRequired) {
+							requiredField(tvQuestionYesNo, obj.question);
+						}
+						else {
+							tvQuestionYesNo.setText(obj.question);
+						}
+						btnNo.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								btnNo.setEnabled(false);
+								btnYes.setEnabled(true);
+							}
+						});
+						btnYes.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								btnNo.setEnabled(true);
+								btnYes.setEnabled(false);
 							}
 						});
 						break;

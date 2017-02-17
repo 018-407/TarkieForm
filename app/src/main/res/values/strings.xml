@@ -6,4 +6,7 @@
     <string name="search">Search</string>
     <string name="next">Next</string>
     <string name="date">Select Date</string>
+    <string name="select">SELECT</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 </resources>

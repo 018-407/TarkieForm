@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/rlOptions"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_trans_thirty"
+    android:clickable="true"
+    android:padding="@dimen/twenty_five">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_rect_white_rad_five">
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvTitleOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/twelve"
+            android:text="@string/select"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/seventeen"
+            codePan:typeface="@string/proxima_nova_bold"/>
+
+        <View
+            android:id="@+id/vDividerOptions"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/one"
+            android:layout_below="@+id/tvTitleOptions"
+            android:background="@color/green"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/vDividerOptions"
+            android:scrollbarThumbVertical="@null">
+
+            <LinearLayout
+                android:id="@+id/llOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </ScrollView>
+
+    </RelativeLayout>
+
+</RelativeLayout>

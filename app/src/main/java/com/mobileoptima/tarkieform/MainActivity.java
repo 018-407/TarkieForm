@@ -158,7 +158,6 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 			public void run() {
 				try {
 					formList = Data.loadForms(db);
-					Thread.sleep(1000);
 					handler.sendMessage(handler.obtainMessage());
 				}
 				catch(Exception e) {
