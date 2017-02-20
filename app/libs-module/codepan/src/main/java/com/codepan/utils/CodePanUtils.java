@@ -44,8 +44,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -136,6 +136,8 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
+import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 
 public class CodePanUtils {
 
@@ -616,7 +618,7 @@ public class CodePanUtils {
 		return key;
 	}
 
-	public static String getAlphaDate(String date, boolean isAbbrev, boolean withYear) {
+	public static String getCalendarDate(String date, boolean isAbbrev, boolean withYear) {
 		String alphaDate = "";
 		if(date != null && !date.isEmpty()) {
 			String[] array = date.split("\\-");
@@ -1423,14 +1425,14 @@ public class CodePanUtils {
 		toast.show();
 	}
 
-	public static void showAlertToast(FragmentActivity activity, String message, int duration, ArrayList<SpannableList> list, Typeface typeface) {
+	public static void showAlertToast(FragmentActivity activity, String message, int duration, ArrayList<SpannableMap> list, Typeface typeface) {
 		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
 		LayoutInflater inflater = activity.getLayoutInflater();
 		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
 		CodePanLabel text = (CodePanLabel) layout.findViewById(R.id.tvMessageAlertToast);
 		SpannableStringBuilder ssb = new SpannableStringBuilder(message);
-		for(SpannableList obj : list) {
-			ssb.setSpan(new CustomTypefaceSpan(typeface), obj.start, obj.end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+		for(SpannableMap obj : list) {
+			ssb.setSpan(new CustomTypefaceSpan(typeface), obj.start, obj.end, android.text.Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		}
 		text.setText(ssb);
 		Toast toast = new Toast(activity);
@@ -1756,7 +1758,7 @@ public class CodePanUtils {
 	public static String getDisplayDate(String date) {
 		Calendar cal = getCalendar(date);
 		String dayOfWeek = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ENGLISH);
-		return dayOfWeek + ", " + CodePanUtils.getAlphaDate(date, true, false);
+		return dayOfWeek + ", " + CodePanUtils.getCalendarDate(date, true, false);
 	}
 
 	public static String getDisplayYear(String date) {
@@ -1764,5 +1766,20 @@ public class CodePanUtils {
 			return date.split("\\-")[0];
 		}
 		return null;
+	}
+
+	public static SpannableStringBuilder customizeText(ArrayList<SpannableMap> list, String text) {
+		SpannableStringBuilder ssb = new SpannableStringBuilder(text);
+		for(SpannableMap span : list) {
+			switch(span.type) {
+				case SpannableMap.COLOR:
+					ssb.setSpan(new ForegroundColorSpan(span.color), span.start, span.end, SPAN_INCLUSIVE_INCLUSIVE);
+					break;
+				case SpannableMap.FONT:
+					ssb.setSpan(new CustomTypefaceSpan(span.typeface), span.start, span.end, SPAN_INCLUSIVE_INCLUSIVE);
+					break;
+			}
+		}
+		return ssb;
 	}
 }

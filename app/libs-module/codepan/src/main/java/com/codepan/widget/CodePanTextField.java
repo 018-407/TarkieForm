@@ -101,7 +101,8 @@ public class CodePanTextField extends EditText {
 			focusChangeListener = new OnFocusChangeListener() {
 				@Override
 				public void onFocusChange(View v, boolean hasFocus) {
-					if(!hasFocus && (focusSearch(FOCUS_DOWN) == null || (focusSearch(FOCUS_DOWN) != null && !focusSearch(FOCUS_DOWN).hasFocus()))) {
+					if(!hasFocus && (focusSearch(FOCUS_DOWN) == null ||
+							(focusSearch(FOCUS_DOWN) != null && !focusSearch(FOCUS_DOWN).hasFocus()))) {
 						CodePanUtils.hideKeyboard(v, context);
 					}
 				}

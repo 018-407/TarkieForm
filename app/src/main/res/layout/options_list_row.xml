@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvItemOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/state_rect_trans_dark"
+        android:padding="@dimen/fifteen"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+    <View
+        android:id="@+id/vDividerOptions"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/one"
+        android:background="@color/gray_qui"/>
+
+</LinearLayout>

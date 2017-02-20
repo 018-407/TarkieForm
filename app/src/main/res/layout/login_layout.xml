@@ -31,16 +31,16 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/ivPoweredByLogoLogin"
         android:layout_below="@+id/ivLogoAuthorization"
-        android:layout_marginEnd="@dimen/fourty_six"
-        android:layout_marginLeft="@dimen/fourty_six"
-        android:layout_marginRight="@dimen/fourty_six"
-        android:layout_marginStart="@dimen/fourty_six"
+        android:layout_marginEnd="@dimen/forty_six"
+        android:layout_marginLeft="@dimen/forty_six"
+        android:layout_marginRight="@dimen/forty_six"
+        android:layout_marginStart="@dimen/forty_six"
         android:gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_rect_white_rad_twelve_str_one"
+            android:background="@drawable/bg_rect_white_rad_twelve_str_gray_pri"
             android:orientation="vertical"
             android:paddingBottom="@dimen/twenty_two"
             android:paddingEnd="@dimen/sixteen"
@@ -53,7 +53,7 @@
                 android:id="@+id/etUsernameLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/state_rect_gray_qui_rad_ten_str_green_one"
+                android:background="@drawable/state_rect_gray_qui_rad_five"
                 android:gravity="center"
                 android:hint="Username"
                 android:imeOptions="actionNext"
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/sixteen"
-                android:background="@drawable/state_rect_gray_qui_rad_ten_str_green_one"
+                android:background="@drawable/state_rect_gray_qui_rad_five"
                 android:gravity="center"
                 android:hint="Password"
                 android:imeOptions="actionDone"
@@ -99,7 +99,7 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty_two"
                 codePan:typeface="@string/proxima_nova_bold"/>
-
+            
         </LinearLayout>
 
     </RelativeLayout>
@@ -107,7 +107,7 @@
     <ImageView
         android:id="@+id/ivPoweredByLogoLogin"
         android:layout_width="@dimen/ninety_five"
-        android:layout_height="@dimen/fourty_five"
+        android:layout_height="@dimen/forty_five"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/eighteen"

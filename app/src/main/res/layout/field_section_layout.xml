@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvTitleSec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/fifteen"
+        android:paddingEnd="@dimen/ten"
+        android:paddingLeft="@dimen/ten"
+        android:paddingRight="@dimen/ten"
+        android:paddingStart="@dimen/ten"
+        android:paddingTop="@dimen/fifteen"
+        android:text="TITLE"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/eighteen"
+        codePan:typeface="@string/proxima_nova_bold"/>
+
+    <View
+        android:id="@+id/vDividerSec"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/one"
+        android:layout_below="@+id/tvTitleSec"
+        android:background="@color/green"/>
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvDescSec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vDividerSec"
+        android:paddingBottom="@dimen/five"
+        android:paddingEnd="@dimen/ten"
+        android:paddingLeft="@dimen/ten"
+        android:paddingRight="@dimen/ten"
+        android:paddingStart="@dimen/ten"
+        android:paddingTop="@dimen/fifteen"
+        android:text="Description"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+</RelativeLayout>

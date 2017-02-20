@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/ten">
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvQuestionDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/five"
+        android:text="Question"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvQuestionDate"
+        android:background="@drawable/bg_rect_gray_qui_rad_three">
+
+        <com.codepan.widget.CodePanButton
+            android:id="@+id/btnCalendarDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/state_rect_trans_rad_three"
+            android:gravity="left"
+            android:padding="@dimen/ten"
+            android:text="@string/date"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/seventeen"
+            codePan:typeface="@string/proxima_nova_light"/>
+
+        <ImageView
+            android:layout_width="@dimen/twenty"
+            android:layout_height="@dimen/twenty_one"
+            android:layout_gravity="center_vertical|end"
+            android:layout_margin="@dimen/ten"
+            android:src="@drawable/ic_calendar"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

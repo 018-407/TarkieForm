@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingEnd="@dimen/ten"
+    android:paddingLeft="@dimen/ten"
+    android:paddingRight="@dimen/ten"
+    android:paddingStart="@dimen/ten"
+    android:paddingTop="@dimen/ten">
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvQuestionMs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/five"
+        android:text="Question"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+    <LinearLayout
+        android:id="@+id/llChoicesMs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvQuestionMs"
+        android:orientation="vertical"/>
+
+</RelativeLayout>

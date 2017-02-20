@@ -1,6 +1,7 @@
 package com.mobileoptima.callback;
 
 import com.codepan.database.SQLiteAdapter;
+import com.mobileoptima.object.ChoiceObj;
 
 public class Interface {
 
@@ -14,5 +15,9 @@ public class Interface {
 
 	public interface OnLoginCallback {
 		void onLogin(String empID);
+	}
+
+	public interface OnOptionSelectedCallback {
+		void onOptionSelected(ChoiceObj obj);
 	}
 }

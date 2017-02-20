@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/ten">
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvQuestionYon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/five"
+        android:text="Question"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/seventeen"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+    <LinearLayout
+        android:id="@+id/llYon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvQuestionYon"
+        android:background="@drawable/bg_rect_gray_qui_rad_three_str_gray_qua"
+        android:orientation="horizontal">
+
+        <com.codepan.widget.CodePanButton
+            android:id="@+id/btnNoYon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/state_rect_trans_rad_three_left"
+            android:padding="@dimen/nine"
+            android:text="@string/no"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/seventeen"
+            codePan:enableStatePressed="true"
+            codePan:textColorDisabled="@color/white"
+            codePan:textColorEnabled="@color/gray_sec"
+            codePan:typeface="@string/proxima_nova_light"/>
+
+        <com.codepan.widget.CodePanButton
+            android:id="@+id/btnYesYon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/state_rect_trans_rad_three_right"
+            android:padding="@dimen/nine"
+            android:text="@string/yes"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/seventeen"
+            codePan:enableStatePressed="true"
+            codePan:textColorDisabled="@color/white"
+            codePan:textColorEnabled="@color/gray_sec"
+            codePan:typeface="@string/proxima_nova_light"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="@dimen/one"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/llYon"
+        android:layout_alignTop="@+id/llYon"
+        android:layout_centerHorizontal="true"
+        android:background="@color/gray_qua"/>
+
+</RelativeLayout>
