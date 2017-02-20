@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
@@ -19,12 +20,25 @@ import java.util.ArrayList;
 public class OptionsFragment extends Fragment implements OnClickListener {
 
 	private OnOptionSelectedCallback optionSelectedCallback;
+	private OnFragmentCallback fragmentCallback;
 	private CodePanLabel tvTitleOptions;
 	private ArrayList<ChoiceObj> items;
 	private RelativeLayout rlOptions;
 	private LinearLayout llOptions;
 	private SQLiteAdapter db;
 	private String title;
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		setOnBackStack(true);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		setOnBackStack(false);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,16 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 
 	public void setOnOptionSelectedCallback(OnOptionSelectedCallback optionSelectedCallback) {
 		this.optionSelectedCallback = optionSelectedCallback;
+	}
+
+	public void setOnFragmentCallback(OnFragmentCallback fragmentCallback) {
+		this.fragmentCallback = fragmentCallback;
+	}
+
+	public void setOnBackStack(boolean isOnBackStack) {
+		if(fragmentCallback != null) {
+			fragmentCallback.onFragment(isOnBackStack);
+		}
 	}
 
 	@Override

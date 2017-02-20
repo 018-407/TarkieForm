@@ -1,9 +1,12 @@
 package com.mobileoptima.tarkieform;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableStringBuilder;
@@ -16,22 +19,27 @@ import android.widget.LinearLayout;
 
 import com.codepan.calendar.callback.Interface.OnPickDateCallback;
 import com.codepan.calendar.view.CalendarView;
+import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.codepan.utils.SpannableMap;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CodePanTextField;
+import com.mobileoptima.callback.Interface.OnGpsFixedCallback;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
+import com.mobileoptima.callback.Interface.OnOverrideCallback;
+import com.mobileoptima.callback.Interface.OnSignCallback;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.core.Data;
-import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.FieldObj;
 
 import java.util.ArrayList;
 
-public class PageFragment extends Fragment {
+public class PageFragment extends Fragment implements OnFragmentCallback {
 
+	private OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
 	private ArrayList<FieldObj> fieldList;
 	private ViewGroup container;
@@ -138,6 +146,7 @@ public class PageFragment extends Fragment {
 							@Override
 							public void onClick(View view) {
 								CalendarView calendar = new CalendarView();
+								calendar.setOnFragmentCallback(PageFragment.this);
 								calendar.setOnPickDateCallback(new OnPickDateCallback() {
 									@Override
 									public void onPickDate(String date) {
@@ -170,6 +179,7 @@ public class PageFragment extends Fragment {
 								ArrayList<ChoiceObj> items = Data.loadChoices(db);
 								OptionsFragment options = new OptionsFragment();
 								options.setItems(items, obj.field);
+								options.setOnFragmentCallback(PageFragment.this);
 								options.setOnOptionSelectedCallback(new OnOptionSelectedCallback() {
 									@Override
 									public void onOptionSelected(ChoiceObj obj) {
@@ -247,6 +257,107 @@ public class PageFragment extends Fragment {
 						CodePanLabel tvDescLabel = (CodePanLabel) view.findViewById(R.id.tvDescLabel);
 						tvDescLabel.setText(obj.field);
 						break;
+					case FieldType.LINK:
+						view = inflater.inflate(R.layout.field_link_layout, container, false);
+						CodePanLabel tvQuestionLink = (CodePanLabel) view.findViewById(R.id.tvQuestionLink);
+						CodePanButton btnUrlLink = (CodePanButton) view.findViewById(R.id.btnUrlLink);
+						btnUrlLink.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								Intent intent = new Intent(Intent.ACTION_VIEW);
+								intent.setData(Uri.parse(obj.url));
+								startActivity(intent);
+							}
+						});
+						tvQuestionLink.setText(obj.field);
+						break;
+					case FieldType.GPS:
+						view = inflater.inflate(R.layout.field_gps_layout, container, false);
+						CodePanLabel tvQuestionGps = (CodePanLabel) view.findViewById(R.id.tvQuestionGps);
+						CodePanButton btnGetGps = (CodePanButton) view.findViewById(R.id.btnGetGps);
+						if(obj.isRequired) {
+							requiredField(tvQuestionGps, obj.field);
+						}
+						else {
+							tvQuestionGps.setText(obj.field);
+						}
+						btnGetGps.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								if(!CodePanUtils.isGpsEnabled(getActivity())) {
+									final AlertDialogFragment alert = new AlertDialogFragment();
+									alert.setDialogTitle("Location Services");
+									alert.setDialogMessage("Please enable GPS satellites and Google's location service to continue.");
+									alert.setOnFragmentCallback(PageFragment.this);
+									alert.setPositiveButton("Ok", new OnClickListener() {
+										@Override
+										public void onClick(View view) {
+											alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+											Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+											startActivity(intent);
+										}
+									});
+									alert.setNegativeButton("Cancel", new OnClickListener() {
+
+										@Override
+										public void onClick(View v) {
+											alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+										}
+									});
+									transaction = getActivity().getSupportFragmentManager().beginTransaction();
+									transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+											R.anim.fade_in, R.anim.fade_out);
+									transaction.add(R.id.rlMain, alert);
+									transaction.addToBackStack(null);
+									transaction.commit();
+								}
+								else {
+									SearchGpsFragment search = new SearchGpsFragment();
+									search.setOnGpsFixedCallback(new OnGpsFixedCallback() {
+										@Override
+										public void onGpsFixed(double latitude, double longitude) {
+										}
+									});
+									transaction = getActivity().getSupportFragmentManager().beginTransaction();
+									transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+											R.anim.fade_in, R.anim.fade_out);
+									transaction.add(R.id.rlMain, search);
+									transaction.addToBackStack(null);
+									transaction.commit();
+								}
+							}
+						});
+						break;
+					case FieldType.SIG:
+						view = inflater.inflate(R.layout.field_signature_layout, container, false);
+						CodePanLabel tvQuestionSignature = (CodePanLabel) view.findViewById(R.id.tvQuestionSignature);
+						CodePanButton btnAddSignature = (CodePanButton) view.findViewById(R.id.btnAddSignature);
+						if(obj.isRequired) {
+							requiredField(tvQuestionSignature, obj.field);
+						}
+						else {
+							tvQuestionSignature.setText(obj.field);
+						}
+						btnAddSignature.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								SignatureFragment signature = new SignatureFragment();
+								signature.setTitle(obj.field);
+								signature.setOnFragmentCallback(PageFragment.this);
+								signature.setOnSignCallback(new OnSignCallback() {
+									@Override
+									public void onSign(String fileName) {
+									}
+								});
+								transaction = getActivity().getSupportFragmentManager().beginTransaction();
+								transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+										R.anim.fade_in, R.anim.fade_out);
+								transaction.add(R.id.rlMain, signature);
+								transaction.addToBackStack(null);
+								transaction.commit();
+							}
+						});
+						break;
 				}
 				llPage.addView(view);
 			}
@@ -266,6 +377,18 @@ public class PageFragment extends Fragment {
 			list.add(new SpannableMap(length, length + 1, Color.RED));
 			SpannableStringBuilder ssb = CodePanUtils.customizeText(list, name);
 			label.setText(ssb);
+		}
+	}
+
+
+	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
+		this.overrideCallback = overrideCallback;
+	}
+
+	@Override
+	public void onFragment(boolean status) {
+		if(overrideCallback != null) {
+			overrideCallback.onOverride(!status);
 		}
 	}
 }

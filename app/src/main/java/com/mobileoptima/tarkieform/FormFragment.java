@@ -65,6 +65,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		incrementPage();
 		PageFragment first = new PageFragment();
 		first.setPage(page);
+		first.setOnOverrideCallback(overrideCallback);
 		transaction = manager.beginTransaction();
 		transaction.setCustomAnimations(0, R.anim.slide_out_rtl,
 				R.anim.slide_in_ltr, R.anim.slide_out_ltr);
@@ -88,6 +89,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				incrementPage();
 				PageFragment next = new PageFragment();
 				next.setPage(page);
+				next.setOnOverrideCallback(overrideCallback);
 				transaction = manager.beginTransaction();
 				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
 						R.anim.slide_in_ltr, R.anim.slide_out_ltr);

@@ -20,4 +20,12 @@ public class Interface {
 	public interface OnOptionSelectedCallback {
 		void onOptionSelected(ChoiceObj obj);
 	}
+
+	public interface OnGpsFixedCallback {
+		void onGpsFixed(double latitude, double longitude);
+	}
+
+	public interface OnSignCallback {
+		void onSign(String fileName);
+	}
 }

@@ -6,5 +6,6 @@ public class FieldObj {
 	public String type;
 	public String field;
 	public String description;
+	public String url;
 	public boolean isRequired;
 }

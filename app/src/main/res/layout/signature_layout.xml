@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/rlSignature"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_trans_sixty"
+    android:clickable="true"
+    android:padding="@dimen/twenty">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_rect_white_rad_five"
+        android:padding="@dimen/ten">
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvTitleSignature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/five"
+            android:text="@string/signature"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/seventeen"
+            codePan:typeface="@string/proxima_nova_light"/>
+
+        <com.codepan.widget.SignatureView
+            android:id="@+id/svAddSignature"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/one_hundred_thirty"
+            android:layout_below="@+id/tvTitleSignature"
+            android:layout_marginTop="@dimen/ten"
+            android:background="@drawable/bg_layer_rect_white_rad_five_str_green"/>
+
+        <LinearLayout
+            android:id="@+id/llButtonSignature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/svAddSignature"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/ten"
+            android:orientation="horizontal">
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnCancelSignature"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/state_rect_gray_pri_rad_five"
+                android:minWidth="@dimen/one_hundred_twenty"
+                android:paddingBottom="@dimen/ten"
+                android:paddingLeft="@dimen/five"
+                android:paddingRight="@dimen/five"
+                android:paddingTop="@dimen/ten"
+                android:text="Cancel"
+                android:textColor="@color/white"
+                android:textSize="@dimen/eighteen"
+                android:visibility="visible"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnSaveSignature"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/five"
+                android:layout_marginStart="@dimen/five"
+                android:background="@drawable/state_rect_green_rad_five"
+                android:minWidth="@dimen/one_hundred_twenty"
+                android:paddingBottom="@dimen/ten"
+                android:paddingLeft="@dimen/five"
+                android:paddingRight="@dimen/five"
+                android:paddingTop="@dimen/ten"
+                android:text="Save"
+                android:textColor="@color/white"
+                android:textSize="@dimen/eighteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

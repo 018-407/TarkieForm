@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_trans_sixty"
+    android:clickable="true"
+    android:padding="@dimen/thirty">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_rect_white_rad_twelve_str_gray_pri"
+        android:padding="@dimen/fifteen">
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvTitleSearchGps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/gps_title"
+            android:textColor="@color/blue"
+            android:textSize="@dimen/nineteen"
+            codePan:typeface="@string/proxima_nova_bold"/>
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvMessageSearchGps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitleSearchGps"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/ten"
+            android:gravity="center"
+            android:text="@string/gps_message"
+            android:textColor="@color/gray_sec"
+            android:textSize="@dimen/eighteen"
+            codePan:typeface="@string/proxima_nova_light"/>
+
+        <ImageView
+            android:id="@+id/ivLoadingSearchGps"
+            android:layout_width="@dimen/fifty_five"
+            android:layout_height="@dimen/fifty_five"
+            android:layout_below="@+id/tvMessageSearchGps"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/ten"
+            android:src="@drawable/ic_loading_dark"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -91,6 +91,24 @@ public class Data {
 		section2.description = "This is a section heading, you can add description here.";
 		section2.type = FieldType.SEC;
 		fieldList.add(section2);
+		FieldObj link = new FieldObj();
+		link.ID = "10";
+		link.field = "Tarkie Website";
+		link.url = "https://www.tarkie.com/";
+		link.type = FieldType.LINK;
+		fieldList.add(link);
+		FieldObj gps = new FieldObj();
+		gps.ID = "11";
+		gps.field = "Get Location";
+		gps.isRequired = true;
+		gps.type = FieldType.GPS;
+		fieldList.add(gps);
+		FieldObj signature = new FieldObj();
+		signature.ID = "11";
+		signature.field = "Please affix your signature.";
+		signature.isRequired = true;
+		signature.type = FieldType.SIG;
+		fieldList.add(signature);
 		return fieldList;
 	}
 

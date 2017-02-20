@@ -5,7 +5,7 @@
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_trans_thirty"
+    android:background="@color/black_trans_sixty"
     android:clickable="true"
     android:padding="@dimen/twenty_five">
 
