@@ -49,7 +49,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 		lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				FormObj obj =  formList.get(i);
+				FormObj obj = formList.get(i);
 				FormFragment form = new FormFragment();
 				form.setForm(obj);
 				form.setOnOverrideCallback(MainActivity.this);
@@ -179,29 +179,29 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 		}
 	});
 
-	public void setOnBackPressedCallback(OnBackPressedCallback backPressedCallback){
+	public void setOnBackPressedCallback(OnBackPressedCallback backPressedCallback) {
 		this.backPressedCallback = backPressedCallback;
 	}
 
 	@Override
 	public void onBackPressed() {
-		if(isInitialized){
-			if(isOverridden){
-				if(backPressedCallback != null){
+		if(isInitialized) {
+			if(isOverridden) {
+				if(backPressedCallback != null) {
 					backPressedCallback.onBackPressed();
 				}
 			}
-			else{
+			else {
 				super.onBackPressed();
 			}
 		}
-		else{
+		else {
 			this.finish();
 		}
 	}
 
-	public void authenticate(){
-		if(TarkieFormLib.getAPIKey(db).isEmpty()) {
+	public void authenticate() {
+		if(!TarkieFormLib.isAuthorized(db)) {
 			AuthorizationFragment authorization = new AuthorizationFragment();
 			authorization.setOnOverrideCallback(this);
 			authorization.setOnRefreshCallback(this);
@@ -209,17 +209,18 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 			transaction.replace(R.id.rlMain, authorization);
 			transaction.addToBackStack(null);
 			transaction.commit();
-			return;
 		}
-		if(!TarkieFormLib.isLoggedIn(db)) {
-			LoginFragment login = new LoginFragment();
-			login.setOnOverrideCallback(this);
-			login.setOnRefreshCallback(this);
-//			login.setOnLoginCallback(this);
-			transaction = getSupportFragmentManager().beginTransaction();
-			transaction.replace(R.id.rlMain, login);
-			transaction.addToBackStack(null);
-			transaction.commit();
+		else {
+			if(!TarkieFormLib.isLoggedIn(db)) {
+				LoginFragment login = new LoginFragment();
+				login.setOnOverrideCallback(this);
+				login.setOnRefreshCallback(this);
+//				login.setOnLoginCallback(this);
+				transaction = getSupportFragmentManager().beginTransaction();
+				transaction.replace(R.id.rlMain, login);
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
 		}
 	}
 }

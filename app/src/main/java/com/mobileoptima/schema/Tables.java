@@ -2,7 +2,8 @@ package com.mobileoptima.schema;
 
 public class Tables {
 	public enum TB {
-		API_KEY
+		API_KEY,
+		SYNC_BATCH
 	}
 
 	public static String create(TB tb) {
@@ -10,12 +11,14 @@ public class Tables {
 		String statement = null;
 		switch(tb) {
 			case API_KEY:
-				statement = "CREATE TABLE IF NOT EXISTS " + table + "(" +
-						"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" +
-						", apiKey TEXT" +
-						", authorizationCode TEXT" +
-						", deviceID TEXT" +
-						")";
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, apiKey TEXT, " +
+						"authorizationCode TEXT, deviceID TEXT)";
+				break;
+			case SYNC_BATCH:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"syncBatchID TEXT)";
 				break;
 		}
 		return statement;
@@ -26,6 +29,9 @@ public class Tables {
 		switch(tb) {
 			case API_KEY:
 				name = "api_key_tb";
+				break;
+			case SYNC_BATCH:
+				name = "sync_batch_tb";
 				break;
 		}
 		return name;

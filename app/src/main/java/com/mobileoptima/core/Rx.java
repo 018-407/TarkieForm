@@ -2,62 +2,98 @@ package com.mobileoptima.core;
 
 import android.util.Log;
 
+import com.codepan.database.FieldValue;
 import com.codepan.database.SQLiteAdapter;
+import com.codepan.database.SQLiteBinder;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.callback.Interface.OnErrorCallback;
 import com.mobileoptima.constant.App;
-import com.mobileoptima.session.Session;
+import com.mobileoptima.schema.Tables;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 
 public class Rx {
-	public static boolean authorizeDevice(SQLiteAdapter db, String authorizationCode, OnErrorCallback errorCallback) {
-		LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-		map.put("api_key", App.API_KEY);
-		map.put("authorization_code", authorizationCode);
-		map.put("tablet_id", Session.DEVICE_ID);
-		map.put("os_type", "ANDROID");
-		String params = new JSONObject(map).toString();
-		String response = CodePanUtils.getHttpResponse(App.WEB_URL + "authorize-device", params, 5000);
-		Log.e("authorization PARAMS", params);
-		Log.e("authorization RESPONSE", response);
+	public static boolean authorizeDevice(SQLiteAdapter db, String authorizationCode, String deviceID,
+										  OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		String action = "authorize-device";
+		String url = App.WEB_URL + action;
+		String response = null;
+		String params = null;
 		try {
-			JSONObject jsonObject = new JSONObject(response);
-			JSONArray initArray = jsonObject.getJSONArray("init");
-			for(int x = 0; x < initArray.length(); x++) {
-				JSONObject initObj = initArray.getJSONObject(x);
-				String status = initObj.getString("status");
-				int recNo = initObj.getInt("recno");
-				String message = initObj.getString("message");
-				if(status.equals("ok")) {
-					JSONArray dataArray = jsonObject.getJSONArray("data");
-					for(int y = 0; y < dataArray.length(); y++) {
-						JSONObject dataObj = dataArray.getJSONObject(y);
-						if(TarkieFormLib.saveAPIKey(db, dataObj.getString("request_code"), authorizationCode, Session.DEVICE_ID)) {
-							return true;
-						}
+			JSONObject paramsObj = new JSONObject();
+			paramsObj.put("tablet_id", deviceID);
+			paramsObj.put("authorization_code", authorizationCode);
+			paramsObj.put("api_key", App.API_KEY);
+			paramsObj.put("os_type", App.OS_TYPE);
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.getHttpResponse(url, params, 5000);
+			Log.e("authorization PARAMS", params);
+			Log.e("authorization RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
 						if(errorCallback != null) {
-							errorCallback.onError("Failed to save authorization code.", params, response, true);
+							errorCallback.onError(message, params, response, true);
 						}
+						return false;
 					}
 				}
-				if(status.equals("error") && message != null && !message.isEmpty()) {
-					if(errorCallback != null) {
-						errorCallback.onError(message, params, response, true);
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				String table = Tables.getName(Tables.TB.API_KEY);
+				JSONArray dataArray = responseObj.getJSONArray("data");
+				for(int d = 0; d < dataArray.length(); d++) {
+					JSONObject dataObj = dataArray.getJSONObject(d);
+					String apiKey = dataObj.getString("request_code");
+					String syncBatchID = dataObj.getString("sync_batch_id");
+					TarkieFormLib.updateSyncBatchID(db, syncBatchID);
+					ArrayList<FieldValue> list = new ArrayList<>();
+					list.add(new FieldValue("apiKey", apiKey));
+					list.add(new FieldValue("authorizationCode", authorizationCode));
+					list.add(new FieldValue("deviceID", deviceID));
+					String query = "SELECT ID FROM " + table + " WHERE ID = 1";
+					if(!db.isRecordExists(query)) {
+						binder.insert(table, list);
+					}
+					else {
+						binder.update(table, list, 1);
 					}
 				}
+				result = binder.finish();
 			}
 		}
 		catch(JSONException je) {
 			je.printStackTrace();
-			if(errorCallback != null){
+			if(errorCallback != null) {
 				errorCallback.onError(je.getMessage(), params, response, false);
 			}
+			return false;
 		}
-		return false;
+		return result;
 	}
 }

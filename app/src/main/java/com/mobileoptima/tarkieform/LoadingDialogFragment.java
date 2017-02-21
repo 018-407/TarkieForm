@@ -66,7 +66,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 	public void onResume() {
 		super.onResume();
 		if(isPause && isDone) {
-			showResult(message);
+			showResult(title, message);
 		}
 		isPause = false;
 	}
@@ -86,23 +86,28 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 		progressLoadingDialog = (ProgressWheel) view.findViewById(R.id.progressLoadingDialog);
 		tvTitleLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvTitleLoadingDialog);
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
-		setMax(1);
-		title = "Authorizing Device...";
-		successMsg = "Authorization successful.";
-		failedMsg = "Failed to authorize the device.";
-		String authorizationCode = bundle.getString(Key.AUTH_CODE);
-		authorizeDevice(db, authorizationCode);
-		tvTitleLoadingDialog.setText(title);
+		switch(action) {
+			case AUTHORIZE_DEVICE:
+				setMax(1);
+				title = "Authorizing Device...";
+				successMsg = "Authorization successful.";
+				failedMsg = "Failed to authorize the device.";
+				String authorizationCode = bundle.getString(Key.AUTH_CODE);
+				String deviceID = CodePanUtils.getDeviceID(db.getContext());
+				authorizeDevice(db, authorizationCode, deviceID);
+				tvTitleLoadingDialog.setText(title);
+				break;
+		}
 		return view;
 	}
 
-	public void authorizeDevice(final SQLiteAdapter db, final String authorizationCode) {
+	public void authorizeDevice(final SQLiteAdapter db, final String authorizationCode, final String deviceID) {
 		bg = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Looper.prepare();
 				try {
-					result = Rx.authorizeDevice(db, authorizationCode, getErrorCallback());
+					result = Rx.authorizeDevice(db, authorizationCode, deviceID, getErrorCallback());
 					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
 				}
@@ -124,7 +129,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 					message = successMsg;
 					isDone = true;
 					if(!isPause) {
-						showResult(message);
+						showResult(title, message);
 					}
 				}
 			}
@@ -132,7 +137,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 				isDone = true;
 				message = error != null ? error : failedMsg;
 				if(!isPause) {
-					showResult(message);
+					showResult(title, message);
 				}
 			}
 			return true;
@@ -188,12 +193,11 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 		}
 	}
 
-	public void showResult(String message) {
+	public void showResult(String title, String message) {
 		if(!inOtherFragment) {
 			getActivity().getSupportFragmentManager().popBackStack();
 			final AlertDialogFragment alert = new AlertDialogFragment();
-//			alert.setStatusBarColorInActive(R.color.sv_blue_sec);
-			alert.setStatusBarColorActive(R.color.black);
+			alert.setDialogTitle(title);
 			alert.setDialogMessage(message);
 			alert.setPositiveButton("Okay", new OnClickListener() {
 				@Override
@@ -247,10 +251,8 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 				}
 			});
 			transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//			if(Settings.ENABLE_TRANSITION) {
-//				transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
-//						R.anim.fade_in, R.anim.fade_out);
-//			}
+			transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+					R.anim.fade_in, R.anim.fade_out);
 			transaction.add(R.id.rlMain, alert);
 			transaction.addToBackStack(null);
 			transaction.commit();

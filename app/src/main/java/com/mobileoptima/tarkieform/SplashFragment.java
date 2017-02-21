@@ -160,7 +160,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 
 	public void authenticate() {
 		getActivity().getSupportFragmentManager().popBackStack();
-		if(TarkieFormLib.getAPIKey(db).isEmpty()) {
+		if(!TarkieFormLib.isAuthorized(db)) {
 			AuthorizationFragment authorization = new AuthorizationFragment();
 			authorization.setOnOverrideCallback(overrideCallback);
 			authorization.setOnRefreshCallback(refreshCallback);
@@ -168,17 +168,18 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 			transaction.replace(R.id.rlMain, authorization);
 			transaction.addToBackStack(null);
 			transaction.commit();
-			return;
 		}
-		if(!TarkieFormLib.isLoggedIn(db)) {
-			LoginFragment login = new LoginFragment();
-			login.setOnOverrideCallback(overrideCallback);
-			login.setOnRefreshCallback(refreshCallback);
-			login.setOnLoginCallback(loginCallback);
-			transaction = getActivity().getSupportFragmentManager().beginTransaction();
-			transaction.replace(R.id.rlMain, login);
-			transaction.addToBackStack(null);
-			transaction.commit();
+		else {
+			if(!TarkieFormLib.isLoggedIn(db)) {
+				LoginFragment login = new LoginFragment();
+				login.setOnOverrideCallback(overrideCallback);
+				login.setOnRefreshCallback(refreshCallback);
+				//login.setOnLoginCallback(loginCallback);
+				transaction = getActivity().getSupportFragmentManager().beginTransaction();
+				transaction.replace(R.id.rlMain, login);
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
 		}
 	}
 }
