@@ -16,7 +16,7 @@ import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.object.FormObj;
 
-public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback {
+public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback{
 
 	private CodePanButton btnNextForm, btnBackForm;
 	private OnOverrideCallback overrideCallback;
@@ -120,4 +120,9 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		getActivity().getSupportFragmentManager().popBackStack();
 		decrementPage();
 	}
+
+	public OnBackPressedCallback getOnBackPressedCallback() {
+		return this;
+	}
+
 }

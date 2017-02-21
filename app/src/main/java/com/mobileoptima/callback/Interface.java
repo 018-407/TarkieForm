@@ -2,6 +2,10 @@ package com.mobileoptima.callback;
 
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.GpsObj;
+import com.mobileoptima.object.ImageObj;
+
+import java.util.ArrayList;
 
 public class Interface {
 
@@ -26,10 +30,18 @@ public class Interface {
 	}
 
 	public interface OnGpsFixedCallback {
-		void onGpsFixed(double latitude, double longitude);
+		void onGpsFixed(GpsObj gps);
 	}
 
 	public interface OnSignCallback {
 		void onSign(String fileName);
+	}
+
+	public interface OnCameraDoneCallback{
+		void onCameraDone(ArrayList<ImageObj> imageList);
+	}
+
+	public interface OnDeletePhotoCallback{
+		void onDeletePhoto(int position);
 	}
 }

@@ -1,6 +1,7 @@
 package com.mobileoptima.tarkieform;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,13 +9,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CheckBox;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.codepan.calendar.callback.Interface.OnPickDateCallback;
@@ -26,14 +31,20 @@ import com.codepan.utils.SpannableMap;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CodePanTextField;
+import com.mobileoptima.callback.Interface.OnCameraDoneCallback;
+import com.mobileoptima.callback.Interface.OnDeletePhotoCallback;
 import com.mobileoptima.callback.Interface.OnGpsFixedCallback;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.callback.Interface.OnSignCallback;
+import com.mobileoptima.constant.App;
 import com.mobileoptima.constant.FieldType;
+import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.object.ChoiceObj;
 import com.mobileoptima.object.FieldObj;
+import com.mobileoptima.object.GpsObj;
+import com.mobileoptima.object.ImageObj;
 
 import java.util.ArrayList;
 
@@ -42,6 +53,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 	private OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
 	private ArrayList<FieldObj> fieldList;
+	private FragmentManager manager;
 	private ViewGroup container;
 	private LinearLayout llPage;
 	private SQLiteAdapter db;
@@ -50,6 +62,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		manager = getActivity().getSupportFragmentManager();
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
 	}
@@ -154,7 +167,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 										btnCalendarDate.setText(selected);
 									}
 								});
-								transaction = getActivity().getSupportFragmentManager().beginTransaction();
+								transaction = manager.beginTransaction();
 								transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 										R.anim.fade_in, R.anim.fade_out);
 								transaction.add(R.id.rlMain, calendar);
@@ -186,7 +199,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 										btnOptionsDd.setText(obj.dDesc);
 									}
 								});
-								transaction = getActivity().getSupportFragmentManager().beginTransaction();
+								transaction = manager.beginTransaction();
 								transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 										R.anim.fade_in, R.anim.fade_out);
 								transaction.add(R.id.rlMain, options);
@@ -273,6 +286,9 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						break;
 					case FieldType.GPS:
 						view = inflater.inflate(R.layout.field_gps_layout, container, false);
+						final CodePanLabel tvStatusGps = (CodePanLabel) view.findViewById(R.id.tvStatusGps);
+						final CodePanLabel tvLatitudeGps = (CodePanLabel) view.findViewById(R.id.tvLatitudeGps);
+						final CodePanLabel tvLongitudeGps = (CodePanLabel) view.findViewById(R.id.tvLongitudeGps);
 						CodePanLabel tvQuestionGps = (CodePanLabel) view.findViewById(R.id.tvQuestionGps);
 						CodePanButton btnGetGps = (CodePanButton) view.findViewById(R.id.btnGetGps);
 						if(obj.isRequired) {
@@ -304,7 +320,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 											alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 										}
 									});
-									transaction = getActivity().getSupportFragmentManager().beginTransaction();
+									transaction = manager.beginTransaction();
 									transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 											R.anim.fade_in, R.anim.fade_out);
 									transaction.add(R.id.rlMain, alert);
@@ -312,18 +328,29 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 									transaction.commit();
 								}
 								else {
-									SearchGpsFragment search = new SearchGpsFragment();
-									search.setOnGpsFixedCallback(new OnGpsFixedCallback() {
-										@Override
-										public void onGpsFixed(double latitude, double longitude) {
-										}
-									});
-									transaction = getActivity().getSupportFragmentManager().beginTransaction();
-									transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
-											R.anim.fade_in, R.anim.fade_out);
-									transaction.add(R.id.rlMain, search);
-									transaction.addToBackStack(null);
-									transaction.commit();
+									if(CodePanUtils.withGooglePlayServices(getActivity())) {
+										SearchGpsFragment search = new SearchGpsFragment();
+										search.setOnFragmentCallback(PageFragment.this);
+										search.setOnGpsFixedCallback(new OnGpsFixedCallback() {
+											@Override
+											public void onGpsFixed(GpsObj gps) {
+												String status = "Location Acquired";
+												String latitude = "Latitude: " + gps.latitude;
+												String longitude = "Longitude: " + gps.longitude;
+												tvStatusGps.setText(status);
+												tvLatitudeGps.setText(latitude);
+												tvLongitudeGps.setText(longitude);
+												tvLatitudeGps.setVisibility(View.VISIBLE);
+												tvLongitudeGps.setVisibility(View.VISIBLE);
+											}
+										});
+										transaction = manager.beginTransaction();
+										transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+												R.anim.fade_in, R.anim.fade_out);
+										transaction.add(R.id.rlMain, search);
+										transaction.addToBackStack(null);
+										transaction.commit();
+									}
 								}
 							}
 						});
@@ -349,10 +376,45 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 									public void onSign(String fileName) {
 									}
 								});
-								transaction = getActivity().getSupportFragmentManager().beginTransaction();
+								transaction = manager.beginTransaction();
 								transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 										R.anim.fade_in, R.anim.fade_out);
 								transaction.add(R.id.rlMain, signature);
+								transaction.addToBackStack(null);
+								transaction.commit();
+							}
+						});
+						break;
+					case FieldType.PHOTO:
+						view = inflater.inflate(R.layout.field_photo_layout, container, false);
+						CodePanLabel tvQuestionPhoto = (CodePanLabel) view.findViewById(R.id.tvQuestionPhoto);
+						CodePanButton btnAddPhoto = (CodePanButton) view.findViewById(R.id.btnAddPhoto);
+						final LinearLayout llGridPhoto = (LinearLayout) view.findViewById(R.id.llGridPhoto);
+						if(obj.isRequired) {
+							requiredField(tvQuestionPhoto, obj.field);
+						}
+						else {
+							tvQuestionPhoto.setText(obj.field);
+						}
+						btnAddPhoto.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								FormFragment form = (FormFragment) manager.findFragmentByTag(Tag.FORM);
+								CameraFragment camera = new CameraFragment();
+								camera.setOnBackPressedCallback(form.getOnBackPressedCallback());
+								camera.setOnOverrideCallback(overrideCallback);
+								camera.setOnFragmentCallback(PageFragment.this);
+								camera.setOnCameraDoneCallback(new OnCameraDoneCallback() {
+									@Override
+									public void onCameraDone(ArrayList<ImageObj> imageList) {
+										updatePhotoGrid(llGridPhoto, imageList);
+									}
+								});
+								transaction = manager.beginTransaction();
+								transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+										R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+								transaction.add(R.id.rlMain, camera);
+								transaction.hide(form);
 								transaction.addToBackStack(null);
 								transaction.commit();
 							}
@@ -369,6 +431,77 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 		this.page = page;
 	}
 
+	public void updatePhotoGrid(final LinearLayout llGridPhoto, final ArrayList<ImageObj> imageList) {
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		llGridPhoto.removeAllViews();
+		for(ImageObj obj : imageList) {
+			View view = inflater.inflate(R.layout.photo_item, container, false);
+			CodePanButton btnPhoto = (CodePanButton) view.findViewById(R.id.btnPhoto);
+			ImageView ivPhoto = (ImageView) view.findViewById(R.id.ivPhoto);
+			int size = CodePanUtils.getWidth(view);
+			Bitmap bitmap = CodePanUtils.getBitmapThumbnails(getActivity(), App.FOLDER, obj.fileName, size);
+			ivPhoto.setImageBitmap(bitmap);
+			final int position = imageList.indexOf(obj);
+			imageList.get(position).bitmap = bitmap;
+			btnPhoto.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onPhotoGridItemClick(llGridPhoto, imageList, position);
+				}
+			});
+			llGridPhoto.addView(view);
+		}
+		ViewParent parent = llGridPhoto.getParent();
+		final HorizontalScrollView hsvPhoto = (HorizontalScrollView) parent.getParent();
+		hsvPhoto.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View view, int l, int t, int r, int b, int ol,
+									   int ot, int or, int ob) {
+				hsvPhoto.removeOnLayoutChangeListener(this);
+				hsvPhoto.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+			}
+		});
+	}
+
+	public void onPhotoGridItemClick(final LinearLayout llGridPhoto, final ArrayList<ImageObj> imageList, int position) {
+		FormFragment form = (FormFragment) manager.findFragmentByTag(Tag.FORM);
+		ImagePreviewFragment imagePreview = new ImagePreviewFragment();
+		imagePreview.setImageList(imageList, position);
+		imagePreview.setOnDeletePhotoCallback(new OnDeletePhotoCallback() {
+			@Override
+			public void onDeletePhoto(int position) {
+				imageList.remove(position);
+				llGridPhoto.removeViewAt(position);
+				if(imageList.size() > 0) {
+					invalidateViews(llGridPhoto, imageList);
+				}
+			}
+		});
+		imagePreview.setOnFragmentCallback(PageFragment.this);
+		transaction = getActivity().getSupportFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+				R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+		transaction.add(R.id.rlMain, imagePreview);
+		transaction.hide(form);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
+
+	public void invalidateViews(final LinearLayout llGridPhoto, final ArrayList<ImageObj> imageList) {
+		int count = llGridPhoto.getChildCount();
+		for(int i = 0; i < count; i++) {
+			final int position = i;
+			View view = llGridPhoto.getChildAt(i);
+			CodePanButton btnPhoto = (CodePanButton) view.findViewById(R.id.btnPhoto);
+			btnPhoto.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onPhotoGridItemClick(llGridPhoto, imageList, position);
+				}
+			});
+		}
+	}
+
 	public void requiredField(CodePanLabel label, String text) {
 		if(text != null) {
 			int length = text.length();
@@ -379,7 +512,6 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 			label.setText(ssb);
 		}
 	}
-
 
 	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
 		this.overrideCallback = overrideCallback;

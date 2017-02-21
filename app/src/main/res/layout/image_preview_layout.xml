@@ -8,13 +8,13 @@
     android:clickable="true">
 
     <RelativeLayout
-        android:id="@+id/rlHeaderForm"
+        android:id="@+id/rlHeaderImagePreview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue">
 
         <FrameLayout
-            android:id="@+id/flBackForm"
+            android:id="@+id/flBackImagePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -27,7 +27,7 @@
                 android:src="@drawable/ic_back"/>
 
             <com.codepan.widget.CodePanButton
-                android:id="@+id/btnBackForm"
+                android:id="@+id/btnBackImagePreview"
                 android:layout_width="@dimen/forty_eight"
                 android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
@@ -35,37 +35,35 @@
         </FrameLayout>
 
         <com.codepan.widget.CodePanLabel
-            android:id="@+id/tvForm"
+            android:id="@+id/tvImagePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/eighteen"
-            android:layout_marginRight="@dimen/eighteen"
-            android:layout_toEndOf="@+id/flBackForm"
-            android:layout_toLeftOf="@+id/flOptionsForm"
-            android:layout_toRightOf="@+id/flBackForm"
-            android:layout_toStartOf="@+id/flOptionsForm"
+            android:layout_toEndOf="@+id/flBackImagePreview"
+            android:layout_toLeftOf="@+id/flOptionsImagePreview"
+            android:layout_toRightOf="@+id/flBackImagePreview"
+            android:layout_toStartOf="@+id/flOptionsImagePreview"
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="@dimen/eighteen"
             codePan:typeface="@string/proxima_nova_light"/>
 
         <FrameLayout
-            android:id="@+id/flOptionsForm"
+            android:id="@+id/flOptionsImagePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true">
 
             <ImageView
-                android:layout_width="@dimen/four"
-                android:layout_height="@dimen/twenty"
+                android:layout_width="@dimen/eighteen"
+                android:layout_height="@dimen/twenty_one"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_options_light"/>
+                android:src="@drawable/ic_delete"/>
 
             <com.codepan.widget.CodePanButton
-                android:id="@+id/btnOptionsForm"
-                android:layout_width="@dimen/thirty"
+                android:id="@+id/btnDeleteImagePreview"
+                android:layout_width="@dimen/forty_eight"
                 android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
 
@@ -73,38 +71,10 @@
 
     </RelativeLayout>
 
-    <FrameLayout
-        android:id="@+id/flForm"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpImagePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/flNextForm"
-        android:layout_below="@+id/rlHeaderForm"/>
-
-    <FrameLayout
-        android:id="@+id/flNextForm"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/fifty_five"
-        android:layout_alignParentBottom="true"
-        android:background="@color/blue">
-
-        <com.codepan.widget.CodePanButton
-            android:id="@+id/btnNextForm"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/state_rect_trans_dark"
-            android:gravity="center"
-            android:text="@string/next"
-            android:textColor="@color/white"
-            android:textSize="@dimen/seventeen"
-            codePan:typeface="@string/proxima_nova_light"/>
-
-        <ImageView
-            android:layout_width="@dimen/eight"
-            android:layout_height="@dimen/fifteen"
-            android:layout_gravity="center_vertical|end"
-            android:layout_margin="@dimen/fifteen"
-            android:src="@drawable/ic_next_light"/>
-
-    </FrameLayout>
+        android:layout_below="@+id/rlHeaderImagePreview"/>
 
 </RelativeLayout>

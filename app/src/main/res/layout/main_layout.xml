@@ -73,7 +73,7 @@
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnOptionsMain"
-                android:layout_width="@dimen/twenty_five"
+                android:layout_width="@dimen/thirty"
                 android:layout_height="@dimen/forty_eight"
                 android:background="@drawable/state_rect_trans_dark"/>
 

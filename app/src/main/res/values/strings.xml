@@ -14,4 +14,7 @@
     <string name="gps_title">No GPS Signal</string>
     <string name="gps_message">Searching for GPS Signal. Please try going outside.</string>
     <string name="signature">Add Signature</string>
+    <string name="camera">Camera</string>
+    <string name="capture">Take Photo</string>
+    <string name="taken">Photos Taken</string>
 </resources>

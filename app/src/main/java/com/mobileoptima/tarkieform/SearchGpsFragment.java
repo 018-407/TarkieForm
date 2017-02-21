@@ -1,15 +1,14 @@
 package com.mobileoptima.tarkieform;
 
-import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,47 +18,47 @@ import android.widget.ImageView;
 
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.utils.CodePanUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.mobileoptima.callback.Interface.OnGpsFixedCallback;
+import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.object.GpsObj;
 
-public class SearchGpsFragment extends Fragment implements LocationListener {
+public class SearchGpsFragment extends Fragment implements LocationListener, ConnectionCallbacks,
+		OnConnectionFailedListener {
+
+	private final long FASTEST_UPDATE_INTERVAL = 1000;
+	private final long UPDATE_INTERVAL = 5000;
+	private final float ACCURACY = 100;
 
 	private boolean runThread, isGpsFixed, isPause;
 	private OnGpsFixedCallback gpsFixedCallback;
 	private OnFragmentCallback fragmentCallback;
 	private FragmentTransaction transaction;
-	private LocationManager locationManager;
+	private GoogleApiClient googleApiClient;
+	private LocationRequest locationRequest;
 	private ImageView ivLoadingSearchGps;
-	private double longitude, latitude;
-	private long lastMillis;
+	private long lastLocationUpdate;
+	private Location location;
 	private Animation anim;
+	private GpsObj gps;
 	private Thread bg;
 
 	@Override
 	public void onStart() {
 		super.onStart();
 		setOnBackStack(true);
-		if(locationManager != null) {
-			try {
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-			}
-			catch(SecurityException se) {
-				se.printStackTrace();
-			}
-		}
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
 		setOnBackStack(false);
-		if(locationManager != null) {
-			try {
-				locationManager.removeUpdates(this);
-			}
-			catch(SecurityException se) {
-				se.printStackTrace();
-			}
-		}
 	}
 
 	@Override
@@ -80,7 +79,8 @@ public class SearchGpsFragment extends Fragment implements LocationListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+		buildGoogleApiClient();
+		googleApiClient.connect();
 	}
 
 	@Override
@@ -102,17 +102,15 @@ public class SearchGpsFragment extends Fragment implements LocationListener {
 				Looper.prepare();
 				try {
 					while(runThread) {
-						Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						if(location != null) {
-							if(location.getTime() != lastMillis) {
-								longitude = location.getLongitude();
-								latitude = location.getLatitude();
-								isGpsFixed = true;
-							}
-							lastMillis = location.getTime();
+						GpsObj obj = TarkieFormLib.getGPS(getActivity(), location, lastLocationUpdate, UPDATE_INTERVAL, ACCURACY);
+						if(obj.isValid) {
+							isGpsFixed = true;
+							gps = obj;
 						}
-						Thread.sleep(1000);
+						Log.e("ISVALID", ""+obj.isValid);
+						Log.e("ISCONNECTED", ""+googleApiClient.isConnected());
 						loaderHandler.sendMessage(loaderHandler.obtainMessage());
+						Thread.sleep(1000);
 					}
 				}
 				catch(SecurityException | InterruptedException e) {
@@ -150,22 +148,6 @@ public class SearchGpsFragment extends Fragment implements LocationListener {
 		}
 	}
 
-	@Override
-	public void onLocationChanged(Location location) {
-	}
-
-	@Override
-	public void onStatusChanged(String s, int i, Bundle bundle) {
-	}
-
-	@Override
-	public void onProviderEnabled(String s) {
-	}
-
-	@Override
-	public void onProviderDisabled(String s) {
-	}
-
 	public void showResult() {
 		getActivity().getSupportFragmentManager().popBackStack();
 		String title = "GPS Acquired";
@@ -178,7 +160,7 @@ public class SearchGpsFragment extends Fragment implements LocationListener {
 			public void onClick(View v) {
 				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 				if(gpsFixedCallback != null) {
-					gpsFixedCallback.onGpsFixed(latitude, longitude);
+					gpsFixedCallback.onGpsFixed(gps);
 				}
 			}
 		});
@@ -213,11 +195,73 @@ public class SearchGpsFragment extends Fragment implements LocationListener {
 	public void onDestroy() {
 		super.onDestroy();
 		stopSearch();
+		if(googleApiClient.isConnected()) {
+			stopLocationUpdates();
+		}
 	}
 
 	public void setOnBackStack(boolean isOnBackStack) {
 		if(fragmentCallback != null) {
 			fragmentCallback.onFragment(isOnBackStack);
 		}
+	}
+
+	protected synchronized void buildGoogleApiClient() {
+		googleApiClient = new GoogleApiClient.Builder(getActivity())
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+		createLocationRequest();
+	}
+
+	protected void createLocationRequest() {
+		locationRequest = new LocationRequest();
+		locationRequest.setInterval(UPDATE_INTERVAL);
+		locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	}
+
+	protected void startLocationUpdates() {
+		try {
+			LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+		}
+		catch(SecurityException se) {
+			se.printStackTrace();
+		}
+	}
+
+	protected void stopLocationUpdates() {
+		LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		this.lastLocationUpdate = SystemClock.elapsedRealtime();
+		this.location = location;
+	}
+
+	@Override
+	public void onConnected(Bundle bundle) {
+		Log.e("Google API Client", "connected");
+		if(location == null) {
+			try {
+				location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+			}
+			catch(SecurityException se) {
+				se.printStackTrace();
+			}
+		}
+		startLocationUpdates();
+	}
+
+	@Override
+	public void onConnectionSuspended(int i) {
+		googleApiClient.connect();
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		Log.e("Google API Client", "connection failed");
 	}
 }

@@ -17,6 +17,7 @@
         codePan:typeface="@string/proxima_nova_light"/>
 
     <FrameLayout
+        android:id="@+id/flGetGps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvQuestionGps"
@@ -35,6 +36,7 @@
                 android:src="@drawable/ic_gps"/>
 
             <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvStatusGps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/five"
@@ -55,5 +57,29 @@
             android:textSize="@dimen/seventeen"/>
 
     </FrameLayout>
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvLatitudeGps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flGetGps"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/fifteen"
+        android:visibility="gone"
+        codePan:typeface="@string/proxima_nova_light"/>
+
+    <com.codepan.widget.CodePanLabel
+        android:id="@+id/tvLongitudeGps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flGetGps"
+        android:layout_marginLeft="@dimen/ten"
+        android:layout_marginStart="@dimen/ten"
+        android:layout_toEndOf="@+id/tvLatitudeGps"
+        android:layout_toRightOf="@+id/tvLatitudeGps"
+        android:textColor="@color/gray_sec"
+        android:textSize="@dimen/fifteen"
+        android:visibility="gone"
+        codePan:typeface="@string/proxima_nova_light"/>
 
 </RelativeLayout>
