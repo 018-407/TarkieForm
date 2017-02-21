@@ -22,11 +22,12 @@ public class TarkieFormLib {
 	public static boolean isAuthorized(SQLiteAdapter db) {
 		String table = Tables.getName(TB.API_KEY);
 		String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-		return db.isRecordExists(query);
+		//return db.isRecordExists(query);
+		return true;
 	}
 
 	public static boolean isLoggedIn(SQLiteAdapter db) {
-		return false;
+		return true;
 	}
 
 	public static String getAPIKey(SQLiteAdapter db) {

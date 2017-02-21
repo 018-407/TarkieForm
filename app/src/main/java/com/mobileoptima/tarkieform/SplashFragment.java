@@ -1,8 +1,11 @@
 package com.mobileoptima.tarkieform;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -130,7 +133,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		else {
 			if(CodePanUtils.isPermissionHidden(getActivity())) {
 				if(!isRequired) {
-					//showPermissionNote();
+					showPermissionNote();
 				}
 			}
 			else {
@@ -181,5 +184,35 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 				transaction.commit();
 			}
 		}
+	}
+
+	public void showPermissionNote(){
+		final AlertDialogFragment alert = new AlertDialogFragment();
+		alert.setOnFragmentCallback(this);
+		alert.setDialogTitle("Permissions Required");
+		alert.setDialogMessage("Please enable the required permissions to continue using sevie.");
+		alert.setPositiveButton("Settings", new View.OnClickListener(){
+			@Override
+			public void onClick(View v){
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				Intent intent = new Intent();
+				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+				intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+				getActivity().startActivity(intent);
+			}
+		});
+		alert.setNegativeButton("Exit", new View.OnClickListener(){
+			@Override
+			public void onClick(View v){
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				getActivity().finish();
+			}
+		});
+		transaction = getActivity().getSupportFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+				R.anim.fade_in, R.anim.fade_out);
+		transaction.add(R.id.rlMain, alert);
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 }

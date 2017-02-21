@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.codepan.callback.Interface;
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
@@ -24,10 +23,10 @@ import com.codepan.widget.CodePanTextField;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module.Action;
-import com.mobileoptima.core.TarkieFormLib;
-import com.mobileoptima.session.Session;
 
-public class AuthorizationFragment extends Fragment implements OnClickListener, OnRefreshCallback, OnBackPressedCallback, OnFragmentCallback {
+public class AuthorizationFragment extends Fragment implements OnClickListener, OnRefreshCallback,
+		OnBackPressedCallback, OnFragmentCallback {
+
 	private CodePanButton btnAuthorization;
 	private CodePanTextField etCodeAuthorization;
 	private SQLiteAdapter db;

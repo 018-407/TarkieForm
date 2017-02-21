@@ -22,17 +22,17 @@ import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.Module.Action;
+import com.mobileoptima.constant.Process;
 import com.mobileoptima.core.Rx;
 
 import static com.codepan.callback.Interface.OnRefreshCallback;
 
-public class LoadingDialogFragment extends Fragment implements OnClickListener, OnErrorCallback,
+public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		OnBackPressedCallback, OnFragmentCallback {
 
-	private Action action;
 	private CodePanLabel tvTitleLoadingDialog, tvCountLoadingDialog;
-	private String successMsg, failedMsg, error, message, title;
 	private boolean result, isDone, isPause, inOtherFragment;
+	private String successMsg, failedMsg, error, message;
 	private OnFragmentCallback fragmentCallback;
 	private OnOverrideCallback overrideCallback;
 	private ProgressWheel progressLoadingDialog;
@@ -40,6 +40,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 	private FragmentTransaction transaction;
 	private int progress, max;
 	private SQLiteAdapter db;
+	private Action action;
 	private float percent;
 	private Bundle bundle;
 	private Thread bg;
@@ -66,7 +67,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 	public void onResume() {
 		super.onResume();
 		if(isPause && isDone) {
-			showResult(title, message);
+			showResult(message);
 		}
 		isPause = false;
 	}
@@ -89,13 +90,13 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 		switch(action) {
 			case AUTHORIZE_DEVICE:
 				setMax(1);
-				title = "Authorizing Device...";
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
+				String title = "Authorizing Device...";
+				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
 				authorizeDevice(db, authorizationCode, deviceID);
-				tvTitleLoadingDialog.setText(title);
 				break;
 		}
 		return view;
@@ -108,7 +109,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 				Looper.prepare();
 				try {
 					result = Rx.authorizeDevice(db, authorizationCode, deviceID, getErrorCallback());
-					Thread.sleep(250);
+					Thread.sleep(5000);
 					handler.sendMessage(handler.obtainMessage());
 				}
 				catch(Exception e) {
@@ -116,7 +117,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 				}
 			}
 		});
-		bg.setName(Module.getTitle(Action.AUTHORIZE_DEVICE));
+		bg.setName(Process.AUTHORIZATION);
 		bg.start();
 	}
 
@@ -129,7 +130,7 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 					message = successMsg;
 					isDone = true;
 					if(!isPause) {
-						showResult(title, message);
+						showResult(message);
 					}
 				}
 			}
@@ -137,18 +138,12 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 				isDone = true;
 				message = error != null ? error : failedMsg;
 				if(!isPause) {
-					showResult(title, message);
+					showResult(message);
 				}
 			}
 			return true;
 		}
 	});
-
-	@Override
-	public void onClick(View v) {
-		switch(v.getId()) {
-		}
-	}
 
 	public void updateProgress() {
 		progress++;
@@ -193,9 +188,10 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 		}
 	}
 
-	public void showResult(String title, String message) {
+	public void showResult(String message) {
 		if(!inOtherFragment) {
 			getActivity().getSupportFragmentManager().popBackStack();
+			String title = Module.getTitle(action);
 			final AlertDialogFragment alert = new AlertDialogFragment();
 			alert.setDialogTitle(title);
 			alert.setDialogMessage(message);
@@ -232,8 +228,9 @@ public class LoadingDialogFragment extends Fragment implements OnClickListener, 
 		if(!inOtherFragment) {
 			String title = Module.getTitle(action);
 			final AlertDialogFragment alert = new AlertDialogFragment();
-			alert.setOnFragmentCallback(this);
+			alert.setDialogTitle(title);
 			alert.setDialogMessage("Are you sure you want to cancel " + title + "?");
+			alert.setOnFragmentCallback(this);
 			alert.setPositiveButton("Yes", new OnClickListener() {
 				@Override
 				public void onClick(View v) {

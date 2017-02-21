@@ -12,8 +12,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
-        <!--android:background="@drawable/bg_rect_white_rad_ten">-->
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_rect_white_rad_twelve_str_gray_pri">
 
         <com.codepan.widget.CodePanLabel
             android:id="@+id/tvTitleLoadingDialog"
@@ -23,10 +23,9 @@
             android:gravity="center"
             android:padding="@dimen/ten"
             android:text="Loading..."
-            android:textColor="@color/white"
+            android:textColor="@color/blue"
             android:textSize="@dimen/nineteen"
-            codePan:typeface="@string/helvetica_neue_light"/>
-        <!--android:background="@drawable/bg_rect_blue_pri_rad_ten_top"-->
+            codePan:typeface="@string/proxima_nova_bold"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -39,6 +38,7 @@
                 android:layout_width="@dimen/seventy_five"
                 android:layout_height="@dimen/seventy_five"
                 android:layout_centerInParent="true"
+                progressWheel:barColor="@color/blue"
                 progressWheel:barWidth="@dimen/two"
                 progressWheel:circleRadius="@dimen/one_hundred"
                 progressWheel:contourColor="@color/transparent"
@@ -46,13 +46,12 @@
                 progressWheel:max="100"
                 progressWheel:progress="0"
                 progressWheel:progressIndeterminate="false"
+                progressWheel:rimColor="@color/gray_qua"
                 progressWheel:rimWidth="@dimen/two"
                 progressWheel:spinSpeed="@dimen/one"
                 progressWheel:text="0%"
+                progressWheel:textColor="@color/gray_sec"
                 progressWheel:textSize="@dimen/eighteen"/>
-            <!--progressWheel:barColor="@color/sv_blue_pri"-->
-            <!--progressWheel:rimColor="@color/sv_gray_sen"-->
-            <!--progressWheel:textColor="@color/sv_gray_pri"-->
 
             <com.codepan.widget.CodePanLabel
                 android:id="@+id/tvCountLoadingDialog"
@@ -60,9 +59,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/progressLoadingDialog"
                 android:text="0/0"
+                android:textColor="@color/gray_sec"
                 android:textSize="@dimen/fourteen"
                 codePan:typeface="@string/helvetica_neue_light"/>
-            <!--android:textColor="@color/sv_blue_pri"-->
 
         </RelativeLayout>
 

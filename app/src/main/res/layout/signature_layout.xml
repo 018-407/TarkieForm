@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/black_trans_sixty"
     android:clickable="true"
-    android:padding="@dimen/twenty">
+    android:padding="@dimen/ten">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
         <com.codepan.widget.SignatureView
             android:id="@+id/svAddSignature"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/one_hundred_thirty"
+            android:layout_height="@dimen/one_hundred_fifty"
             android:layout_below="@+id/tvTitleSignature"
             android:layout_marginTop="@dimen/ten"
             android:background="@drawable/bg_layer_rect_white_rad_five_str_green"/>
