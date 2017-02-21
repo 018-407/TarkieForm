@@ -24,6 +24,7 @@ import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.core.Data;
+import com.mobileoptima.core.TarkieFormLib;
 import com.mobileoptima.object.FormObj;
 
 import java.util.ArrayList;
@@ -109,6 +110,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 
 	@Override
 	public void onRefresh() {
+		authenticate();
 	}
 
 	@Override
@@ -195,6 +197,29 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 		}
 		else{
 			this.finish();
+		}
+	}
+
+	public void authenticate(){
+		if(TarkieFormLib.getAPIKey(db).isEmpty()) {
+			AuthorizationFragment authorization = new AuthorizationFragment();
+			authorization.setOnOverrideCallback(this);
+			authorization.setOnRefreshCallback(this);
+			transaction = getSupportFragmentManager().beginTransaction();
+			transaction.replace(R.id.rlMain, authorization);
+			transaction.addToBackStack(null);
+			transaction.commit();
+			return;
+		}
+		if(!TarkieFormLib.isLoggedIn(db)) {
+			LoginFragment login = new LoginFragment();
+			login.setOnOverrideCallback(this);
+			login.setOnRefreshCallback(this);
+//			login.setOnLoginCallback(this);
+			transaction = getSupportFragmentManager().beginTransaction();
+			transaction.replace(R.id.rlMain, login);
+			transaction.addToBackStack(null);
+			transaction.commit();
 		}
 	}
 }

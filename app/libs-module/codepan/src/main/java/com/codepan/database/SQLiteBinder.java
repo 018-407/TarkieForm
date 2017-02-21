@@ -272,16 +272,17 @@ public class SQLiteBinder {
 	}
 
 	public boolean finish() {
+		boolean result = false;
 		try {
 			db.setTransactionSuccessful();
+			result = true;
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		}
 		finally {
 			db.endTransaction();
 		}
-		return true;
+		return result;
 	}
 }

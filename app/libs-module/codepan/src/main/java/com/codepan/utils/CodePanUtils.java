@@ -110,6 +110,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -756,7 +757,7 @@ public class CodePanUtils {
 			connection.connect();
 			Writer out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
 			BufferedWriter writer = new BufferedWriter(out);
-			writer.write(URLEncoder.encode(params, "UTF-8"));
+			writer.write(params);
 			writer.flush();
 			writer.close();
 			if(connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {

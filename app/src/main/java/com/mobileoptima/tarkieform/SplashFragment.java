@@ -76,6 +76,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 					db.setOnCreateDatabaseCallback(SplashFragment.this);
 					db.setOnUpgradeDatabaseCallback(SplashFragment.this);
 					db.openConnection();
+					TarkieFormLib.createTables(db);
 					Thread.sleep(DELAY);
 					handler.sendMessage(handler.obtainMessage());
 				}
@@ -159,26 +160,25 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 
 	public void authenticate() {
 		getActivity().getSupportFragmentManager().popBackStack();
-		if(!TarkieFormLib.isAuthorized(db)) {
+		if(TarkieFormLib.getAPIKey(db).isEmpty()) {
 			AuthorizationFragment authorization = new AuthorizationFragment();
-//			authorization.setOnOverrideCallback(overrideCallback);
-//			authorization.setOnRefreshCallback(refreshCallback);
+			authorization.setOnOverrideCallback(overrideCallback);
+			authorization.setOnRefreshCallback(refreshCallback);
 			transaction = getActivity().getSupportFragmentManager().beginTransaction();
 			transaction.replace(R.id.rlMain, authorization);
 			transaction.addToBackStack(null);
 			transaction.commit();
+			return;
 		}
-		else {
-			if(!TarkieFormLib.isLoggedIn(db)) {
-				LoginFragment login = new LoginFragment();
-//				login.setOnOverrideCallback(overrideCallback);
-//				login.setOnRefreshCallback(refreshCallback);
-//				login.setOnLoginCallback(loginCallback);
-				transaction = getActivity().getSupportFragmentManager().beginTransaction();
-				transaction.replace(R.id.rlMain, login);
-				transaction.addToBackStack(null);
-				transaction.commit();
-			}
+		if(!TarkieFormLib.isLoggedIn(db)) {
+			LoginFragment login = new LoginFragment();
+			login.setOnOverrideCallback(overrideCallback);
+			login.setOnRefreshCallback(refreshCallback);
+			login.setOnLoginCallback(loginCallback);
+			transaction = getActivity().getSupportFragmentManager().beginTransaction();
+			transaction.replace(R.id.rlMain, login);
+			transaction.addToBackStack(null);
+			transaction.commit();
 		}
 	}
 }

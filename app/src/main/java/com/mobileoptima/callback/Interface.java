@@ -20,4 +20,8 @@ public class Interface {
 	public interface OnOptionSelectedCallback {
 		void onOptionSelected(ChoiceObj obj);
 	}
+
+	public interface OnErrorCallback{
+		void onError(String error, String params, String response, boolean showError);
+	}
 }

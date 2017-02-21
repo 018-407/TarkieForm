@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_trans_sixty"
+    android:clickable="true"
+    android:padding="@dimen/thirty">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+        <!--android:background="@drawable/bg_rect_white_rad_ten"-->
+
+        <RelativeLayout
+            android:id="@+id/rlMessageAlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/eighty"
+            android:paddingBottom="@dimen/fifteen"
+            android:paddingEnd="@dimen/ten"
+            android:paddingLeft="@dimen/ten"
+            android:paddingRight="@dimen/ten"
+            android:paddingStart="@dimen/ten"
+            android:paddingTop="@dimen/fifteen">
+
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvMessageAlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="Save Changes?"
+                android:textSize="@dimen/nineteen"
+                codePan:typeface="@string/helvetica_neue_light"/>
+            <!--android:textColor="@color/sv_gray_pri"-->
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/vDividerAlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/one"
+            android:layout_below="@+id/rlMessageAlertDialog"
+            android:layout_marginBottom="@dimen/negative_one"/>
+        <!--android:background="@color/sv_gray_qui"-->
+
+        <LinearLayout
+            android:id="@+id/llButtonAlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/vDividerAlertDialog"
+            android:minHeight="@dimen/fifty"
+            android:orientation="horizontal">
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnNegativeAlertDialog"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingBottom="@dimen/ten"
+                android:paddingLeft="@dimen/five"
+                android:paddingRight="@dimen/five"
+                android:paddingTop="@dimen/ten"
+                android:text="No"
+                android:textSize="@dimen/nineteen"
+                codePan:typeface="@string/helvetica_neue_mid"/>
+            <!--android:background="@drawable/state_rect_white_rad_ten_bot_left"-->
+            <!--android:textColor="@color/sv_gray_pri"-->
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnPositiveAlertDialog"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingBottom="@dimen/ten"
+                android:paddingLeft="@dimen/five"
+                android:paddingRight="@dimen/five"
+                android:paddingTop="@dimen/ten"
+                android:text="Yes"
+                android:textColor="@color/white"
+                android:textSize="@dimen/nineteen"
+                codePan:typeface="@string/helvetica_neue_mid"/>
+            <!--android:background="@drawable/state_rect_blue_pri_rad_ten_bot_right"-->
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
