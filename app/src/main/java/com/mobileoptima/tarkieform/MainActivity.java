@@ -20,7 +20,6 @@ import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.adapter.FormAdapter;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
-import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.core.Data;
@@ -29,7 +28,7 @@ import com.mobileoptima.object.FormObj;
 
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements OnInitializeCallback, OnLoginCallback,
+public class MainActivity extends FragmentActivity implements OnInitializeCallback,
 		OnOverrideCallback, OnRefreshCallback {
 
 	private OnPermissionGrantedCallback permissionGrantedCallback;
@@ -82,7 +81,6 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 			splash.setOnInitializeCallback(this);
 			splash.setOnRefreshCallback(this);
 			splash.setOnOverrideCallback(this);
-			splash.setOnLoginCallback(this);
 			transaction = getSupportFragmentManager().beginTransaction();
 			transaction.add(R.id.rlMain, splash);
 			transaction.addToBackStack(null);
@@ -111,10 +109,6 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	@Override
 	public void onRefresh() {
 		authenticate();
-	}
-
-	@Override
-	public void onLogin(String empID) {
 	}
 
 	@Override
@@ -215,7 +209,6 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				LoginFragment login = new LoginFragment();
 				login.setOnOverrideCallback(this);
 				login.setOnRefreshCallback(this);
-//				login.setOnLoginCallback(this);
 				transaction = getSupportFragmentManager().beginTransaction();
 				transaction.replace(R.id.rlMain, login);
 				transaction.addToBackStack(null);

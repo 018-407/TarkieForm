@@ -2,6 +2,7 @@ package com.mobileoptima.tarkieform;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -12,26 +13,52 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
+import com.codepan.callback.Interface;
+import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
+import com.codepan.database.SQLiteAdapter;
+import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanTextField;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
+import com.mobileoptima.constant.Key;
+import com.mobileoptima.constant.Module.Action;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-public class LoginFragment extends Fragment implements OnClickListener {
+public class LoginFragment extends Fragment implements OnClickListener, OnRefreshCallback,
+		OnBackPressedCallback, Interface.OnFragmentCallback {
+
 	private CodePanButton btnLogin;
 	private CodePanTextField etUsernameLogin, etPasswordLogin;
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader;
 	private OnRefreshCallback refreshCallback;
 	private OnOverrideCallback overrideCallback;
+	private SQLiteAdapter db;
+	private boolean inOtherFragment;
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		setOnBackStack(true);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		setOnBackStack(false);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		((MainActivity) getActivity()).setOnBackPressedCallback(this);
+		db = ((MainActivity) getActivity()).getDatabase();
+		db.openConnection();
 		imageLoader = ImageLoader.getInstance();
 		imageLoader.init(ImageLoaderConfiguration.createDefault(getActivity()));
 		options = new DisplayImageOptions.Builder()
@@ -78,6 +105,29 @@ public class LoginFragment extends Fragment implements OnClickListener {
 			case R.id.btnAuthorization:
 				String username = etUsernameLogin.getText().toString().trim();
 				String password = etPasswordLogin.getText().toString().trim();
+				if(!username.isEmpty() && !password.isEmpty()) {
+					if(CodePanUtils.isInternetConnected(getActivity())) {
+						LoadingDialogFragment loading = new LoadingDialogFragment();
+						Bundle bundle = new Bundle();
+						bundle.putString(Key.USERNAME, username);
+						bundle.putString(Key.PASSWORD, password);
+						loading.setArguments(bundle);
+						loading.setAction(Action.LOGIN);
+						loading.setOnRefreshCallback(this);
+						loading.setOnFragmentCallback(this);
+						loading.setOnOverrideCallback(overrideCallback);
+						FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+						transaction.add(R.id.rlMain, loading);
+						transaction.addToBackStack(null);
+						transaction.commit();
+					}
+					else {
+						CodePanUtils.showAlertToast(getActivity(), "Internet connection required..", Toast.LENGTH_SHORT);
+					}
+				}
+				else{
+					CodePanUtils.showAlertToast(getActivity(), "Please input username and password.", Toast.LENGTH_SHORT);
+				}
 				break;
 		}
 	}
@@ -88,5 +138,40 @@ public class LoginFragment extends Fragment implements OnClickListener {
 
 	public void setOnRefreshCallback(OnRefreshCallback refreshCallback) {
 		this.refreshCallback = refreshCallback;
+	}
+
+	@Override
+	public void onRefresh() {
+		getActivity().getSupportFragmentManager().popBackStack();
+		if(refreshCallback != null){
+			refreshCallback.onRefresh();
+		}
+	}
+
+	public void setOnBackStack(boolean isOnBackStack) {
+		if(overrideCallback != null) {
+			overrideCallback.onOverride(isOnBackStack);
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if(!inOtherFragment){
+			getActivity().finish();
+		}
+		else{
+			getActivity().getSupportFragmentManager().popBackStack();
+		}
+	}
+
+	@Override
+	public void onFragment(boolean status) {
+		this.inOtherFragment = status;
+		if(!status){
+			((MainActivity) getActivity()).setOnBackPressedCallback(this);
+			if(overrideCallback != null){
+				overrideCallback.onOverride(true);
+			}
+		}
 	}
 }

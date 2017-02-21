@@ -13,10 +13,6 @@ public class Interface {
 		void onOverride(boolean isOverridden);
 	}
 
-	public interface OnLoginCallback {
-		void onLogin(String empID);
-	}
-
 	public interface OnOptionSelectedCallback {
 		void onOptionSelected(ChoiceObj obj);
 	}

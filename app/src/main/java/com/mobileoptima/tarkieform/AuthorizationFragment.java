@@ -29,9 +29,9 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 
 	private CodePanButton btnAuthorization;
 	private CodePanTextField etCodeAuthorization;
-	private SQLiteAdapter db;
 	private OnRefreshCallback refreshCallback;
 	private OnOverrideCallback overrideCallback;
+	private SQLiteAdapter db;
 	private boolean inOtherFragment;
 
 	@Override
@@ -95,6 +95,9 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 					else {
 						CodePanUtils.showAlertToast(getActivity(), "Internet connection required..", Toast.LENGTH_SHORT);
 					}
+				}
+				else{
+					CodePanUtils.showAlertToast(getActivity(), "Please input authorization code.", Toast.LENGTH_SHORT);
 				}
 				break;
 		}

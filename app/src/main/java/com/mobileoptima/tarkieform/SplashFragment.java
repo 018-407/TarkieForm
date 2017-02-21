@@ -21,7 +21,6 @@ import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.cache.SQLiteCache;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
-import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.constant.RequestCode;
@@ -29,15 +28,12 @@ import com.mobileoptima.core.TarkieFormLib;
 
 public class SplashFragment extends Fragment implements OnCreateDatabaseCallback,
 		OnUpgradeDatabaseCallback, OnPermissionGrantedCallback, OnFragmentCallback {
-
 	private final int DELAY = 2000;
-
 	private boolean isPause, isPending, isRequired;
 	private OnInitializeCallback initializeCallback;
 	private OnOverrideCallback overrideCallback;
 	private OnRefreshCallback refreshCallback;
 	private FragmentTransaction transaction;
-	private OnLoginCallback loginCallback;
 	private SQLiteAdapter db;
 
 	@Override
@@ -119,10 +115,6 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		this.overrideCallback = overrideCallback;
 	}
 
-	public void setOnLoginCallback(OnLoginCallback loginCallback) {
-		this.loginCallback = loginCallback;
-	}
-
 	public void checkPermission() {
 		if(CodePanUtils.isPermissionGranted(getActivity())) {
 			if(isRequired) {
@@ -177,7 +169,6 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 				LoginFragment login = new LoginFragment();
 				login.setOnOverrideCallback(overrideCallback);
 				login.setOnRefreshCallback(refreshCallback);
-				//login.setOnLoginCallback(loginCallback);
 				transaction = getActivity().getSupportFragmentManager().beginTransaction();
 				transaction.replace(R.id.rlMain, login);
 				transaction.addToBackStack(null);
@@ -186,14 +177,14 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		}
 	}
 
-	public void showPermissionNote(){
+	public void showPermissionNote() {
 		final AlertDialogFragment alert = new AlertDialogFragment();
 		alert.setOnFragmentCallback(this);
 		alert.setDialogTitle("Permissions Required");
 		alert.setDialogMessage("Please enable the required permissions to continue using sevie.");
-		alert.setPositiveButton("Settings", new View.OnClickListener(){
+		alert.setPositiveButton("Settings", new View.OnClickListener() {
 			@Override
-			public void onClick(View v){
+			public void onClick(View v) {
 				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 				Intent intent = new Intent();
 				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -201,9 +192,9 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 				getActivity().startActivity(intent);
 			}
 		});
-		alert.setNegativeButton("Exit", new View.OnClickListener(){
+		alert.setNegativeButton("Exit", new View.OnClickListener() {
 			@Override
-			public void onClick(View v){
+			public void onClick(View v) {
 				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 				getActivity().finish();
 			}

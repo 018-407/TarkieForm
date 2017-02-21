@@ -14,6 +14,7 @@ public class TarkieFormLib {
 	public static void createTables(SQLiteAdapter db) {
 		db.execQuery(Tables.create(TB.API_KEY));
 		db.execQuery(Tables.create(TB.SYNC_BATCH));
+		db.execQuery(Tables.create(TB.CREDENTIALS));
 	}
 
 	public static void alterTables(SQLiteAdapter db, int oldVersion, int newVersion) {
@@ -22,12 +23,13 @@ public class TarkieFormLib {
 	public static boolean isAuthorized(SQLiteAdapter db) {
 		String table = Tables.getName(TB.API_KEY);
 		String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-		//return db.isRecordExists(query);
-		return true;
+		return db.isRecordExists(query);
 	}
 
 	public static boolean isLoggedIn(SQLiteAdapter db) {
-		return true;
+		String table = Tables.getName(TB.CREDENTIALS);
+		String query = "SELECT ID FROM " + table + " WHERE ID = 1 AND employeeID != 0 AND isLogOut = 0";
+		return db.isRecordExists(query);
 	}
 
 	public static String getAPIKey(SQLiteAdapter db) {
