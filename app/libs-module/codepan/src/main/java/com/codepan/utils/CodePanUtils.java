@@ -48,6 +48,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -90,6 +91,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -98,13 +100,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -129,6 +136,7 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 
@@ -726,25 +734,20 @@ public class CodePanUtils {
 		return cursor.getString(column_index);
 	}
 
-	public static String getHttpResponse(String uri, List<NameValuePair> nameValuePairs) {
-		int timeOut = 60000 * 3;
-		final int INDENT = 4;
-		String response = "";
-		String inputLine = null;
-		String message = null;
-		String exception = null;
+	public static String getHttpResponse(String spec, String params, int timeOut) {
 		boolean result = false;
+		StringBuilder response = new StringBuilder();
+		String exception = null;
+		String message = null;
+		HttpURLConnection connection = null;
 		try {
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs);
-			String length = Long.toString(entity.getContentLength());
-			URL url = new URL(uri);
-			System.setProperty("http.keepAlive", "false");
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setReadTimeout(timeOut);
+			URL url = new URL(spec);
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setConnectTimeout(timeOut);
-			connection.setRequestMethod(HttpPost.METHOD_NAME);
+			connection.setReadTimeout(timeOut);
+			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			connection.setRequestProperty("Content-Length", length);
+//			connection.setRequestProperty("Content-Length", String.valueOf(params.length()));
 			connection.setRequestProperty("Content-Language", "en-US");
 			connection.setRequestProperty("connection", "close");
 			connection.setRequestProperty("Accept-Encoding", "");
@@ -752,20 +755,25 @@ public class CodePanUtils {
 			connection.setDoOutput(true);
 			connection.setUseCaches(false);
 			connection.connect();
-			OutputStream os = connection.getOutputStream();
-			entity.writeTo(os);
-			os.flush();
-			os.close();
-			int responseCode = connection.getResponseCode();
-			if(responseCode == HttpStatus.SC_OK) {
-				InputStream is = connection.getInputStream();
-				InputStreamReader reader = new InputStreamReader(is);
-				BufferedReader in = new BufferedReader(reader);
-				while((inputLine = in.readLine()) != null) {
-					response += inputLine;
+			Writer out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
+			BufferedWriter writer = new BufferedWriter(out);
+			writer.write(params);
+			writer.flush();
+			writer.close();
+			if(connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+				if(!url.getHost().equals(connection.getURL().getHost())) {
+					message = "WiFi authentication required. Please check on your web browser. ";
 				}
-				in.close();
-				result = true;
+				else {
+					Reader in = new InputStreamReader(connection.getInputStream());
+					BufferedReader reader = new BufferedReader(in);
+					String line;
+					while((line = reader.readLine()) != null) {
+						response.append(line);
+					}
+					reader.close();
+					result = true;
+				}
 			}
 		}
 		catch(SocketTimeoutException ste) {
@@ -780,20 +788,30 @@ public class CodePanUtils {
 			message = "You are getting weak internet connection. " +
 					"Please find a reliable source to continue.";
 		}
+		catch(Exception e) {
+			e.printStackTrace();
+			exception = e.toString();
+			message = e.getMessage();
+		}
+		finally {
+			if(connection != null) {
+				connection.disconnect();
+			}
+		}
 		if(!result) {
 			try {
-				JSONObject error = new JSONObject();
 				JSONObject field = new JSONObject();
 				field.put("message", message);
 				field.put("exception", exception);
+				JSONObject error = new JSONObject();
 				error.put("error", field);
-				response = error.toString(INDENT);
+				response.append(error.toString());
 			}
 			catch(JSONException je) {
 				je.printStackTrace();
 			}
 		}
-		return response;
+		return response.toString();
 	}
 
 	public static String uploadFile(String url, String params, String name, File file) {

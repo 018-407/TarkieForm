@@ -13,18 +13,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
+import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanTextField;
+import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class LoginFragment extends Fragment implements OnClickListener {
-
 	private CodePanButton btnLogin;
 	private CodePanTextField etUsernameLogin, etPasswordLogin;
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader;
+	private OnRefreshCallback refreshCallback;
+	private OnOverrideCallback overrideCallback;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -77,5 +80,13 @@ public class LoginFragment extends Fragment implements OnClickListener {
 				String password = etPasswordLogin.getText().toString().trim();
 				break;
 		}
+	}
+
+	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
+		this.overrideCallback = overrideCallback;
+	}
+
+	public void setOnRefreshCallback(OnRefreshCallback refreshCallback) {
+		this.refreshCallback = refreshCallback;
 	}
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:codePan="http://schemas.android.com/apk/res-auto"
+    xmlns:progressWheel="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_trans_sixty"
+    android:clickable="true"
+    android:padding="@dimen/fifteen">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+        <!--android:background="@drawable/bg_rect_white_rad_ten">-->
+
+        <com.codepan.widget.CodePanLabel
+            android:id="@+id/tvTitleLoadingDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:padding="@dimen/ten"
+            android:text="Loading..."
+            android:textColor="@color/white"
+            android:textSize="@dimen/nineteen"
+            codePan:typeface="@string/helvetica_neue_light"/>
+        <!--android:background="@drawable/bg_rect_blue_pri_rad_ten_top"-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitleLoadingDialog"
+            android:padding="@dimen/fifteen">
+
+            <com.codepan.widget.ProgressWheel
+                android:id="@+id/progressLoadingDialog"
+                android:layout_width="@dimen/seventy_five"
+                android:layout_height="@dimen/seventy_five"
+                android:layout_centerInParent="true"
+                progressWheel:barWidth="@dimen/two"
+                progressWheel:circleRadius="@dimen/one_hundred"
+                progressWheel:contourColor="@color/transparent"
+                progressWheel:font="@string/helvetica_neue_light"
+                progressWheel:max="100"
+                progressWheel:progress="0"
+                progressWheel:progressIndeterminate="false"
+                progressWheel:rimWidth="@dimen/two"
+                progressWheel:spinSpeed="@dimen/one"
+                progressWheel:text="0%"
+                progressWheel:textSize="@dimen/eighteen"/>
+            <!--progressWheel:barColor="@color/sv_blue_pri"-->
+            <!--progressWheel:rimColor="@color/sv_gray_sen"-->
+            <!--progressWheel:textColor="@color/sv_gray_pri"-->
+
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvCountLoadingDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/progressLoadingDialog"
+                android:text="0/0"
+                android:textSize="@dimen/fourteen"
+                codePan:typeface="@string/helvetica_neue_light"/>
+            <!--android:textColor="@color/sv_blue_pri"-->
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

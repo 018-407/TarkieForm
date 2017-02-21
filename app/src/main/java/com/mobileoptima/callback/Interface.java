@@ -21,6 +21,10 @@ public class Interface {
 		void onOptionSelected(ChoiceObj obj);
 	}
 
+	public interface OnErrorCallback{
+		void onError(String error, String params, String response, boolean showError);
+	}
+
 	public interface OnGpsFixedCallback {
 		void onGpsFixed(double latitude, double longitude);
 	}
