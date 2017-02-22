@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
@@ -22,6 +23,7 @@ import com.mobileoptima.adapter.FormAdapter;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.RequestCode;
+import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.core.TarkieFormLib;
 import com.mobileoptima.object.FormObj;
@@ -36,7 +38,9 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	private boolean isInitialized, isOverridden;
 	private FragmentTransaction transaction;
 	private ArrayList<FormObj> formList;
+	private RelativeLayout rlMain;
 	private FormAdapter adapter;
+	private int width, height;
 	private SQLiteAdapter db;
 	private ListView lvMain;
 
@@ -44,6 +48,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
+		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
 		lvMain = (ListView) findViewById(R.id.lvMain);
 		lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -55,7 +60,7 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				transaction = getSupportFragmentManager().beginTransaction();
 				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
 						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-				transaction.replace(R.id.rlMain, form);
+				transaction.replace(R.id.rlMain, form, Tag.FORM);
 				transaction.addToBackStack(null);
 				transaction.commit();
 			}
@@ -215,5 +220,20 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				transaction.commit();
 			}
 		}
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		this.width = rlMain.getWidth();
+		this.height = rlMain.getHeight();
+	}
+
+	public int getHeight(){
+		return this.height;
+	}
+
+	public int getWidth(){
+		return this.width;
 	}
 }

@@ -10,6 +10,7 @@
     <color name="gray_sen">#808285</color>
     <color name="gray_sep">#BCBEC0</color>
     <color name="gray_oct">#939598</color>
-
-
+    <color name="gray_non">#808080</color>
+    <color name="gray_den">#CCCCCC</color>
+    <color name="yellow">#FDF232</color>
 </resources>

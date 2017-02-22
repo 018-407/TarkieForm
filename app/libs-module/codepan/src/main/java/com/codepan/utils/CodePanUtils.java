@@ -7,10 +7,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -69,6 +71,8 @@ import com.codepan.R;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CustomTypefaceSpan;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
@@ -1776,5 +1780,36 @@ public class CodePanUtils {
 			}
 		}
 		return ssb;
+	}
+
+	public static boolean withGooglePlayServices(final Activity activity) {
+		boolean result = false;
+		final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+		if(resultCode != ConnectionResult.SUCCESS) {
+			if(GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+				Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, activity, 1);
+				if(dialog != null) {
+					dialog.show();
+					dialog.setCancelable(true);
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						public void onDismiss(DialogInterface dialog) {
+							if(ConnectionResult.SERVICE_INVALID == resultCode) {
+								activity.finish();
+							}
+						}
+					});
+					dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							activity.finish();
+						}
+					});
+				}
+			}
+		}
+		else {
+			result = true;
+		}
+		return result;
 	}
 }

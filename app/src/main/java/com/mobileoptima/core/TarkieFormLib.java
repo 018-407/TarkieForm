@@ -1,13 +1,27 @@
 package com.mobileoptima.core;
 
+import android.content.Context;
+import android.location.Location;
+import android.os.SystemClock;
+
 import com.codepan.database.FieldValue;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.database.SQLiteBinder;
+import com.codepan.utils.CodePanUtils;
+import com.mobileoptima.constant.App;
+import com.mobileoptima.object.GpsObj;
+import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.schema.Tables;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.mobileoptima.schema.Tables.TB;
+import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
+import static com.mobileoptima.schema.Tables.TB.PHOTO;
+import static com.mobileoptima.schema.Tables.TB.SYNC_BATCH;
 
 public class TarkieFormLib {
 
