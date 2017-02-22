@@ -60,7 +60,7 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 				View v = inflater.inflate(R.layout.options_list_row, container, false);
 				CodePanLabel tvItemOptions = (CodePanLabel) v.findViewById(R.id.tvItemOptions);
 				View vDividerOptions = v.findViewById(R.id.vDividerOptions);
-				tvItemOptions.setText(obj.dDesc);
+				tvItemOptions.setText(obj.name);
 				tvItemOptions.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View view) {

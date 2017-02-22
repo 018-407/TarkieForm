@@ -14,19 +14,24 @@ import com.codepan.database.SQLiteAdapter;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
+import com.mobileoptima.core.Data;
 import com.mobileoptima.object.FormObj;
+import com.mobileoptima.object.PageObj;
 
-public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback{
+import java.util.ArrayList;
+
+public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback {
 
 	private CodePanButton btnNextForm, btnBackForm;
 	private OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
+	private ArrayList<PageObj> pageList;
 	private FragmentManager manager;
 	private CodePanLabel tvForm;
 	private SQLiteAdapter db;
 	private FormObj form;
-	private int page;
-	private String tag;
+	private PageObj page;
+	private int index;
 
 	@Override
 	public void onStart() {
@@ -51,6 +56,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		manager = getActivity().getSupportFragmentManager();
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
+		pageList = Data.loadPages(db, form.ID);
 	}
 
 	@Override
@@ -61,16 +67,19 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		btnBackForm = (CodePanButton) view.findViewById(R.id.btnBackForm);
 		btnNextForm.setOnClickListener(this);
 		btnBackForm.setOnClickListener(this);
-		tvForm.setText(form.dDesc);
-		incrementPage();
-		PageFragment first = new PageFragment();
-		first.setPage(page);
-		first.setOnOverrideCallback(overrideCallback);
-		transaction = manager.beginTransaction();
-		transaction.setCustomAnimations(0, R.anim.slide_out_rtl,
-				R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-		transaction.add(R.id.flForm, first, tag);
-		transaction.commit();
+		tvForm.setText(form.name);
+		if(!pageList.isEmpty()) {
+			this.page = pageList.get(index);
+			PageFragment first = new PageFragment();
+			first.setPage(page);
+			first.setForm(form);
+			first.setOnOverrideCallback(overrideCallback);
+			transaction = manager.beginTransaction();
+			transaction.setCustomAnimations(0, R.anim.slide_out_rtl,
+					R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+			transaction.add(R.id.flForm, first, page.fieldID);
+			transaction.commit();
+		}
 		return view;
 	}
 
@@ -85,30 +94,47 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				onBackPressed();
 				break;
 			case R.id.btnNextForm:
-				Fragment current = manager.findFragmentByTag(tag);
-				incrementPage();
-				PageFragment next = new PageFragment();
-				next.setPage(page);
-				next.setOnOverrideCallback(overrideCallback);
-				transaction = manager.beginTransaction();
-				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
-						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-				transaction.add(R.id.flForm, next, tag);
-				transaction.hide(current);
-				transaction.addToBackStack(null);
-				transaction.commit();
+				Fragment current = manager.findFragmentByTag(page.fieldID);
+				if(incrementPage()) {
+					PageFragment next = new PageFragment();
+					next.setPage(page);
+					next.setForm(form);
+					next.setOnOverrideCallback(overrideCallback);
+					transaction = manager.beginTransaction();
+					transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+							R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+					transaction.add(R.id.flForm, next, page.fieldID);
+					transaction.hide(current);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+				else {
+					//Save Entries
+				}
 				break;
 		}
 	}
 
-	public void incrementPage() {
-		this.page++;
-		this.tag = "page-" + page;
+	public boolean incrementPage() {
+		if(index < pageList.size() - 1) {
+			this.index++;
+			this.page = pageList.get(index);
+			if(index == pageList.size() - 1) {
+				String finish = "Finish";
+				btnNextForm.setText(finish);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public void decrementPage() {
-		this.page--;
-		this.tag = "page-" + page;
+		if(index != 0) {
+			this.index--;
+			this.page = pageList.get(index);
+			String next = "Next";
+			btnNextForm.setText(next);
+		}
 	}
 
 	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
@@ -124,5 +150,4 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 	public OnBackPressedCallback getOnBackPressedCallback() {
 		return this;
 	}
-
 }

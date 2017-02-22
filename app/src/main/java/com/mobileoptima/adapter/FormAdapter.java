@@ -38,8 +38,8 @@ public class FormAdapter extends ArrayAdapter<FormObj> {
 			else {
 				holder = (ViewHolder) view.getTag();
 			}
-			if(obj.dDesc != null) {
-				holder.tvForm.setText(obj.dDesc);
+			if(obj.name != null) {
+				holder.tvForm.setText(obj.name);
 			}
 		}
 		return view;

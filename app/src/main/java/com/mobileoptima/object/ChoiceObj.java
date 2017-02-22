@@ -3,6 +3,7 @@ package com.mobileoptima.object;
 public class ChoiceObj {
 
 	public String ID;
-	public String dDesc;
+	public String code;
+	public String name;
 	public boolean isCheck;
 }

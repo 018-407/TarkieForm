@@ -1,10 +1,14 @@
 package com.mobileoptima.core;
 
+import android.database.Cursor;
+import android.util.Log;
+
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.constant.FieldType;
+import com.mobileoptima.object.ChoiceObj;
 import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.FormObj;
-import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.PageObj;
 import com.mobileoptima.schema.Tables;
 
 import java.util.ArrayList;
@@ -13,123 +17,77 @@ public class Data {
 
 	public static ArrayList<FormObj> loadForms(SQLiteAdapter db) {
 		ArrayList<FormObj> formList = new ArrayList<>();
+		String groupID = TarkieFormLib.getGroupID(db);
 		String table = Tables.getName(Tables.TB.FORMS);
-
-
-
-		FormObj form1 = new FormObj();
-		form1.ID = "1";
-		form1.dDesc = "Service Order Form";
-		formList.add(form1);
-		FormObj form2 = new FormObj();
-		form2.ID = "2";
-		form2.dDesc = "Medical Form";
-		formList.add(form2);
+		String query = "SELECT ID, name FROM " + table + " WHERE groupID = '" + groupID + "'";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			FormObj obj = new FormObj();
+			obj.ID = cursor.getString(0);
+			obj.name = cursor.getString(1);
+			formList.add(obj);
+		}
+		cursor.close();
 		return formList;
 	}
 
-	public static ArrayList<FieldObj> loadFields(SQLiteAdapter db, int page) {
+	public static ArrayList<PageObj> loadPages(SQLiteAdapter db, String formID) {
+		ArrayList<PageObj> pageList = new ArrayList<>();
+		String table = Tables.getName(Tables.TB.FIELDS);
+		String query = "SELECT ID, orderNo FROM " + table + " WHERE type = '" +
+				FieldType.PB + "' ORDER BY orderNo";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			PageObj obj = new PageObj();
+			obj.fieldID = cursor.getString(0);
+			int orderNo = cursor.getInt(1);
+			int index = cursor.getPosition();
+			if(pageList.size() > 0) {
+				PageObj previous = pageList.get(index - 1);
+				obj.start = previous.end + 2;
+			}
+			else {
+				obj.start = 1;
+			}
+			obj.end = orderNo - 1;
+			pageList.add(obj);
+		}
+		cursor.close();
+		return pageList;
+	}
+
+	public static ArrayList<FieldObj> loadFields(SQLiteAdapter db, String formID, PageObj page) {
 		ArrayList<FieldObj> fieldList = new ArrayList<>();
-		FieldObj section1 = new FieldObj();
-		section1.ID = "1";
-		section1.field = "STEP 1";
-		section1.description = "You may now proceed with the installation proper. For reference in standard " +
-				"procedures, you may refer to the standards tab of the iKnow App.";
-		section1.type = FieldType.SEC;
-		fieldList.add(section1);
-		FieldObj text = new FieldObj();
-		text.ID = "2";
-		text.field = "Name of field personnel";
-		text.type = FieldType.TEXT;
-		text.isRequired = true;
-		fieldList.add(text);
-		FieldObj numeric = new FieldObj();
-		numeric.ID = "3";
-		numeric.field = "Number of P-CLAMP/S-CLAMP?";
-		numeric.type = FieldType.NUM;
-		numeric.isRequired = true;
-		fieldList.add(numeric);
-		FieldObj lText = new FieldObj();
-		lText.ID = "4";
-		lText.field = "Reason for not letting go.";
-		lText.type = FieldType.LTEXT;
-		lText.isRequired = true;
-		fieldList.add(lText);
-		FieldObj date = new FieldObj();
-		date.ID = "5";
-		date.field = "Date of break-up.";
-		date.type = FieldType.DATE;
-		date.isRequired = true;
-		fieldList.add(date);
-		FieldObj dropdown = new FieldObj();
-		dropdown.ID = "6";
-		dropdown.field = "Type of Request.";
-		dropdown.type = FieldType.DD;
-		dropdown.isRequired = true;
-		fieldList.add(dropdown);
-		FieldObj yon1 = new FieldObj();
-		yon1.ID = "7";
-		yon1.field = "With Voice Service?";
-		yon1.type = FieldType.YON;
-		yon1.isRequired = true;
-		fieldList.add(yon1);
-		FieldObj yon2 = new FieldObj();
-		yon2.ID = "8";
-		yon2.field = "Was there a dial tone?";
-		yon2.type = FieldType.YON;
-		yon2.isRequired = false;
-		fieldList.add(yon2);
-		FieldObj ms = new FieldObj();
-		ms.ID = "8";
-		ms.field = "This is for multi-selection question.";
-		ms.type = FieldType.MS;
-		ms.isRequired = true;
-		fieldList.add(ms);
-		FieldObj label = new FieldObj();
-		label.ID = "9";
-		label.field = "This is a sample label, you can add additional information here.";
-		label.type = FieldType.LAB;
-		fieldList.add(label);
-		FieldObj section2 = new FieldObj();
-		section2.ID = "9";
-		section2.field = "SECTION HEADING";
-		section2.description = "This is a section heading, you can add description here.";
-		section2.type = FieldType.SEC;
-		fieldList.add(section2);
-		FieldObj link = new FieldObj();
-		link.ID = "10";
-		link.field = "Tarkie Website";
-		link.url = "https://www.tarkie.com/";
-		link.type = FieldType.LINK;
-		fieldList.add(link);
-		FieldObj gps = new FieldObj();
-		gps.ID = "11";
-		gps.field = "Get Location";
-		gps.isRequired = true;
-		gps.type = FieldType.GPS;
-		fieldList.add(gps);
-		FieldObj signature = new FieldObj();
-		signature.ID = "12";
-		signature.field = "Please affix your signature.";
-		signature.isRequired = true;
-		signature.type = FieldType.SIG;
-		fieldList.add(signature);
-		FieldObj photo = new FieldObj();
-		photo.ID = "13";
-		photo.field = "Photo of Installed items(s)/Equipment";
-		photo.isRequired = true;
-		photo.type = FieldType.PHOTO;
-		fieldList.add(photo);
+		String table = Tables.getName(Tables.TB.FIELDS);
+		String query = "SELECT ID, name, description, type, isRequired FROM " + table + " WHERE " +
+				"formID = '" + formID + "' AND orderNo BETWEEN '" + page.start + "' AND '" +
+				page.end + "' ORDER BY orderNo";
+		Log.e("QUERY", "" + query);
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			FieldObj obj = new FieldObj();
+			obj.ID = cursor.getString(0);
+			obj.name = cursor.getString(1);
+			obj.description = cursor.getString(2);
+			obj.type = cursor.getString(3);
+			obj.isRequired = cursor.getInt(4) == 1;
+			fieldList.add(obj);
+		}
+		cursor.close();
 		return fieldList;
 	}
 
-	public static ArrayList<ChoiceObj> loadChoices(SQLiteAdapter db) {
+	public static ArrayList<ChoiceObj> loadChoices(SQLiteAdapter db, String fieldID) {
 		ArrayList<ChoiceObj> choiceList = new ArrayList<>();
-		for(int x = 1; x <= 5; x++) {
-			ChoiceObj option = new ChoiceObj();
-			option.ID = "" + x;
-			option.dDesc = "Option " + x;
-			choiceList.add(option);
+		String table = Tables.getName(Tables.TB.CHOICES);
+		String query = "SELECT ID, code, name FROM " + table + " WHERE fieldID = '" + fieldID + "'";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			ChoiceObj obj = new ChoiceObj();
+			obj.ID = cursor.getString(0);
+			obj.code = cursor.getString(1);
+			obj.name = cursor.getString(2);
+			choiceList.add(obj);
 		}
 		return choiceList;
 	}

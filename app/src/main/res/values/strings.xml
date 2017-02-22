@@ -10,6 +10,7 @@
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="link">Click Here</string>
+    <string name="time">Get Time</string>
     <string name="gps">Add Geo-tag</string>
     <string name="gps_title">No GPS Signal</string>
     <string name="gps_message">Searching for GPS Signal. Please try going outside.</string>

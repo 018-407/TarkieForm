@@ -9,7 +9,6 @@ import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.callback.Interface.OnErrorCallback;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.schema.Tables;
-import com.mobileoptima.session.Session;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -291,7 +290,8 @@ public class Rx {
 		String params = null;
 		try {
 			JSONObject paramsObj = new JSONObject();
-			paramsObj.put("api_key", Session.API_KEY);
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			paramsObj.put("api_key", apiKey);
 			paramsObj.put("username", username);
 			paramsObj.put("password", password);
 			params = paramsObj.toString(INDENT);

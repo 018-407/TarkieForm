@@ -43,8 +43,10 @@ import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.object.ChoiceObj;
 import com.mobileoptima.object.FieldObj;
+import com.mobileoptima.object.FormObj;
 import com.mobileoptima.object.GpsObj;
 import com.mobileoptima.object.ImageObj;
+import com.mobileoptima.object.PageObj;
 
 import java.util.ArrayList;
 
@@ -57,7 +59,8 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 	private ViewGroup container;
 	private LinearLayout llPage;
 	private SQLiteAdapter db;
-	private int page = 0;
+	private FormObj form;
+	private PageObj page;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 			@Override
 			public void run() {
 				try {
-					fieldList = Data.loadFields(db, page);
+					fieldList = Data.loadFields(db, form.ID, page);
 					handler.sendMessage(handler.obtainMessage());
 				}
 				catch(Exception e) {
@@ -90,6 +93,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 			}
 		});
 		bg.start();
+	}
+
+	public void setForm(FormObj form) {
+		this.form = form;
 	}
 
 	Handler handler = new Handler(new Handler.Callback() {
@@ -103,7 +110,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_section_layout, container, false);
 						CodePanLabel tvTitleSec = (CodePanLabel) view.findViewById(R.id.tvTitleSec);
 						CodePanLabel tvDescSec = (CodePanLabel) view.findViewById(R.id.tvDescSec);
-						tvTitleSec.setText(obj.field);
+						tvTitleSec.setText(obj.name);
 						if(obj.description != null) {
 							tvDescSec.setText(obj.description);
 							tvDescSec.setVisibility(View.VISIBLE);
@@ -117,10 +124,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionText = (CodePanLabel) view.findViewById(R.id.tvQuestionText);
 						CodePanTextField etAnswerText = (CodePanTextField) view.findViewById(R.id.etAnswerText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionText, obj.field);
+							requiredField(tvQuestionText, obj.name);
 						}
 						else {
-							tvQuestionText.setText(obj.field);
+							tvQuestionText.setText(obj.name);
 						}
 						break;
 					case FieldType.NUM:
@@ -128,10 +135,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionNum = (CodePanLabel) view.findViewById(R.id.tvQuestionNum);
 						CodePanTextField etAnswerNum = (CodePanTextField) view.findViewById(R.id.etAnswerNum);
 						if(obj.isRequired) {
-							requiredField(tvQuestionNum, obj.field);
+							requiredField(tvQuestionNum, obj.name);
 						}
 						else {
-							tvQuestionNum.setText(obj.field);
+							tvQuestionNum.setText(obj.name);
 						}
 						break;
 					case FieldType.LTEXT:
@@ -139,10 +146,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionLText = (CodePanLabel) view.findViewById(R.id.tvQuestionLText);
 						CodePanTextField etAnswerLText = (CodePanTextField) view.findViewById(R.id.etAnswerLText);
 						if(obj.isRequired) {
-							requiredField(tvQuestionLText, obj.field);
+							requiredField(tvQuestionLText, obj.name);
 						}
 						else {
-							tvQuestionLText.setText(obj.field);
+							tvQuestionLText.setText(obj.name);
 						}
 						break;
 					case FieldType.DATE:
@@ -150,10 +157,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionDate = (CodePanLabel) view.findViewById(R.id.tvQuestionDate);
 						final CodePanButton btnCalendarDate = (CodePanButton) view.findViewById(R.id.btnCalendarDate);
 						if(obj.isRequired) {
-							requiredField(tvQuestionDate, obj.field);
+							requiredField(tvQuestionDate, obj.name);
 						}
 						else {
-							tvQuestionDate.setText(obj.field);
+							tvQuestionDate.setText(obj.name);
 						}
 						btnCalendarDate.setOnClickListener(new OnClickListener() {
 							@Override
@@ -181,22 +188,22 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionDd = (CodePanLabel) view.findViewById(R.id.tvQuestionDd);
 						final CodePanButton btnOptionsDd = (CodePanButton) view.findViewById(R.id.btnOptionsDd);
 						if(obj.isRequired) {
-							requiredField(tvQuestionDd, obj.field);
+							requiredField(tvQuestionDd, obj.name);
 						}
 						else {
-							tvQuestionDd.setText(obj.field);
+							tvQuestionDd.setText(obj.name);
 						}
 						btnOptionsDd.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								ArrayList<ChoiceObj> items = Data.loadChoices(db);
+								ArrayList<ChoiceObj> items = Data.loadChoices(db, obj.ID);
 								OptionsFragment options = new OptionsFragment();
-								options.setItems(items, obj.field);
+								options.setItems(items, obj.name);
 								options.setOnFragmentCallback(PageFragment.this);
 								options.setOnOptionSelectedCallback(new OnOptionSelectedCallback() {
 									@Override
 									public void onOptionSelected(ChoiceObj obj) {
-										btnOptionsDd.setText(obj.dDesc);
+										btnOptionsDd.setText(obj.name);
 									}
 								});
 								transaction = manager.beginTransaction();
@@ -209,15 +216,16 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						});
 						break;
 					case FieldType.YON:
+					case FieldType.CB:
 						view = inflater.inflate(R.layout.field_yes_no_layout, container, false);
 						CodePanLabel tvQuestionYon = (CodePanLabel) view.findViewById(R.id.tvQuestionYon);
 						final CodePanButton btnNoYon = (CodePanButton) view.findViewById(R.id.btnNoYon);
 						final CodePanButton btnYesYon = (CodePanButton) view.findViewById(R.id.btnYesYon);
 						if(obj.isRequired) {
-							requiredField(tvQuestionYon, obj.field);
+							requiredField(tvQuestionYon, obj.name);
 						}
 						else {
-							tvQuestionYon.setText(obj.field);
+							tvQuestionYon.setText(obj.name);
 						}
 						btnNoYon.setOnClickListener(new OnClickListener() {
 							@Override
@@ -239,18 +247,18 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionMs = (CodePanLabel) view.findViewById(R.id.tvQuestionMs);
 						LinearLayout llChoicesMs = (LinearLayout) view.findViewById(R.id.llChoicesMs);
 						if(obj.isRequired) {
-							requiredField(tvQuestionMs, obj.field);
+							requiredField(tvQuestionMs, obj.name);
 						}
 						else {
-							tvQuestionMs.setText(obj.field);
+							tvQuestionMs.setText(obj.name);
 						}
-						ArrayList<ChoiceObj> choices = Data.loadChoices(db);
+						ArrayList<ChoiceObj> choices = Data.loadChoices(db, obj.ID);
 						for(ChoiceObj choice : choices) {
 							View v = inflater.inflate(R.layout.multiple_selection_item, container, false);
 							LinearLayout llChoiceMs = (LinearLayout) v.findViewById(R.id.llChoiceMs);
 							CodePanLabel tvChoiceMs = (CodePanLabel) v.findViewById(R.id.tvChoiceMs);
 							final CheckBox cbChoiceMs = (CheckBox) v.findViewById(R.id.cbChoiceMs);
-							tvChoiceMs.setText(choice.dDesc);
+							tvChoiceMs.setText(choice.name);
 							llChoiceMs.setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View view) {
@@ -268,7 +276,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 					case FieldType.LAB:
 						view = inflater.inflate(R.layout.field_label_layout, container, false);
 						CodePanLabel tvDescLabel = (CodePanLabel) view.findViewById(R.id.tvDescLabel);
-						tvDescLabel.setText(obj.field);
+						tvDescLabel.setText(obj.name);
 						break;
 					case FieldType.LINK:
 						view = inflater.inflate(R.layout.field_link_layout, container, false);
@@ -282,7 +290,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 								startActivity(intent);
 							}
 						});
-						tvQuestionLink.setText(obj.field);
+						tvQuestionLink.setText(obj.name);
 						break;
 					case FieldType.GPS:
 						view = inflater.inflate(R.layout.field_gps_layout, container, false);
@@ -292,10 +300,10 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionGps = (CodePanLabel) view.findViewById(R.id.tvQuestionGps);
 						CodePanButton btnGetGps = (CodePanButton) view.findViewById(R.id.btnGetGps);
 						if(obj.isRequired) {
-							requiredField(tvQuestionGps, obj.field);
+							requiredField(tvQuestionGps, obj.name);
 						}
 						else {
-							tvQuestionGps.setText(obj.field);
+							tvQuestionGps.setText(obj.name);
 						}
 						btnGetGps.setOnClickListener(new OnClickListener() {
 							@Override
@@ -360,16 +368,16 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionSignature = (CodePanLabel) view.findViewById(R.id.tvQuestionSignature);
 						CodePanButton btnAddSignature = (CodePanButton) view.findViewById(R.id.btnAddSignature);
 						if(obj.isRequired) {
-							requiredField(tvQuestionSignature, obj.field);
+							requiredField(tvQuestionSignature, obj.name);
 						}
 						else {
-							tvQuestionSignature.setText(obj.field);
+							tvQuestionSignature.setText(obj.name);
 						}
 						btnAddSignature.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								SignatureFragment signature = new SignatureFragment();
-								signature.setTitle(obj.field);
+								signature.setTitle(obj.name);
 								signature.setOnFragmentCallback(PageFragment.this);
 								signature.setOnSignCallback(new OnSignCallback() {
 									@Override
@@ -385,16 +393,37 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 							}
 						});
 						break;
+					case FieldType.TIME:
+						view = inflater.inflate(R.layout.field_time_layout, container, false);
+						CodePanLabel tvQuestionTime = (CodePanLabel) view.findViewById(R.id.tvQuestionTime);
+						CodePanButton btnGetTime = (CodePanButton) view.findViewById(R.id.btnGetTime);
+						final CodePanLabel tvResultTime = (CodePanLabel) view.findViewById(R.id.tvResultTime);
+						if(obj.isRequired) {
+							requiredField(tvQuestionTime, obj.name);
+						}
+						else {
+							tvQuestionTime.setText(obj.name);
+						}
+						btnGetTime.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								String time = CodePanUtils.getTime();
+								String date = CodePanUtils.getDate();
+								String result = "Time: " + date + " " + time;
+								tvResultTime.setText(result);
+							}
+						});
+						break;
 					case FieldType.PHOTO:
 						view = inflater.inflate(R.layout.field_photo_layout, container, false);
 						CodePanLabel tvQuestionPhoto = (CodePanLabel) view.findViewById(R.id.tvQuestionPhoto);
 						CodePanButton btnAddPhoto = (CodePanButton) view.findViewById(R.id.btnAddPhoto);
 						final LinearLayout llGridPhoto = (LinearLayout) view.findViewById(R.id.llGridPhoto);
 						if(obj.isRequired) {
-							requiredField(tvQuestionPhoto, obj.field);
+							requiredField(tvQuestionPhoto, obj.name);
 						}
 						else {
-							tvQuestionPhoto.setText(obj.field);
+							tvQuestionPhoto.setText(obj.name);
 						}
 						btnAddPhoto.setOnClickListener(new OnClickListener() {
 							@Override
@@ -427,7 +456,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 		}
 	});
 
-	public void setPage(int page) {
+	public void setPage(PageObj page) {
 		this.page = page;
 	}
 
