@@ -3,7 +3,8 @@ package com.mobileoptima.constant;
 public class Module {
 	public enum Action {
 		AUTHORIZE_DEVICE,
-		LOGIN
+		LOGIN,
+		UPDATE_MASTERLIST
 	}
 
 	public static String getTitle(Action action) {
@@ -15,6 +16,10 @@ public class Module {
 
 			case LOGIN:
 				title = "Login";
+				break;
+
+			case UPDATE_MASTERLIST:
+				title = "Update Masterlist";
 				break;
 		}
 		return title;

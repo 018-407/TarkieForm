@@ -10,18 +10,22 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
+import com.codepan.widget.CodePanButton;
 import com.mobileoptima.adapter.FormAdapter;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
+import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
@@ -30,9 +34,9 @@ import com.mobileoptima.object.FormObj;
 
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements OnInitializeCallback,
+public class MainActivity extends FragmentActivity implements OnClickListener, OnInitializeCallback,
 		OnOverrideCallback, OnRefreshCallback {
-
+	private CodePanButton btnSyncMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
 	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
@@ -65,7 +69,31 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 				transaction.commit();
 			}
 		});
+		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		btnSyncMain.setOnClickListener(this);
 		init(savedInstanceState);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()) {
+			case R.id.btnSyncMain:
+				if(CodePanUtils.isInternetConnected(this)) {
+					LoadingDialogFragment loading = new LoadingDialogFragment();
+					Bundle bundle = new Bundle();
+					loading.setArguments(bundle);
+					loading.setAction(Module.Action.UPDATE_MASTERLIST);
+					loading.setOnRefreshCallback(this);
+					FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+					transaction.add(R.id.rlMain, loading);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+				else {
+					CodePanUtils.showAlertToast(this, "Internet connection required..", Toast.LENGTH_SHORT);
+				}
+				break;
+		}
 	}
 
 	public void init(Bundle savedInstanceState) {
@@ -229,11 +257,11 @@ public class MainActivity extends FragmentActivity implements OnInitializeCallba
 		this.height = rlMain.getHeight();
 	}
 
-	public int getHeight(){
+	public int getHeight() {
 		return this.height;
 	}
 
-	public int getWidth(){
+	public int getWidth() {
 		return this.width;
 	}
 }
