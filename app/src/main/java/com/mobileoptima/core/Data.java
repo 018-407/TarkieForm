@@ -104,11 +104,17 @@ public class Data {
 		gps.type = FieldType.GPS;
 		fieldList.add(gps);
 		FieldObj signature = new FieldObj();
-		signature.ID = "11";
+		signature.ID = "12";
 		signature.field = "Please affix your signature.";
 		signature.isRequired = true;
 		signature.type = FieldType.SIG;
 		fieldList.add(signature);
+		FieldObj photo = new FieldObj();
+		photo.ID = "13";
+		photo.field = "Photo of Installed items(s)/Equipment";
+		photo.isRequired = true;
+		photo.type = FieldType.PHOTO;
+		fieldList.add(photo);
 		return fieldList;
 	}
 

@@ -4,7 +4,8 @@ public class Tables {
 	public enum TB {
 		API_KEY,
 		SYNC_BATCH,
-		CREDENTIALS
+		CREDENTIALS,
+		PHOTO
 	}
 
 	public static String create(TB tb) {
@@ -23,8 +24,15 @@ public class Tables {
 				break;
 			case CREDENTIALS:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, companyID INTEGER, " +
-						"employeeID INTEGER, dDate TEXT, dTime TEXT, isLogOut INTEGER DEFAULT 0)";
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, dDate TEXT, dTime TEXT, " +
+						"empID INTEGER, isLogOut INTEGER DEFAULT 0, isNewUser INTEGER DEFAULT 0 )";
+				break;
+			case PHOTO:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, dDesc TEXT, " +
+						"fileName TEXT, dDate TEXT, dTime TEXT, empID INTEGER, " +
+						"isDelete INTEGER DEFAULT 0, isUpload INTEGER DEFAULT 0, " +
+						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, syncBatchID TEXT)";
 				break;
 		}
 		return statement;
@@ -41,6 +49,9 @@ public class Tables {
 				break;
 			case CREDENTIALS:
 				name = "credentials_tb";
+				break;
+			case PHOTO:
+				name = "photo_tb";
 				break;
 		}
 		return name;

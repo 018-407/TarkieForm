@@ -8,4 +8,5 @@ public class App {
 	public static final String WEB_URL = "http://192.168.254.115/gotarkie/API/1.0/";
 	public static final String API_KEY = "sample";
 	public static final String OS_TYPE = "ANDROID";
+	public static final String FOLDER = "tarkieform";
 }
