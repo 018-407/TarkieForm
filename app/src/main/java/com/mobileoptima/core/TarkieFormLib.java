@@ -33,6 +33,9 @@ public class TarkieFormLib {
 		db.execQuery(Tables.create(TB.COMPANY));
 		db.execQuery(Tables.create(TB.EMPLOYEE));
 		db.execQuery(Tables.create(TB.PHOTO));
+		db.execQuery(Tables.create(TB.FORMS));
+		db.execQuery(Tables.create(TB.FIELDS));
+		db.execQuery(Tables.create(TB.CHOICES));
 	}
 
 	public static void loadCredentials(SQLiteAdapter db) {
@@ -73,19 +76,10 @@ public class TarkieFormLib {
 		return db.getString(query);
 	}
 
-	public static boolean updateSyncBatchID(SQLiteAdapter db, String syncBatchID) {
-		SQLiteBinder binder = new SQLiteBinder(db);
-		String table = Tables.getName(TB.SYNC_BATCH);
-		String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
-		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
-		if(db.isRecordExists(query)) {
-			binder.update(table, fieldValueList, 1);
-		}
-		else {
-			binder.insert(table, fieldValueList);
-		}
-		return binder.finish();
+	public static String getGroupID(SQLiteAdapter db) {
+		String query = "SELECT e.groupID FROM " + Tables.getName(TB.EMPLOYEE) + " e, " +
+				Tables.getName(TB.CREDENTIALS) + " c WHERE c.ID = 1 AND e.ID = c.empID";
+		return db.getString(query);
 	}
 
 	public static GpsObj getGPS(Context context, Location location,

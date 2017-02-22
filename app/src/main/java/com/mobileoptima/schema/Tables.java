@@ -8,7 +8,11 @@ public class Tables {
 		CREDENTIALS,
 		COMPANY,
 		EMPLOYEE,
-		PHOTO
+		PHOTO,
+		FORMS,
+		FIELDS,
+		CHOICES,
+		ENTRIES
 	}
 
 	public static String create(TB tb) {
@@ -48,6 +52,28 @@ public class Tables {
 						"isDelete INTEGER DEFAULT 0, isUpload INTEGER DEFAULT 0, " +
 						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, syncBatchID TEXT)";
 				break;
+			case FORMS:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"name TEXT, description TEXT, dateCreated TEXT, timeCreated TEXT)";
+				break;
+			case FIELDS:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, formID INTEGER, " +
+						"name TEXT, description TEXT, type TEXT, orderNo INTEGER, " +
+						"isRequired INTEGER)";
+				break;
+			case CHOICES:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"fieldID INTEGER, code TEXT, name TEXT)";
+				break;
+			case ENTRIES:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"formID INTEGER, dDate TEXt, dTime TEXT, isSync INTEGER DEFAULT 0, " +
+						"syncBatchID TEXT, webEntryID INTEGER)";
+				break;
 		}
 		return statement;
 	}
@@ -72,6 +98,18 @@ public class Tables {
 				break;
 			case PHOTO:
 				name = "photo_tb";
+				break;
+			case FORMS:
+				name = "forms_tb";
+				break;
+			case FIELDS:
+				name = "fields_tb";
+				break;
+			case CHOICES:
+				name = "choices_tb";
+				break;
+			case ENTRIES:
+				name = "entries_tb";
 				break;
 		}
 		return name;

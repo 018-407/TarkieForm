@@ -69,25 +69,33 @@ public class Rx {
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				String table = Tables.getName(Tables.TB.API_KEY);
-				JSONArray dataArray = responseObj.getJSONArray("data");
-				for(int d = 0; d < dataArray.length(); d++) {
-					JSONObject dataObj = dataArray.getJSONObject(d);
-					String apiKey = dataObj.getString("api_key");
-					String syncBatchID = dataObj.getString("sync_batch_id");
-					TarkieFormLib.updateSyncBatchID(db, syncBatchID);
-					ArrayList<FieldValue> list = new ArrayList<>();
-					list.add(new FieldValue("apiKey", apiKey));
-					list.add(new FieldValue("authorizationCode", authorizationCode));
-					list.add(new FieldValue("deviceID", deviceID));
-					String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-					if(!db.isRecordExists(query)) {
-						binder.insert(table, list);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String apiKey = dataObj.getString("api_key");
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("apiKey", apiKey));
+						fieldValueList.add(new FieldValue("authorizationCode", authorizationCode));
+						fieldValueList.add(new FieldValue("deviceID", deviceID));
+						String query = "SELECT ID FROM " + table + " WHERE ID = 1";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, 1);
+						}
 					}
-					else {
-						binder.update(table, list, 1);
-					}
+					result = binder.finish();
 				}
-				result = binder.finish();
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
 			}
 		}
 		catch(JSONException je) {
@@ -95,7 +103,88 @@ public class Rx {
 			if(errorCallback != null) {
 				errorCallback.onError(je.getMessage(), params, response, false);
 			}
-			return false;
+		}
+		return result;
+	}
+
+	public static boolean getSyncBatchID(SQLiteAdapter db, OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		final int TIMEOUT = 5000;
+		String action = "get-sync-batch-id";
+		String url = App.WEB_URL + action;
+		String response = null;
+		String params = null;
+		try {
+			JSONObject paramsObj = new JSONObject();
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			paramsObj.put("api_key", apiKey);
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			Log.e("getSyncBatchID PARAMS", params);
+			Log.e("getSyncBatchID RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
+						if(errorCallback != null) {
+							errorCallback.onError(message, params, response, true);
+						}
+						return false;
+					}
+				}
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				String table = Tables.getName(Tables.TB.SYNC_BATCH);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String query = "SELECT ID FROM " + table + " WHERE ID = 1";
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("syncBatchID", dataObj.getString("sync_batch_id")));
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, 1);
+						}
+					}
+					result = binder.finish();
+				}
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
+			}
+		}
+		catch(JSONException je) {
+			je.printStackTrace();
+			if(errorCallback != null) {
+				errorCallback.onError(je.getMessage(), params, response, false);
+			}
 		}
 		return result;
 	}
@@ -147,22 +236,38 @@ public class Rx {
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				String table = Tables.getName(Tables.TB.COMPANY);
-				binder.truncate(table);
-				JSONArray dataArray = responseObj.getJSONArray("data");
-				for(int d = 0; d < dataArray.length(); d++) {
-					JSONObject dataObj = dataArray.getJSONObject(d);
-					String company = CodePanUtils.handleUniCode(dataObj.getString("name"));
-					String address = CodePanUtils.handleUniCode(dataObj.getString("address"));
-					ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
-					fieldValueList.add(new FieldValue("ID", dataObj.getString("company_id")));
-					fieldValueList.add(new FieldValue("name", company));
-					fieldValueList.add(new FieldValue("address", address));
-					fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
-					fieldValueList.add(new FieldValue("contactNo", dataObj.getString("contact_number")));
-					fieldValueList.add(new FieldValue("imageUrl", dataObj.getString("splash_screen_image")));
-					binder.insert(table, fieldValueList);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String coID = dataObj.getString("company_id");
+						String company = CodePanUtils.handleUniCode(dataObj.getString("name"));
+						String address = CodePanUtils.handleUniCode(dataObj.getString("address"));
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("ID", coID));
+						fieldValueList.add(new FieldValue("name", company));
+						fieldValueList.add(new FieldValue("address", address));
+						fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
+						fieldValueList.add(new FieldValue("contactNo", dataObj.getString("contact_number")));
+						fieldValueList.add(new FieldValue("imageUrl", dataObj.getString("splash_screen_image")));
+						String query = "SELECT ID FROM " + table + " WHERE ID = '" + coID + "'";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, coID);
+						}
+					}
+					result = binder.finish();
 				}
-				result = binder.finish();
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
 			}
 		}
 		catch(JSONException je) {
@@ -170,13 +275,12 @@ public class Rx {
 			if(errorCallback != null) {
 				errorCallback.onError(je.getMessage(), params, response, false);
 			}
-			return false;
 		}
 		return result;
 	}
 
 	public static boolean login(SQLiteAdapter db, String username, String password,
-										  OnErrorCallback errorCallback) {
+								OnErrorCallback errorCallback) {
 		boolean result = false;
 		boolean hasData = false;
 		final int INDENT = 4;
@@ -224,24 +328,34 @@ public class Rx {
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				String table = Tables.getName(Tables.TB.CREDENTIALS);
-				JSONArray dataArray = responseObj.getJSONArray("data");
-				for(int d = 0; d < dataArray.length(); d++) {
-					JSONObject dataObj = dataArray.getJSONObject(d);
-					int empID = dataObj.getInt("user_id");
-					ArrayList<FieldValue> list = new ArrayList<>();
-					list.add(new FieldValue("dDate", CodePanUtils.getDate()));
-					list.add(new FieldValue("dTime", CodePanUtils.getTime()));
-					list.add(new FieldValue("isLogOut", false));
-					list.add(new FieldValue("empID", empID));
-					String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-					if(!db.isRecordExists(query)) {
-						binder.insert(table, list);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String empID = dataObj.getString("user_id");
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("dDate", CodePanUtils.getDate()));
+						fieldValueList.add(new FieldValue("dTime", CodePanUtils.getTime()));
+						fieldValueList.add(new FieldValue("isLogOut", false));
+						fieldValueList.add(new FieldValue("empID", empID));
+						String query = "SELECT ID FROM " + table + " WHERE ID = 1";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, 1);
+						}
 					}
-					else {
-						binder.update(table, list, 1);
-					}
+					result = binder.finish();
 				}
-				result = binder.finish();
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
 			}
 		}
 		catch(JSONException je) {
@@ -249,7 +363,6 @@ public class Rx {
 			if(errorCallback != null) {
 				errorCallback.onError(je.getMessage(), params, response, false);
 			}
-			return false;
 		}
 		return result;
 	}
@@ -301,24 +414,40 @@ public class Rx {
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				String table = Tables.getName(Tables.TB.EMPLOYEE);
-				binder.truncate(table);
-				JSONArray dataArray = responseObj.getJSONArray("data");
-				for(int d = 0; d < dataArray.length(); d++) {
-					JSONObject dataObj = dataArray.getJSONObject(d);
-					String firstName = CodePanUtils.handleUniCode(dataObj.getString("fname"));
-					String lastName = CodePanUtils.handleUniCode(dataObj.getString("lname"));
-					String employeeNo = CodePanUtils.handleUniCode(dataObj.getString("employee_code"));
-					ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
-					fieldValueList.add(new FieldValue("ID", dataObj.getString("user_id")));
-					fieldValueList.add(new FieldValue("firstName", firstName));
-					fieldValueList.add(new FieldValue("lastName", lastName));
-					fieldValueList.add(new FieldValue("employeeNo", employeeNo));
-					fieldValueList.add(new FieldValue("groupID", dataObj.getString("team_id")));
-					fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
-					fieldValueList.add(new FieldValue("isActive", dataObj.getInt("is_active")));
-					binder.insert(table, fieldValueList);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String empID = dataObj.getString("user_id");
+						String firstName = CodePanUtils.handleUniCode(dataObj.getString("fname"));
+						String lastName = CodePanUtils.handleUniCode(dataObj.getString("lname"));
+						String employeeNo = CodePanUtils.handleUniCode(dataObj.getString("employee_code"));
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("ID", empID));
+						fieldValueList.add(new FieldValue("firstName", firstName));
+						fieldValueList.add(new FieldValue("lastName", lastName));
+						fieldValueList.add(new FieldValue("employeeNo", employeeNo));
+						fieldValueList.add(new FieldValue("groupID", dataObj.getString("team_id")));
+						fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
+						fieldValueList.add(new FieldValue("isActive", dataObj.getInt("is_active")));
+						String query = "SELECT ID FROM " + table + " WHERE ID = '" + empID + "'";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, empID);
+						}
+					}
+					result = binder.finish();
 				}
-				result = binder.finish();
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
 			}
 		}
 		catch(JSONException je) {
@@ -326,7 +455,212 @@ public class Rx {
 			if(errorCallback != null) {
 				errorCallback.onError(je.getMessage(), params, response, false);
 			}
-			return false;
+		}
+		return result;
+	}
+
+	public static boolean getForms(SQLiteAdapter db, OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		final int TIMEOUT = 5000;
+		String action = "get-forms";
+		String url = App.WEB_URL + action;
+		String response = null;
+		String params = null;
+		try {
+			JSONObject paramsObj = new JSONObject();
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			String groupID = TarkieFormLib.getGroupID(db);
+			paramsObj.put("api_key", apiKey);
+			paramsObj.put("team_id", groupID);
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			Log.e("getForms PARAMS", params);
+			Log.e("getForms RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
+						if(errorCallback != null) {
+							errorCallback.onError(message, params, response, true);
+						}
+						return false;
+					}
+				}
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				String table = Tables.getName(Tables.TB.FORMS);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String formID = dataObj.getString("form_id");
+						String name = CodePanUtils.handleUniCode(dataObj.getString("form_name"));
+						String description = CodePanUtils.handleUniCode(dataObj.getString("form_description"));
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("ID", formID));
+						fieldValueList.add(new FieldValue("name", name));
+						fieldValueList.add(new FieldValue("description", description));
+						fieldValueList.add(new FieldValue("dateCreated", dataObj.getString("date_created")));
+						fieldValueList.add(new FieldValue("timeCreated", dataObj.getString("time_created")));
+						String query = "SELECT ID FROM " + table + " WHERE ID = '" + formID + "'";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, formID);
+						}
+					}
+					result = binder.finish();
+				}
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
+			}
+		}
+		catch(JSONException je) {
+			je.printStackTrace();
+			if(errorCallback != null) {
+				errorCallback.onError(je.getMessage(), params, response, false);
+			}
+		}
+		return result;
+	}
+
+	public static boolean getFields(SQLiteAdapter db, OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		final int TIMEOUT = 5000;
+		String action = "get-forms-fields";
+		String url = App.WEB_URL + action;
+		String response = null;
+		String params = null;
+		try {
+			JSONObject paramsObj = new JSONObject();
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			String groupID = TarkieFormLib.getGroupID(db);
+			paramsObj.put("api_key", apiKey);
+			paramsObj.put("team_id", groupID);
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			Log.e("getForms PARAMS", params);
+			Log.e("getForms RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
+						if(errorCallback != null) {
+							errorCallback.onError(message, params, response, true);
+						}
+						return false;
+					}
+				}
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				try {
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String fieldID = dataObj.getString("field_id");
+						String type = dataObj.getString("field_type");
+						String name = CodePanUtils.handleUniCode(dataObj.getString("field_name"));
+						String description = CodePanUtils.handleUniCode(dataObj.getString("field_description"));
+						fieldValueList.clear();
+						fieldValueList.add(new FieldValue("ID", fieldID));
+						fieldValueList.add(new FieldValue("name", name));
+						fieldValueList.add(new FieldValue("type", type));
+						fieldValueList.add(new FieldValue("description", description));
+						fieldValueList.add(new FieldValue("formID", dataObj.getString("field_form_id")));
+						fieldValueList.add(new FieldValue("orderNo", dataObj.getString("field_order_number")));
+						fieldValueList.add(new FieldValue("isRequired", dataObj.getInt("field_is_required")));
+						String table = Tables.getName(Tables.TB.FIELDS);
+						String query = "SELECT ID FROM " + table + " WHERE ID = '" + fieldID + "'";
+						if(!db.isRecordExists(query)) {
+							binder.insert(table, fieldValueList);
+						}
+						else {
+							binder.update(table, fieldValueList, fieldID);
+						}
+						if(!dataObj.isNull("field_choices")) {
+							JSONArray choicesArray = dataObj.getJSONArray("field_choices");
+							for(int c = 0; c < choicesArray.length(); c++) {
+								JSONObject choicesObj = choicesArray.getJSONObject(c);
+								String code = choicesObj.getString("field_choice_id");
+								String choice = CodePanUtils.handleUniCode(choicesObj.getString("field_choice_name"));
+								fieldValueList.clear();
+								fieldValueList.add(new FieldValue("code", code));
+								fieldValueList.add(new FieldValue("name", choice));
+								fieldValueList.add(new FieldValue("fieldID", fieldID));
+								table = Tables.getName(Tables.TB.CHOICES);
+								query = "SELECT ID FROM " + table + " WHERE code = '" + code + "'";
+								if(!db.isRecordExists(query)) {
+									binder.insert(table, fieldValueList);
+								}
+								else {
+									String choiceID = db.getString(query);
+									binder.update(table, fieldValueList, choiceID);
+								}
+							}
+						}
+					}
+					result = binder.finish();
+				}
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
+			}
+		}
+		catch(JSONException je) {
+			je.printStackTrace();
+			if(errorCallback != null) {
+				errorCallback.onError(je.getMessage(), params, response, false);
+			}
 		}
 		return result;
 	}

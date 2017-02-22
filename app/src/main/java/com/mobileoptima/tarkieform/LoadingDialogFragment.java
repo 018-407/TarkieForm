@@ -89,7 +89,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
 		switch(action) {
 			case AUTHORIZE_DEVICE:
-				setMax(1);
+				setMax(4);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
 				String title = "Authorizing Device...";
@@ -98,9 +98,8 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
 				authorizeDevice(db, authorizationCode, deviceID);
 				break;
-
 			case LOGIN:
-				setMax(2);
+				setMax(4);
 				successMsg = "Login successful.";
 				failedMsg = "Failed to login.";
 				title = "Validating account...";
@@ -122,6 +121,11 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 					result = Rx.authorizeDevice(db, authorizationCode, deviceID, getErrorCallback());
 					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
+					if(result) {
+						result = Rx.getSyncBatchID(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
 					if(result) {
 						result = Rx.getCompany(db, getErrorCallback());
 						Thread.sleep(250);
@@ -153,6 +157,16 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 					handler.sendMessage(handler.obtainMessage());
 					if(result) {
 						result = Rx.login(db, username, password, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+					if(result) {
+						result = Rx.getForms(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+					if(result) {
+						result = Rx.getFields(db, getErrorCallback());
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
