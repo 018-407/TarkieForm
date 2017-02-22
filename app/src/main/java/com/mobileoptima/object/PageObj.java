@@ -2,7 +2,8 @@ package com.mobileoptima.object;
 
 public class PageObj {
 
-	public String fieldID;
+	public String tag;
+	public int orderNo;
 	public int start;
 	public int end;
 }

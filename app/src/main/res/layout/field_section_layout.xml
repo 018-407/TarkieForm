@@ -37,7 +37,7 @@
         android:paddingLeft="@dimen/ten"
         android:paddingRight="@dimen/ten"
         android:paddingStart="@dimen/ten"
-        android:paddingTop="@dimen/fifteen"
+        android:paddingTop="@dimen/ten"
         android:text="Description"
         android:textColor="@color/gray_sec"
         android:textSize="@dimen/seventeen"

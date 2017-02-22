@@ -286,7 +286,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 							@Override
 							public void onClick(View view) {
 								Intent intent = new Intent(Intent.ACTION_VIEW);
-								intent.setData(Uri.parse(obj.url));
+								intent.setData(Uri.parse(obj.description));
 								startActivity(intent);
 							}
 						});
@@ -411,6 +411,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 								String date = CodePanUtils.getDate();
 								String result = "Time: " + date + " " + time;
 								tvResultTime.setText(result);
+								tvResultTime.setVisibility(View.VISIBLE);
 							}
 						});
 						break;

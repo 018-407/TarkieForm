@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import static com.mobileoptima.schema.Tables.TB;
 import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
+import static com.mobileoptima.schema.Tables.TB.FIELDS;
 import static com.mobileoptima.schema.Tables.TB.PHOTO;
 import static com.mobileoptima.schema.Tables.TB.SYNC_BATCH;
 
@@ -80,6 +81,13 @@ public class TarkieFormLib {
 		String query = "SELECT e.groupID FROM " + Tables.getName(TB.EMPLOYEE) + " e, " +
 				Tables.getName(TB.CREDENTIALS) + " c WHERE c.ID = 1 AND e.ID = c.empID";
 		return db.getString(query);
+	}
+
+	public static int getLastOrderNo(SQLiteAdapter db, String formID) {
+		String table = Tables.getName(FIELDS);
+		String query = "SELECT orderNo FROM " + table + " WHERE formID = '" + formID + "' " +
+				"ORDER BY orderNo DESC LIMIT 1";
+		return db.getInt(query);
 	}
 
 	public static GpsObj getGPS(Context context, Location location,

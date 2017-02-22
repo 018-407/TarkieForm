@@ -77,7 +77,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 			transaction = manager.beginTransaction();
 			transaction.setCustomAnimations(0, R.anim.slide_out_rtl,
 					R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-			transaction.add(R.id.flForm, first, page.fieldID);
+			transaction.add(R.id.flForm, first, page.tag);
 			transaction.commit();
 		}
 		return view;
@@ -94,7 +94,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				onBackPressed();
 				break;
 			case R.id.btnNextForm:
-				Fragment current = manager.findFragmentByTag(page.fieldID);
+				Fragment current = manager.findFragmentByTag(page.tag);
 				if(incrementPage()) {
 					PageFragment next = new PageFragment();
 					next.setPage(page);
@@ -103,7 +103,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 					transaction = manager.beginTransaction();
 					transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
 							R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-					transaction.add(R.id.flForm, next, page.fieldID);
+					transaction.add(R.id.flForm, next, page.tag);
 					transaction.hide(current);
 					transaction.addToBackStack(null);
 					transaction.commit();

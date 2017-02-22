@@ -1,7 +1,6 @@
 package com.mobileoptima.core;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.constant.FieldType;
@@ -39,7 +38,7 @@ public class Data {
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			PageObj obj = new PageObj();
-			obj.fieldID = cursor.getString(0);
+			obj.tag = cursor.getString(0);
 			int orderNo = cursor.getInt(1);
 			int index = cursor.getPosition();
 			if(pageList.size() > 0) {
@@ -50,7 +49,21 @@ public class Data {
 				obj.start = 1;
 			}
 			obj.end = orderNo - 1;
+			obj.orderNo = orderNo;
 			pageList.add(obj);
+		}
+		if(!pageList.isEmpty()) {
+			int orderNo = TarkieFormLib.getLastOrderNo(db, formID);
+			int index = pageList.size() - 1;
+			PageObj last = pageList.get(index);
+			if(orderNo > last.orderNo) {
+				PageObj obj = new PageObj();
+				obj.tag = String.valueOf(orderNo + 1);
+				obj.start = last.end + 2;
+				obj.orderNo = orderNo;
+				obj.end = orderNo;
+				pageList.add(obj);
+			}
 		}
 		cursor.close();
 		return pageList;
@@ -62,7 +75,6 @@ public class Data {
 		String query = "SELECT ID, name, description, type, isRequired FROM " + table + " WHERE " +
 				"formID = '" + formID + "' AND orderNo BETWEEN '" + page.start + "' AND '" +
 				page.end + "' ORDER BY orderNo";
-		Log.e("QUERY", "" + query);
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			FieldObj obj = new FieldObj();
