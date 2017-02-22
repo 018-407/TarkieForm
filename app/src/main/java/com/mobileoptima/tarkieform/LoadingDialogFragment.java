@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -96,6 +97,9 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
+				if(deviceID == null) {
+					deviceID = "000000000000000";
+				}
 				authorizeDevice(db, authorizationCode, deviceID);
 				break;
 			case LOGIN:
@@ -107,6 +111,14 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				String username = bundle.getString(Key.USERNAME);
 				String password = bundle.getString(Key.PASSWORD);
 				login(db, username, password);
+				break;
+			case UPDATE_MASTERLIST:
+				setMax(4);
+				successMsg = "Update masterlist successful.";
+				failedMsg = "Failed to update masterlist.";
+				title = "Updating masterlist...";
+				tvTitleLoadingDialog.setText(title);
+				updateMasterlist(db);
 				break;
 		}
 		return view;
@@ -177,6 +189,40 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			}
 		});
 		bg.setName(Process.LOGIN);
+		bg.start();
+	}
+
+	public void updateMasterlist(final SQLiteAdapter db) {
+		bg = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Looper.prepare();
+				try {
+					result = Rx.getCompany(db, getErrorCallback());
+					Thread.sleep(250);
+					handler.sendMessage(handler.obtainMessage());
+					if(result) {
+						result = Rx.getEmployee(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+					if(result) {
+						result = Rx.getForms(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+					if(result) {
+						result = Rx.getFields(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		bg.setName(Process.UPDATE_MASTERFILE);
 		bg.start();
 	}
 

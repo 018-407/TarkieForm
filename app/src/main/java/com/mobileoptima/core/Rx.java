@@ -291,7 +291,8 @@ public class Rx {
 		String params = null;
 		try {
 			JSONObject paramsObj = new JSONObject();
-			paramsObj.put("api_key", Session.API_KEY);
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			paramsObj.put("api_key", apiKey);
 			paramsObj.put("username", username);
 			paramsObj.put("password", password);
 			params = paramsObj.toString(INDENT);
