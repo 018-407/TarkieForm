@@ -101,18 +101,20 @@
                 android:layout_gravity="center">
 
                 <ImageView
+                    android:id="@+id/ivHomeMain"
                     android:layout_width="@dimen/twenty_seven"
                     android:layout_height="@dimen/twenty_seven"
-                    android:src="@drawable/ic_home"/>
+                    android:src="@drawable/ic_home_active"/>
 
                 <com.codepan.widget.CodePanLabel
+                    android:id="@+id/tvHomeMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/five"
                     android:layout_marginStart="@dimen/five"
                     android:text="@string/home"
-                    android:textColor="@color/gray_sec"
+                    android:textColor="@color/green"
                     android:textSize="@dimen/seventeen"
                     codePan:typeface="@string/proxima_nova_light"/>
 
@@ -137,11 +139,13 @@
                 android:layout_gravity="center">
 
                 <ImageView
+                    android:id="@+id/ivEntriesMain"
                     android:layout_width="@dimen/twenty_six"
                     android:layout_height="@dimen/twenty_seven"
-                    android:src="@drawable/ic_entries"/>
+                    android:src="@drawable/ic_entries_inactive"/>
 
                 <com.codepan.widget.CodePanLabel
+                    android:id="@+id/tvEntriesMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -173,11 +177,13 @@
                 android:layout_gravity="center">
 
                 <ImageView
+                    android:id="@+id/ivPhotosMain"
                     android:layout_width="@dimen/twenty_seven"
                     android:layout_height="@dimen/twenty_seven"
-                    android:src="@drawable/ic_photos"/>
+                    android:src="@drawable/ic_photos_inactive"/>
 
                 <com.codepan.widget.CodePanLabel
+                    android:id="@+id/tvPhotosMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -200,57 +206,13 @@
 
     </LinearLayout>
 
-    <RelativeLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/llTabMain"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/rlMenuMain"
-        android:padding="@dimen/thirteen">
-
-        <FrameLayout
-            android:id="@+id/flSearchMain"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.codepan.widget.CodePanTextField
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_rect_black_trans_thirty_rad_four"
-                android:hint="@string/search"
-                android:paddingBottom="@dimen/eight"
-                android:paddingEnd="@dimen/thirty"
-                android:paddingLeft="@dimen/ten"
-                android:paddingRight="@dimen/thirty"
-                android:paddingStart="@dimen/ten"
-                android:paddingTop="@dimen/eight"
-                android:textColor="@color/white"
-                android:textColorHint="@color/gray_ter"
-                android:textSize="@dimen/eighteen"
-                codePan:typeface="@string/proxima_nova_light"/>
-
-            <ImageView
-                android:layout_width="@dimen/twenty"
-                android:layout_height="@dimen/twenty_one"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginEnd="@dimen/ten"
-                android:layout_marginRight="@dimen/ten"
-                android:src="@drawable/ic_search"/>
-
-        </FrameLayout>
-
-        <ListView
-            android:id="@+id/lvMain"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/flSearchMain"
-            android:layout_marginTop="@dimen/five"
-            android:divider="@color/transparent"
-            android:listSelector="@color/transparent"
-            android:scrollbarSize="@dimen/three"
-            android:scrollbarThumbVertical="@color/black_trans_forty"/>
-
-    </RelativeLayout>
+        android:layout_above="@+id/llTabMain"/>
 
 </RelativeLayout>

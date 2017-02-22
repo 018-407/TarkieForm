@@ -13,7 +13,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.codepan.callback.Interface;
 import com.codepan.callback.Interface.OnBackPressedCallback;
@@ -22,6 +21,7 @@ import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanTextField;
+import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module.Action;
@@ -32,14 +32,15 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 public class LoginFragment extends Fragment implements OnClickListener, OnRefreshCallback,
 		OnBackPressedCallback, Interface.OnFragmentCallback {
 
-	private CodePanButton btnLogin;
 	private CodePanTextField etUsernameLogin, etPasswordLogin;
+	private OnOverrideCallback overrideCallback;
+	private OnRefreshCallback refreshCallback;
+	private OnLoginCallback loginCallback;
 	private DisplayImageOptions options;
 	private ImageLoader imageLoader;
-	private OnRefreshCallback refreshCallback;
-	private OnOverrideCallback overrideCallback;
-	private SQLiteAdapter db;
 	private boolean inOtherFragment;
+	private CodePanButton btnLogin;
+	private SQLiteAdapter db;
 
 	@Override
 	public void onStart() {
@@ -122,11 +123,11 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 						transaction.commit();
 					}
 					else {
-						CodePanUtils.showAlertToast(getActivity(), "Internet connection required..", Toast.LENGTH_SHORT);
+						CodePanUtils.showAlertToast(getActivity(), "Internet connection required.");
 					}
 				}
-				else{
-					CodePanUtils.showAlertToast(getActivity(), "Please input username and password.", Toast.LENGTH_SHORT);
+				else {
+					CodePanUtils.showAlertToast(getActivity(), "Please input username and password.");
 				}
 				break;
 		}
@@ -140,11 +141,18 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 		this.refreshCallback = refreshCallback;
 	}
 
+	public void setOnLoginCallback(OnLoginCallback loginCallback) {
+		this.loginCallback = loginCallback;
+	}
+
 	@Override
 	public void onRefresh() {
 		getActivity().getSupportFragmentManager().popBackStack();
-		if(refreshCallback != null){
+		if(refreshCallback != null) {
 			refreshCallback.onRefresh();
+		}
+		if(loginCallback != null) {
+			loginCallback.onLogin();
 		}
 	}
 
@@ -156,10 +164,10 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 
 	@Override
 	public void onBackPressed() {
-		if(!inOtherFragment){
+		if(!inOtherFragment) {
 			getActivity().finish();
 		}
-		else{
+		else {
 			getActivity().getSupportFragmentManager().popBackStack();
 		}
 	}
@@ -167,9 +175,9 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 	@Override
 	public void onFragment(boolean status) {
 		this.inOtherFragment = status;
-		if(!status){
+		if(!status) {
 			((MainActivity) getActivity()).setOnBackPressedCallback(this);
-			if(overrideCallback != null){
+			if(overrideCallback != null) {
 				overrideCallback.onOverride(true);
 			}
 		}

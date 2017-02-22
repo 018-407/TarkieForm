@@ -11,7 +11,9 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,11 +39,15 @@ import com.mobileoptima.callback.Interface.OnGpsFixedCallback;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.callback.Interface.OnSignCallback;
+import com.mobileoptima.constant.AnswerType;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
+import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.object.AnswerObj;
 import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.FormObj;
 import com.mobileoptima.object.GpsObj;
@@ -58,7 +64,9 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 	private FragmentManager manager;
 	private ViewGroup container;
 	private LinearLayout llPage;
+	private boolean withChanges;
 	private SQLiteAdapter db;
+	private EntryObj entry;
 	private FormObj form;
 	private PageObj page;
 
@@ -84,7 +92,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 			@Override
 			public void run() {
 				try {
-					fieldList = Data.loadFields(db, form.ID, page);
+					fieldList = Data.loadFields(db, form, entry, page);
 					handler.sendMessage(handler.obtainMessage());
 				}
 				catch(Exception e) {
@@ -99,20 +107,25 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 		this.form = form;
 	}
 
+	public void setEntry(EntryObj entry) {
+		this.entry = entry;
+	}
+
 	Handler handler = new Handler(new Handler.Callback() {
 		@Override
 		public boolean handleMessage(Message message) {
 			LayoutInflater inflater = getActivity().getLayoutInflater();
 			View view = null;
-			for(final FieldObj obj : fieldList) {
-				switch(obj.type) {
+			for(final FieldObj field : fieldList) {
+				final AnswerObj answer = field.answer;
+				switch(field.type) {
 					case FieldType.SEC:
 						view = inflater.inflate(R.layout.field_section_layout, container, false);
 						CodePanLabel tvTitleSec = (CodePanLabel) view.findViewById(R.id.tvTitleSec);
 						CodePanLabel tvDescSec = (CodePanLabel) view.findViewById(R.id.tvDescSec);
-						tvTitleSec.setText(obj.name);
-						if(obj.description != null) {
-							tvDescSec.setText(obj.description);
+						tvTitleSec.setText(field.name);
+						if(field.description != null) {
+							tvDescSec.setText(field.description);
 							tvDescSec.setVisibility(View.VISIBLE);
 						}
 						else {
@@ -123,44 +136,96 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_text_layout, container, false);
 						CodePanLabel tvQuestionText = (CodePanLabel) view.findViewById(R.id.tvQuestionText);
 						CodePanTextField etAnswerText = (CodePanTextField) view.findViewById(R.id.etAnswerText);
-						if(obj.isRequired) {
-							requiredField(tvQuestionText, obj.name);
+						etAnswerText.addTextChangedListener(new TextWatcher() {
+							@Override
+							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
+							}
+
+							@Override
+							public void onTextChanged(CharSequence cs, int start, int before, int count) {
+								answer.value = cs.toString();
+								withChanges = true;
+							}
+
+							@Override
+							public void afterTextChanged(Editable e) {
+							}
+						});
+						if(field.isRequired) {
+							requiredField(tvQuestionText, field.name);
 						}
 						else {
-							tvQuestionText.setText(obj.name);
+							tvQuestionText.setText(field.name);
 						}
+						etAnswerText.setText(answer.value);
 						break;
 					case FieldType.NUM:
 						view = inflater.inflate(R.layout.field_numeric_layout, container, false);
 						CodePanLabel tvQuestionNum = (CodePanLabel) view.findViewById(R.id.tvQuestionNum);
 						CodePanTextField etAnswerNum = (CodePanTextField) view.findViewById(R.id.etAnswerNum);
-						if(obj.isRequired) {
-							requiredField(tvQuestionNum, obj.name);
+						etAnswerNum.addTextChangedListener(new TextWatcher() {
+							@Override
+							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
+							}
+
+							@Override
+							public void onTextChanged(CharSequence cs, int start, int before, int count) {
+								answer.value = cs.toString();
+								withChanges = true;
+							}
+
+							@Override
+							public void afterTextChanged(Editable e) {
+							}
+						});
+						if(field.isRequired) {
+							requiredField(tvQuestionNum, field.name);
 						}
 						else {
-							tvQuestionNum.setText(obj.name);
+							tvQuestionNum.setText(field.name);
 						}
+						etAnswerNum.setText(answer.value);
 						break;
 					case FieldType.LTEXT:
 						view = inflater.inflate(R.layout.field_long_text_layout, container, false);
 						CodePanLabel tvQuestionLText = (CodePanLabel) view.findViewById(R.id.tvQuestionLText);
 						CodePanTextField etAnswerLText = (CodePanTextField) view.findViewById(R.id.etAnswerLText);
-						if(obj.isRequired) {
-							requiredField(tvQuestionLText, obj.name);
+						etAnswerLText.addTextChangedListener(new TextWatcher() {
+							@Override
+							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
+							}
+
+							@Override
+							public void onTextChanged(CharSequence cs, int start, int before, int count) {
+								answer.value = cs.toString();
+								withChanges = true;
+							}
+
+							@Override
+							public void afterTextChanged(Editable e) {
+							}
+						});
+						if(field.isRequired) {
+							requiredField(tvQuestionLText, field.name);
 						}
 						else {
-							tvQuestionLText.setText(obj.name);
+							tvQuestionLText.setText(field.name);
 						}
+						etAnswerLText.setText(answer.value);
 						break;
 					case FieldType.DATE:
 						view = inflater.inflate(R.layout.field_date_layout, container, false);
 						CodePanLabel tvQuestionDate = (CodePanLabel) view.findViewById(R.id.tvQuestionDate);
 						final CodePanButton btnCalendarDate = (CodePanButton) view.findViewById(R.id.btnCalendarDate);
-						if(obj.isRequired) {
-							requiredField(tvQuestionDate, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionDate, field.name);
 						}
 						else {
-							tvQuestionDate.setText(obj.name);
+							tvQuestionDate.setText(field.name);
+						}
+						if(answer.value != null) {
+							String date = CodePanUtils.getCalendarDate(answer.value, false, true);
+							btnCalendarDate.setText(date);
 						}
 						btnCalendarDate.setOnClickListener(new OnClickListener() {
 							@Override
@@ -172,6 +237,8 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 									public void onPickDate(String date) {
 										String selected = CodePanUtils.getCalendarDate(date, false, true);
 										btnCalendarDate.setText(selected);
+										answer.value = date;
+										withChanges = true;
 									}
 								});
 								transaction = manager.beginTransaction();
@@ -187,23 +254,32 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_dropdown_layout, container, false);
 						CodePanLabel tvQuestionDd = (CodePanLabel) view.findViewById(R.id.tvQuestionDd);
 						final CodePanButton btnOptionsDd = (CodePanButton) view.findViewById(R.id.btnOptionsDd);
-						if(obj.isRequired) {
-							requiredField(tvQuestionDd, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionDd, field.name);
 						}
 						else {
-							tvQuestionDd.setText(obj.name);
+							tvQuestionDd.setText(field.name);
+						}
+						final ArrayList<ChoiceObj> optionList = Data.loadChoices(db, field.ID);
+						if(answer.value != null) {
+							for(ChoiceObj choice : optionList) {
+								if(choice.ID.equals(answer.value)) {
+									btnOptionsDd.setText(choice.name);
+								}
+							}
 						}
 						btnOptionsDd.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								ArrayList<ChoiceObj> items = Data.loadChoices(db, obj.ID);
 								OptionsFragment options = new OptionsFragment();
-								options.setItems(items, obj.name);
+								options.setItems(optionList, field.name);
 								options.setOnFragmentCallback(PageFragment.this);
 								options.setOnOptionSelectedCallback(new OnOptionSelectedCallback() {
 									@Override
-									public void onOptionSelected(ChoiceObj obj) {
-										btnOptionsDd.setText(obj.name);
+									public void onOptionSelected(ChoiceObj choice) {
+										btnOptionsDd.setText(choice.name);
+										answer.value = choice.ID;
+										withChanges = true;
 									}
 								});
 								transaction = manager.beginTransaction();
@@ -221,17 +297,36 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionYon = (CodePanLabel) view.findViewById(R.id.tvQuestionYon);
 						final CodePanButton btnNoYon = (CodePanButton) view.findViewById(R.id.btnNoYon);
 						final CodePanButton btnYesYon = (CodePanButton) view.findViewById(R.id.btnYesYon);
-						if(obj.isRequired) {
-							requiredField(tvQuestionYon, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionYon, field.name);
 						}
 						else {
-							tvQuestionYon.setText(obj.name);
+							tvQuestionYon.setText(field.name);
+						}
+						if(answer.value != null) {
+							switch(answer.value) {
+								case AnswerType.NO:
+									btnNoYon.setEnabled(false);
+									btnYesYon.setEnabled(true);
+									answer.isCheck = false;
+									answer.isActive = true;
+									break;
+								case AnswerType.YES:
+									btnNoYon.setEnabled(true);
+									btnYesYon.setEnabled(false);
+									answer.isCheck = true;
+									answer.isActive = true;
+									break;
+							}
 						}
 						btnNoYon.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								btnNoYon.setEnabled(false);
 								btnYesYon.setEnabled(true);
+								answer.isCheck = false;
+								answer.isActive = true;
+								withChanges = true;
 							}
 						});
 						btnYesYon.setOnClickListener(new OnClickListener() {
@@ -239,6 +334,9 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 							public void onClick(View view) {
 								btnNoYon.setEnabled(true);
 								btnYesYon.setEnabled(false);
+								answer.isCheck = true;
+								answer.isActive = true;
+								withChanges = true;
 							}
 						});
 						break;
@@ -246,28 +344,41 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_multiple_selection_layout, container, false);
 						CodePanLabel tvQuestionMs = (CodePanLabel) view.findViewById(R.id.tvQuestionMs);
 						LinearLayout llChoicesMs = (LinearLayout) view.findViewById(R.id.llChoicesMs);
-						if(obj.isRequired) {
-							requiredField(tvQuestionMs, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionMs, field.name);
 						}
 						else {
-							tvQuestionMs.setText(obj.name);
+							tvQuestionMs.setText(field.name);
 						}
-						ArrayList<ChoiceObj> choices = Data.loadChoices(db, obj.ID);
-						for(ChoiceObj choice : choices) {
+						final ArrayList<ChoiceObj> choiceList = Data.loadChoices(db, field.ID);
+						answer.choiceList = choiceList;
+						for(final ChoiceObj choice : choiceList) {
 							View v = inflater.inflate(R.layout.multiple_selection_item, container, false);
 							LinearLayout llChoiceMs = (LinearLayout) v.findViewById(R.id.llChoiceMs);
 							CodePanLabel tvChoiceMs = (CodePanLabel) v.findViewById(R.id.tvChoiceMs);
 							final CheckBox cbChoiceMs = (CheckBox) v.findViewById(R.id.cbChoiceMs);
+							final int index = choiceList.indexOf(choice);
+							if(answer.value != null && answer.value.contains(choice.code)) {
+								cbChoiceMs.setChecked(true);
+								answer.choiceList.get(index).isCheck = true;
+							}
+							else {
+								cbChoiceMs.setChecked(false);
+								answer.choiceList.get(index).isCheck = false;
+							}
 							tvChoiceMs.setText(choice.name);
 							llChoiceMs.setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View view) {
 									if(!cbChoiceMs.isChecked()) {
 										cbChoiceMs.setChecked(true);
+										answer.choiceList.get(index).isCheck = true;
 									}
 									else {
 										cbChoiceMs.setChecked(false);
+										answer.choiceList.get(index).isCheck = false;
 									}
+									withChanges = true;
 								}
 							});
 							llChoicesMs.addView(v);
@@ -276,7 +387,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 					case FieldType.LAB:
 						view = inflater.inflate(R.layout.field_label_layout, container, false);
 						CodePanLabel tvDescLabel = (CodePanLabel) view.findViewById(R.id.tvDescLabel);
-						tvDescLabel.setText(obj.name);
+						tvDescLabel.setText(field.name);
 						break;
 					case FieldType.LINK:
 						view = inflater.inflate(R.layout.field_link_layout, container, false);
@@ -286,11 +397,11 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 							@Override
 							public void onClick(View view) {
 								Intent intent = new Intent(Intent.ACTION_VIEW);
-								intent.setData(Uri.parse(obj.description));
+								intent.setData(Uri.parse(field.description));
 								startActivity(intent);
 							}
 						});
-						tvQuestionLink.setText(obj.name);
+						tvQuestionLink.setText(field.name);
 						break;
 					case FieldType.GPS:
 						view = inflater.inflate(R.layout.field_gps_layout, container, false);
@@ -299,11 +410,22 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						final CodePanLabel tvLongitudeGps = (CodePanLabel) view.findViewById(R.id.tvLongitudeGps);
 						CodePanLabel tvQuestionGps = (CodePanLabel) view.findViewById(R.id.tvQuestionGps);
 						CodePanButton btnGetGps = (CodePanButton) view.findViewById(R.id.btnGetGps);
-						if(obj.isRequired) {
-							requiredField(tvQuestionGps, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionGps, field.name);
 						}
 						else {
-							tvQuestionGps.setText(obj.name);
+							tvQuestionGps.setText(field.name);
+						}
+						if(answer.value != null) {
+							String array[] = answer.value.split(",");
+							String status = "Location Acquired";
+							String latitude = "Latitude: " + array[0];
+							String longitude = "Longitude: " + array[1];
+							tvStatusGps.setText(status);
+							tvLatitudeGps.setText(latitude);
+							tvLongitudeGps.setText(longitude);
+							tvLatitudeGps.setVisibility(View.VISIBLE);
+							tvLongitudeGps.setVisibility(View.VISIBLE);
 						}
 						btnGetGps.setOnClickListener(new OnClickListener() {
 							@Override
@@ -350,6 +472,8 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 												tvLongitudeGps.setText(longitude);
 												tvLatitudeGps.setVisibility(View.VISIBLE);
 												tvLongitudeGps.setVisibility(View.VISIBLE);
+												answer.value = gps.latitude + "," + gps.longitude;
+												withChanges = true;
 											}
 										});
 										transaction = manager.beginTransaction();
@@ -367,21 +491,23 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_signature_layout, container, false);
 						CodePanLabel tvQuestionSignature = (CodePanLabel) view.findViewById(R.id.tvQuestionSignature);
 						CodePanButton btnAddSignature = (CodePanButton) view.findViewById(R.id.btnAddSignature);
-						if(obj.isRequired) {
-							requiredField(tvQuestionSignature, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionSignature, field.name);
 						}
 						else {
-							tvQuestionSignature.setText(obj.name);
+							tvQuestionSignature.setText(field.name);
 						}
 						btnAddSignature.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								SignatureFragment signature = new SignatureFragment();
-								signature.setTitle(obj.name);
+								signature.setTitle(field.name);
 								signature.setOnFragmentCallback(PageFragment.this);
 								signature.setOnSignCallback(new OnSignCallback() {
 									@Override
 									public void onSign(String fileName) {
+										answer.value = fileName;
+										withChanges = true;
 									}
 								});
 								transaction = manager.beginTransaction();
@@ -398,11 +524,17 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionTime = (CodePanLabel) view.findViewById(R.id.tvQuestionTime);
 						CodePanButton btnGetTime = (CodePanButton) view.findViewById(R.id.btnGetTime);
 						final CodePanLabel tvResultTime = (CodePanLabel) view.findViewById(R.id.tvResultTime);
-						if(obj.isRequired) {
-							requiredField(tvQuestionTime, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionTime, field.name);
 						}
 						else {
-							tvQuestionTime.setText(obj.name);
+							tvQuestionTime.setText(field.name);
+						}
+						if(answer.value != null) {
+							String array[] = answer.value.split(",");
+							String result = "Time: " + array[0] + " " + array[1];
+							tvResultTime.setText(result);
+							tvResultTime.setVisibility(View.VISIBLE);
 						}
 						btnGetTime.setOnClickListener(new OnClickListener() {
 							@Override
@@ -412,6 +544,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 								String result = "Time: " + date + " " + time;
 								tvResultTime.setText(result);
 								tvResultTime.setVisibility(View.VISIBLE);
+								answer.value = date + "," + time;
 							}
 						});
 						break;
@@ -420,11 +553,23 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						CodePanLabel tvQuestionPhoto = (CodePanLabel) view.findViewById(R.id.tvQuestionPhoto);
 						CodePanButton btnAddPhoto = (CodePanButton) view.findViewById(R.id.btnAddPhoto);
 						final LinearLayout llGridPhoto = (LinearLayout) view.findViewById(R.id.llGridPhoto);
-						if(obj.isRequired) {
-							requiredField(tvQuestionPhoto, obj.name);
+						if(field.isRequired) {
+							requiredField(tvQuestionPhoto, field.name);
 						}
 						else {
-							tvQuestionPhoto.setText(obj.name);
+							tvQuestionPhoto.setText(field.name);
+						}
+						if(answer.value != null) {
+							String array[] = answer.value.split(",");
+							ArrayList<ImageObj> imageList = new ArrayList<>();
+							for(String photoID : array) {
+								ImageObj image = new ImageObj();
+								image.ID = photoID;
+								image.fileName = TarkieFormLib.getFileName(db, photoID);
+								imageList.add(image);
+							}
+							updatePhotoGrid(llGridPhoto, imageList);
+							answer.imageList = imageList;
 						}
 						btnAddPhoto.setOnClickListener(new OnClickListener() {
 							@Override
@@ -438,6 +583,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 									@Override
 									public void onCameraDone(ArrayList<ImageObj> imageList) {
 										updatePhotoGrid(llGridPhoto, imageList);
+										answer.imageList = imageList;
 									}
 								});
 								transaction = manager.beginTransaction();
@@ -543,8 +689,66 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 		}
 	}
 
+	public FieldObj getUnfilledUpField() {
+		for(FieldObj field : fieldList) {
+			if(field.isRequired && field.isQuestion) {
+				AnswerObj answer = field.answer;
+				switch(field.type) {
+					case FieldType.MS:
+						if(!hasSelected(answer.choiceList)) {
+							return field;
+						}
+						break;
+					case FieldType.YON:
+						if(!answer.isActive) {
+							return field;
+						}
+						break;
+					case FieldType.PHOTO:
+						if(answer.imageList != null) {
+							if(answer.imageList.isEmpty()) {
+								return field;
+							}
+						}
+						else {
+							return field;
+						}
+						break;
+					default:
+						if(answer.value != null) {
+							if(answer.value.isEmpty()) {
+								return field;
+							}
+						}
+						else {
+							return field;
+						}
+						break;
+				}
+			}
+		}
+		return null;
+	}
+
+	public boolean hasSelected(ArrayList<ChoiceObj> choiceList) {
+		for(ChoiceObj obj : choiceList) {
+			if(obj.isCheck) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
 		this.overrideCallback = overrideCallback;
+	}
+
+	public boolean withChanges() {
+		return this.withChanges;
+	}
+
+	public ArrayList<FieldObj> getFieldList() {
+		return this.fieldList;
 	}
 
 	@Override

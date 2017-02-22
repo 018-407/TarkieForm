@@ -9,6 +9,4 @@ public class ImageObj {
 	public String dDate;
 	public String dTime;
 	public Bitmap bitmap;
-	public boolean isChecked;
-	public boolean isHighlight;
 }

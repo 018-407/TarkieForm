@@ -3,16 +3,30 @@ package com.mobileoptima.core;
 import android.content.Context;
 import android.location.Location;
 import android.os.SystemClock;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 
 import com.codepan.database.FieldValue;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.database.SQLiteBinder;
 import com.codepan.utils.CodePanUtils;
+import com.mobileoptima.constant.AnswerType;
 import com.mobileoptima.constant.App;
+import com.mobileoptima.constant.FieldType;
+import com.mobileoptima.object.AnswerObj;
+import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.EntryObj;
+import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.GpsObj;
 import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.schema.Tables;
 import com.mobileoptima.session.Session;
+import com.mobileoptima.tarkieform.AlertDialogFragment;
+import com.mobileoptima.tarkieform.R;
+
+import net.sqlcipher.Cursor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +34,9 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.mobileoptima.schema.Tables.TB;
+import static com.mobileoptima.schema.Tables.TB.ANSWERS;
 import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
+import static com.mobileoptima.schema.Tables.TB.ENTRIES;
 import static com.mobileoptima.schema.Tables.TB.FIELDS;
 import static com.mobileoptima.schema.Tables.TB.PHOTO;
 import static com.mobileoptima.schema.Tables.TB.SYNC_BATCH;
@@ -37,6 +53,8 @@ public class TarkieFormLib {
 		db.execQuery(Tables.create(TB.FORMS));
 		db.execQuery(Tables.create(TB.FIELDS));
 		db.execQuery(Tables.create(TB.CHOICES));
+		db.execQuery(Tables.create(TB.ENTRIES));
+		db.execQuery(Tables.create(TB.ANSWERS));
 	}
 
 	public static void loadCredentials(SQLiteAdapter db) {
@@ -143,7 +161,7 @@ public class TarkieFormLib {
 		SQLiteBinder binder = new SQLiteBinder(db);
 		String syncBatchID = getSyncBatchID(db);
 		String empID = getEmployeeID(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 		fieldValueList.add(new FieldValue("fileName", obj.fileName));
 		fieldValueList.add(new FieldValue("dDate", obj.dDate));
 		fieldValueList.add(new FieldValue("dTime", obj.dTime));
@@ -156,7 +174,7 @@ public class TarkieFormLib {
 
 	public static boolean deletePhoto(Context context, SQLiteAdapter db, ImageObj obj) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 		fieldValueList.add(new FieldValue("isDelete", true));
 		binder.update(Tables.getName(PHOTO), fieldValueList, obj.ID);
 		String path = context.getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() + "/" + obj.fileName;
@@ -166,7 +184,7 @@ public class TarkieFormLib {
 
 	public static boolean deletePhotos(Context context, SQLiteAdapter db, ArrayList<ImageObj> deleteList) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 		for(ImageObj obj : deleteList) {
 			fieldValueList.clear();
 			fieldValueList.add(new FieldValue("isDelete", true));
@@ -175,5 +193,163 @@ public class TarkieFormLib {
 			CodePanUtils.deleteFile(path);
 		}
 		return binder.finish();
+	}
+
+	public static String getFileName(SQLiteAdapter db, String photoID) {
+		String table = Tables.getName(TB.PHOTO);
+		String query = "SELECT fileName FROM " + table + " WHERE ID = '" + photoID + "'";
+		return db.getString(query);
+	}
+
+	public static boolean saveEntry(SQLiteAdapter db, String formID, ArrayList<FieldObj> fieldList, boolean isSubmit) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		String dDate = CodePanUtils.getDate();
+		String dTime = CodePanUtils.getTime();
+		String empID = getEmployeeID(db);
+		String syncBatchID = getSyncBatchID(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("formID", formID));
+		fieldValueList.add(new FieldValue("dDate", dDate));
+		fieldValueList.add(new FieldValue("dTime", dTime));
+		fieldValueList.add(new FieldValue("empID", empID));
+		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
+		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
+		String entryID = binder.insert(Tables.getName(ENTRIES), fieldValueList);
+		for(FieldObj field : fieldList) {
+			if(field.isQuestion) {
+				AnswerObj answer = field.answer;
+				String value = answer.value;
+				switch(field.type) {
+					case FieldType.MS:
+						if(answer.choiceList != null && !answer.choiceList.isEmpty()) {
+							value = "";
+							for(ChoiceObj choiceObj : answer.choiceList) {
+								if(choiceObj.isCheck) {
+									value += choiceObj.code + ",";
+								}
+							}
+							int length = value.length();
+							if(length != 0) {
+								value = value.substring(0, length - 1);
+							}
+						}
+						break;
+					case FieldType.PHOTO:
+						if(answer.imageList != null && !answer.imageList.isEmpty()) {
+							value = "";
+							for(ImageObj image : answer.imageList) {
+								value += image.ID + ",";
+							}
+							int length = value.length();
+							if(length != 0) {
+								value = value.substring(0, length - 1);
+							}
+						}
+						break;
+					case FieldType.YON:
+						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
+						break;
+				}
+				fieldValueList.clear();
+				fieldValueList.add(new FieldValue("entryID", entryID));
+				fieldValueList.add(new FieldValue("fieldID", field.ID));
+				fieldValueList.add(new FieldValue("value", value));
+				binder.insert(Tables.getName(ANSWERS), fieldValueList);
+			}
+		}
+		return binder.finish();
+	}
+
+	public static boolean updateEntry(SQLiteAdapter db, String entryID, ArrayList<FieldObj> fieldList, boolean isSubmit) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
+		binder.update(Tables.getName(ENTRIES), fieldValueList, entryID);
+		for(FieldObj field : fieldList) {
+			if(field.isQuestion) {
+				AnswerObj answer = field.answer;
+				String value = answer.value;
+				switch(field.type) {
+					case FieldType.MS:
+						if(answer.choiceList != null && !answer.choiceList.isEmpty()) {
+							value = "";
+							for(ChoiceObj choiceObj : answer.choiceList) {
+								if(choiceObj.isCheck) {
+									value += choiceObj.code + ",";
+								}
+							}
+							int length = value.length();
+							if(length != 0) {
+								value = value.substring(0, length - 1);
+							}
+						}
+						break;
+					case FieldType.PHOTO:
+						if(answer.imageList != null && !answer.imageList.isEmpty()) {
+							value = "";
+							for(ImageObj image : answer.imageList) {
+								value += image.ID + ",";
+							}
+							int length = value.length();
+							if(length != 0) {
+								value = value.substring(0, length - 1);
+							}
+						}
+						break;
+					case FieldType.YON:
+						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
+						break;
+				}
+				fieldValueList.clear();
+				fieldValueList.add(new FieldValue("value", value));
+				String table = Tables.getName(TB.ANSWERS);
+				String query = "SELECT ID FROM " + table + " WHERE fieldID = '" + field.ID + "' AND entryID = '" + entryID + "'";
+				if(db.isRecordExists(query)) {
+					String answerID = db.getString(query);
+					binder.update(table, fieldValueList, answerID);
+				}
+				else {
+					fieldValueList.add(new FieldValue("entryID", entryID));
+					fieldValueList.add(new FieldValue("fieldID", field.ID));
+					binder.insert(table, fieldValueList);
+				}
+			}
+		}
+		return binder.finish();
+	}
+
+	public static AnswerObj getAnswer(SQLiteAdapter db, EntryObj entry, FieldObj field) {
+		AnswerObj answer = new AnswerObj();
+		if(entry != null) {
+			String table = Tables.getName(TB.ANSWERS);
+			String query = "SELECT ID, value FROM " + table + " WHERE entryID = '" +
+					entry.ID + "' AND fieldID = '" + field.ID + "'";
+			Cursor cursor = db.read(query);
+			while(cursor.moveToNext()) {
+				answer.ID = cursor.getString(0);
+				answer.value = cursor.getString(1);
+			}
+			cursor.close();
+		}
+		return answer;
+	}
+
+	public static void showAlertDialog(FragmentActivity activity, String title, String message) {
+		final AlertDialogFragment alert = new AlertDialogFragment();
+		alert.setDialogTitle(title);
+		alert.setDialogMessage(message);
+		alert.setPositiveButton("Ok", new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+			}
+		});
+		FragmentManager manager = activity.getSupportFragmentManager();
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+				R.anim.fade_in, R.anim.fade_out);
+		transaction.add(R.id.rlMain, alert);
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 }

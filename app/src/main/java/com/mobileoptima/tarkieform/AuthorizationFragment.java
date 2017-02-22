@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
@@ -31,8 +30,8 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 	private CodePanTextField etCodeAuthorization;
 	private OnRefreshCallback refreshCallback;
 	private OnOverrideCallback overrideCallback;
-	private SQLiteAdapter db;
 	private boolean inOtherFragment;
+	private SQLiteAdapter db;
 
 	@Override
 	public void onStart(){
@@ -93,11 +92,11 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 						transaction.commit();
 					}
 					else {
-						CodePanUtils.showAlertToast(getActivity(), "Internet connection required..", Toast.LENGTH_SHORT);
+						CodePanUtils.showAlertToast(getActivity(), "Internet connection required.");
 					}
 				}
 				else{
-					CodePanUtils.showAlertToast(getActivity(), "Please input authorization code.", Toast.LENGTH_SHORT);
+					CodePanUtils.showAlertToast(getActivity(), "Please input authorization code.");
 				}
 				break;
 		}

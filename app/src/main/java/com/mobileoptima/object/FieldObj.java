@@ -7,4 +7,6 @@ public class FieldObj {
 	public String name;
 	public String description;
 	public boolean isRequired;
+	public boolean isQuestion;
+	public AnswerObj answer;
 }

@@ -12,7 +12,8 @@ public class Tables {
 		FORMS,
 		FIELDS,
 		CHOICES,
-		ENTRIES
+		ENTRIES,
+		ANSWERS
 	}
 
 	public static String create(TB tb) {
@@ -71,9 +72,16 @@ public class Tables {
 				break;
 			case ENTRIES:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, empID INTEGER, " +
 						"formID INTEGER, dDate TEXt, dTime TEXT, isSync INTEGER DEFAULT 0, " +
-						"syncBatchID TEXT, webEntryID INTEGER)";
+						"syncBatchID TEXT, isSubmit INTEGER DEFAULT 0, webEntryID INTEGER, " +
+						"isDelete INTEGER DEFAULT 0)";
+				break;
+			case ANSWERS:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+						"entryID INTEGER, fieldID INTEGER, value TEXT, " +
+						"isUpdate INTEGER DEFAULT 0)";
 				break;
 		}
 		return statement;
@@ -111,6 +119,9 @@ public class Tables {
 				break;
 			case ENTRIES:
 				name = "entries_tb";
+				break;
+			case ANSWERS:
+				name = "answers_tb";
 				break;
 		}
 		return name;

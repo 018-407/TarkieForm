@@ -1,5 +1,6 @@
 package com.mobileoptima.tarkieform;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.SignatureView;
 import com.mobileoptima.callback.Interface.OnSignCallback;
+import com.mobileoptima.constant.App;
 
 public class SignatureFragment extends Fragment implements View.OnClickListener {
 
@@ -62,7 +64,15 @@ public class SignatureFragment extends Fragment implements View.OnClickListener 
 				getActivity().getSupportFragmentManager().popBackStack();
 				break;
 			case R.id.btnSaveSignature:
-				getActivity().getSupportFragmentManager().popBackStack();
+				String fileName = System.currentTimeMillis() + ".png";
+				String path = getActivity().getDir(App.FOLDER, Context.MODE_PRIVATE).getPath();
+				int width = svAddSignature.getWidth();
+				int height = svAddSignature.getHeight();
+				boolean result = svAddSignature.exportFile(path, fileName, width, height);
+				if(result && signCallback != null) {
+					getActivity().getSupportFragmentManager().popBackStack();
+					signCallback.onSign(fileName);
+				}
 				break;
 		}
 	}

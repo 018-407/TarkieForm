@@ -13,7 +13,7 @@
         android:padding="@dimen/ten">
 
         <ImageView
-            android:id="@+id/ivLogoForm"
+            android:id="@+id/ivLogoEntries"
             android:layout_width="@dimen/forty"
             android:layout_height="@dimen/forty"
             android:layout_alignParentLeft="true"
@@ -21,8 +21,7 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_service"/>
 
-        <com.codepan.widget.CodePanLabel
-            android:id="@+id/tvNameForm"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -30,17 +29,34 @@
             android:layout_marginLeft="@dimen/ten"
             android:layout_marginRight="@dimen/ten"
             android:layout_marginStart="@dimen/ten"
-            android:layout_toEndOf="@+id/ivLogoForm"
-            android:layout_toLeftOf="@+id/ivNextForm"
-            android:layout_toRightOf="@+id/ivLogoForm"
-            android:layout_toStartOf="@+id/ivNextForm"
-            android:text="Service Order Form"
-            android:textColor="@color/gray_sec"
-            android:textSize="@dimen/seventeen"
-            codePan:typeface="@string/proxima_nova_bold"/>
+            android:layout_toEndOf="@+id/ivLogoEntries"
+            android:layout_toLeftOf="@+id/ivNextEntries"
+            android:layout_toRightOf="@+id/ivLogoEntries"
+            android:layout_toStartOf="@+id/ivNextEntries"
+            android:orientation="vertical">
+
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvNameEntries"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Service Order Form"
+                android:textColor="@color/gray_sec"
+                android:textSize="@dimen/seventeen"
+                codePan:typeface="@string/proxima_nova_bold"/>
+
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvStatusEntries"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Draft"
+                android:textColor="@color/red"
+                android:textSize="@dimen/fifteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/ivNextForm"
+            android:id="@+id/ivNextEntries"
             android:layout_width="@dimen/seven"
             android:layout_height="@dimen/fifteen"
             android:layout_alignParentEnd="true"

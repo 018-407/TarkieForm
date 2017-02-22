@@ -18,7 +18,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnCaptureCallback;
@@ -236,7 +235,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(getActivity(), "No photos to be cleared.", Toast.LENGTH_SHORT);
+					CodePanUtils.showAlertToast(getActivity(), "No photos to be cleared.");
 				}
 				break;
 			case R.id.rlOptionsCamera:
@@ -407,7 +406,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	Handler clearPhotosHandler = new Handler(new Handler.Callback() {
 		@Override
 		public boolean handleMessage(Message msg) {
-			CodePanUtils.showAlertToast(getActivity(), "Photos cleared.", Toast.LENGTH_SHORT);
+			CodePanUtils.showAlertToast(getActivity(), "Photos cleared.");
 			llPhotoGridCamera.removeAllViews();
 			CodePanUtils.collapseView(rlPhotoGridCamera, true);
 			tvPhotosTakenCamera.setText("0");

@@ -5,8 +5,10 @@ import android.database.Cursor;
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.FormObj;
+import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.object.PageObj;
 import com.mobileoptima.schema.Tables;
 
@@ -69,21 +71,34 @@ public class Data {
 		return pageList;
 	}
 
-	public static ArrayList<FieldObj> loadFields(SQLiteAdapter db, String formID, PageObj page) {
+	public static ArrayList<FieldObj> loadFields(SQLiteAdapter db, FormObj form,
+												 EntryObj entry, PageObj page) {
 		ArrayList<FieldObj> fieldList = new ArrayList<>();
 		String table = Tables.getName(Tables.TB.FIELDS);
 		String query = "SELECT ID, name, description, type, isRequired FROM " + table + " WHERE " +
-				"formID = '" + formID + "' AND orderNo BETWEEN '" + page.start + "' AND '" +
+				"formID = '" + form.ID + "' AND orderNo BETWEEN '" + page.start + "' AND '" +
 				page.end + "' ORDER BY orderNo";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
-			FieldObj obj = new FieldObj();
-			obj.ID = cursor.getString(0);
-			obj.name = cursor.getString(1);
-			obj.description = cursor.getString(2);
-			obj.type = cursor.getString(3);
-			obj.isRequired = cursor.getInt(4) == 1;
-			fieldList.add(obj);
+			FieldObj field = new FieldObj();
+			field.ID = cursor.getString(0);
+			field.name = cursor.getString(1);
+			field.description = cursor.getString(2);
+			field.type = cursor.getString(3);
+			field.isRequired = cursor.getInt(4) == 1;
+			switch(field.type) {
+				case FieldType.SEC:
+				case FieldType.LAB:
+				case FieldType.PB:
+				case FieldType.LINK:
+					field.isQuestion = false;
+					break;
+				default:
+					field.isQuestion = true;
+					field.answer = TarkieFormLib.getAnswer(db, entry, field);
+					break;
+			}
+			fieldList.add(field);
 		}
 		cursor.close();
 		return fieldList;
@@ -101,6 +116,45 @@ public class Data {
 			obj.name = cursor.getString(2);
 			choiceList.add(obj);
 		}
+		cursor.close();
 		return choiceList;
+	}
+
+	public static ArrayList<ImageObj> loadPhotos(SQLiteAdapter db) {
+		ArrayList<ImageObj> imageList = new ArrayList<>();
+		String empID = TarkieFormLib.getEmployeeID(db);
+		String table = Tables.getName(Tables.TB.PHOTO);
+		String query = "SELECT ID, fileName FROM " + table + " WHERE empID = '" + empID + "' AND isDelete = 0";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			ImageObj obj = new ImageObj();
+			obj.ID = cursor.getString(0);
+			obj.fileName = cursor.getString(1);
+			imageList.add(obj);
+		}
+		cursor.close();
+		return imageList;
+	}
+
+	public static ArrayList<EntryObj> loadEntries(SQLiteAdapter db) {
+		ArrayList<EntryObj> entryList = new ArrayList<>();
+		String empID = TarkieFormLib.getEmployeeID(db);
+		String query = "SELECT e.ID, e.dDate, e.dTime, e.isSubmit, f.ID, f.name FROM " +
+				Tables.getName(Tables.TB.ENTRIES) + " e , " + Tables.getName(Tables.TB.FORMS) + " f " +
+				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			EntryObj entry = new EntryObj();
+			entry.ID = cursor.getString(0);
+			entry.dDate = cursor.getString(1);
+			entry.dTime = cursor.getString(2);
+			entry.isSubmit = cursor.getInt(3) == 1;
+			FormObj form = new FormObj();
+			form.ID = cursor.getString(4);
+			form.name = cursor.getString(5);
+			entry.form = form;
+			entryList.add(entry);
+		}
+		return entryList;
 	}
 }

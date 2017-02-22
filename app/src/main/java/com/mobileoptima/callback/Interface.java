@@ -21,7 +21,7 @@ public class Interface {
 		void onOptionSelected(ChoiceObj obj);
 	}
 
-	public interface OnErrorCallback{
+	public interface OnErrorCallback {
 		void onError(String error, String params, String response, boolean showError);
 	}
 
@@ -33,11 +33,15 @@ public class Interface {
 		void onSign(String fileName);
 	}
 
-	public interface OnCameraDoneCallback{
+	public interface OnCameraDoneCallback {
 		void onCameraDone(ArrayList<ImageObj> imageList);
 	}
 
-	public interface OnDeletePhotoCallback{
+	public interface OnDeletePhotoCallback {
 		void onDeletePhoto(int position);
+	}
+
+	public interface OnLoginCallback {
+		void onLogin();
 	}
 }

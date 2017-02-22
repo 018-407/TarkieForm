@@ -35,7 +35,7 @@
         </FrameLayout>
 
         <com.codepan.widget.CodePanLabel
-            android:id="@+id/tvForm"
+            android:id="@+id/tvNameForm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -77,8 +77,16 @@
         android:id="@+id/flForm"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/flNextForm"
+        android:layout_above="@+id/llPageForm"
         android:layout_below="@+id/rlHeaderForm"/>
+
+    <LinearLayout
+        android:id="@+id/llPageForm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/flNextForm"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"/>
 
     <FrameLayout
         android:id="@+id/flNextForm"

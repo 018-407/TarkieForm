@@ -3,72 +3,112 @@ package com.mobileoptima.tarkieform;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
+import com.codepan.calendar.adapter.ViewPagerAdapter;
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanButton;
-import com.mobileoptima.adapter.FormAdapter;
+import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
+import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.RequestCode;
-import com.mobileoptima.constant.Tag;
-import com.mobileoptima.core.Data;
+import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.TarkieFormLib;
-import com.mobileoptima.object.FormObj;
 
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements OnClickListener, OnInitializeCallback,
-		OnOverrideCallback, OnRefreshCallback {
-	private CodePanButton btnSyncMain;
+		OnOverrideCallback, OnRefreshCallback, OnLoginCallback {
+
 	private OnPermissionGrantedCallback permissionGrantedCallback;
+	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain;
+	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain;
+	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain;
 	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
+	private ArrayList<Fragment> fragmentList;
 	private FragmentTransaction transaction;
-	private ArrayList<FormObj> formList;
+	private CodePanButton btnSyncMain;
+	private ViewPagerAdapter adapter;
 	private RelativeLayout rlMain;
-	private FormAdapter adapter;
 	private int width, height;
+	private ViewPager vpMain;
 	private SQLiteAdapter db;
-	private ListView lvMain;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
-		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
-		lvMain = (ListView) findViewById(R.id.lvMain);
+		btnHomeMain = (CodePanButton) findViewById(R.id.btnHomeMain);
+		btnEntriesMain = (CodePanButton) findViewById(R.id.btnEntriesMain);
+		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
+		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
+		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
+		ivPhotosMain = (ImageView) findViewById(R.id.ivPhotosMain);
+		tvHomeMain = (CodePanLabel) findViewById(R.id.tvHomeMain);
+		tvEntriesMain = (CodePanLabel) findViewById(R.id.tvEntriesMain);
+		tvPhotosMain = (CodePanLabel) findViewById(R.id.tvPhotosMain);
 		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
+		vpMain = (ViewPager) findViewById(R.id.vpMain);
 		btnSyncMain.setOnClickListener(this);
-		lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		btnHomeMain.setOnClickListener(this);
+		btnEntriesMain.setOnClickListener(this);
+		btnPhotosMain.setOnClickListener(this);
+		vpMain.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				FormObj obj = formList.get(i);
-				FormFragment form = new FormFragment();
-				form.setForm(obj);
-				form.setOnOverrideCallback(MainActivity.this);
-				transaction = getSupportFragmentManager().beginTransaction();
-				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
-						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-				transaction.replace(R.id.rlMain, form, Tag.FORM);
-				transaction.addToBackStack(null);
-				transaction.commit();
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				int green = getResources().getColor(R.color.green);
+				int graySec = getResources().getColor(R.color.gray_sec);
+				switch(position) {
+					case Tab.HOME:
+						ivHomeMain.setImageResource(R.drawable.ic_home_active);
+						ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
+						ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
+						tvHomeMain.setTextColor(green);
+						tvEntriesMain.setTextColor(graySec);
+						tvPhotosMain.setTextColor(graySec);
+						break;
+					case Tab.ENTRIES:
+						ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
+						ivEntriesMain.setImageResource(R.drawable.ic_entries_active);
+						ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
+						tvHomeMain.setTextColor(graySec);
+						tvEntriesMain.setTextColor(green);
+						tvPhotosMain.setTextColor(graySec);
+						break;
+					case Tab.PHOTOS:
+						ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
+						ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
+						ivPhotosMain.setImageResource(R.drawable.ic_photos_active);
+						tvHomeMain.setTextColor(graySec);
+						tvEntriesMain.setTextColor(graySec);
+						tvPhotosMain.setTextColor(green);
+						break;
+				}
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
 			}
 		});
 		init(savedInstanceState);
@@ -90,8 +130,17 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(this, "Internet connection required..", Toast.LENGTH_SHORT);
+					CodePanUtils.showAlertToast(this, "Internet connection required.");
 				}
+				break;
+			case R.id.btnHomeMain:
+				vpMain.setCurrentItem(Tab.HOME);
+				break;
+			case R.id.btnEntriesMain:
+				vpMain.setCurrentItem(Tab.ENTRIES);
+				break;
+			case R.id.btnPhotosMain:
+				vpMain.setCurrentItem(Tab.PHOTOS);
 				break;
 		}
 	}
@@ -114,6 +163,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			splash.setOnInitializeCallback(this);
 			splash.setOnRefreshCallback(this);
 			splash.setOnOverrideCallback(this);
+			splash.setOnLoginCallback(this);
 			transaction = getSupportFragmentManager().beginTransaction();
 			transaction.add(R.id.rlMain, splash);
 			transaction.addToBackStack(null);
@@ -136,12 +186,27 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onInitialize(SQLiteAdapter db) {
 		this.isInitialized = true;
 		this.db = db;
-		loadForms(db);
+		loadTabs();
 	}
 
 	@Override
 	public void onRefresh() {
 		authenticate();
+	}
+
+	public void loadTabs() {
+		HomeFragment home = new HomeFragment();
+		EntriesFragment entries = new EntriesFragment();
+		PhotosFragment photos = new PhotosFragment();
+		home.setOnOverrideCallback(this);
+		entries.setOnOverrideCallback(this);
+		fragmentList = new ArrayList<>();
+		fragmentList.add(home);
+		fragmentList.add(entries);
+		fragmentList.add(photos);
+		adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList);
+		vpMain.setOffscreenPageLimit(2);
+		vpMain.setAdapter(adapter);
 	}
 
 	@Override
@@ -181,31 +246,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		return this.db;
 	}
 
-	public void loadForms(final SQLiteAdapter db) {
-		Thread bg = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					formList = Data.loadForms(db);
-					handler.sendMessage(handler.obtainMessage());
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		bg.start();
-	}
-
-	Handler handler = new Handler(new Handler.Callback() {
-		@Override
-		public boolean handleMessage(Message message) {
-			adapter = new FormAdapter(MainActivity.this, formList);
-			lvMain.setAdapter(adapter);
-			return true;
-		}
-	});
-
 	public void setOnBackPressedCallback(OnBackPressedCallback backPressedCallback) {
 		this.backPressedCallback = backPressedCallback;
 	}
@@ -242,6 +282,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				LoginFragment login = new LoginFragment();
 				login.setOnOverrideCallback(this);
 				login.setOnRefreshCallback(this);
+				login.setOnLoginCallback(this);
 				transaction = getSupportFragmentManager().beginTransaction();
 				transaction.replace(R.id.rlMain, login);
 				transaction.addToBackStack(null);
@@ -263,5 +304,36 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	public int getWidth() {
 		return this.width;
+	}
+
+	public void reloadForms() {
+		if(fragmentList != null) {
+			Fragment fragment = fragmentList.get(Tab.HOME);
+			HomeFragment home = (HomeFragment) fragment;
+			home.loadForms(db);
+		}
+	}
+
+	public void reloadEntries() {
+		if(fragmentList != null) {
+			Fragment fragment = fragmentList.get(Tab.ENTRIES);
+			EntriesFragment entries = (EntriesFragment) fragment;
+			entries.loadEntries(db);
+		}
+	}
+
+	public void reloadPhotos() {
+		if(fragmentList != null) {
+			Fragment fragment = fragmentList.get(Tab.PHOTOS);
+			PhotosFragment photos = (PhotosFragment) fragment;
+			photos.loadPhotos(db);
+		}
+	}
+
+	@Override
+	public void onLogin() {
+		reloadForms();
+		reloadEntries();
+		reloadPhotos();
 	}
 }

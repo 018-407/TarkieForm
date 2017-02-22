@@ -7,17 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.codepan.widget.CodePanLabel;
-import com.mobileoptima.object.FormObj;
+import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.tarkieform.R;
 
 import java.util.ArrayList;
 
-public class FormAdapter extends ArrayAdapter<FormObj> {
+public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 
-	private ArrayList<FormObj> items;
+	private ArrayList<EntryObj> items;
 	private LayoutInflater inflater;
 
-	public FormAdapter(Context context, ArrayList<FormObj> items) {
+	public EntriesAdapter(Context context, ArrayList<EntryObj> items) {
 		super(context, 0, items);
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.items = items;
@@ -27,25 +27,25 @@ public class FormAdapter extends ArrayAdapter<FormObj> {
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		View view = convertView;
 		ViewHolder holder;
-		final FormObj obj = items.get(position);
+		final EntryObj obj = items.get(position);
 		if(obj != null) {
 			if(view == null) {
-				view = inflater.inflate(R.layout.form_list_row, parent, false);
+				view = inflater.inflate(R.layout.entries_list_row, parent, false);
 				holder = new ViewHolder();
-				holder.tvNameForm = (CodePanLabel) view.findViewById(R.id.tvNameForm);
+				holder.tvNameEntries = (CodePanLabel) view.findViewById(R.id.tvNameEntries);
 				view.setTag(holder);
 			}
 			else {
 				holder = (ViewHolder) view.getTag();
 			}
-			if(obj.name != null) {
-				holder.tvNameForm.setText(obj.name);
+			if(obj.form.name != null) {
+				holder.tvNameEntries.setText(obj.form.name);
 			}
 		}
 		return view;
 	}
 
 	private class ViewHolder {
-		public CodePanLabel tvNameForm;
+		public CodePanLabel tvNameEntries;
 	}
 }

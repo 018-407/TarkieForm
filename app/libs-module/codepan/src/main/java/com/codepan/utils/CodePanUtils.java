@@ -1424,6 +1424,19 @@ public class CodePanUtils {
 		toast.show();
 	}
 
+	public static void showAlertToast(FragmentActivity activity, String message) {
+		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
+		LayoutInflater inflater = activity.getLayoutInflater();
+		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
+		CodePanLabel text = (CodePanLabel) layout.findViewById(R.id.tvMessageAlertToast);
+		text.setText(message);
+		Toast toast = new Toast(activity);
+		toast.setGravity(Gravity.BOTTOM, 0, offsetY);
+		toast.setDuration(Toast.LENGTH_SHORT);
+		toast.setView(layout);
+		toast.show();
+	}
+
 	public static void showAlertToast(FragmentActivity activity, String message, int duration, ArrayList<SpannableMap> list, Typeface typeface) {
 		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
 		LayoutInflater inflater = activity.getLayoutInflater();

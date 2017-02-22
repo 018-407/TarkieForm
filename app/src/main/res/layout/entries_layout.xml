@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:clickable="true"
+    android:padding="@dimen/thirteen">
+
+    <ListView
+        android:id="@+id/lvEntries"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/five"
+        android:divider="@color/transparent"
+        android:listSelector="@color/transparent"
+        android:scrollbarSize="@dimen/three"
+        android:scrollbarThumbVertical="@color/black_trans_forty"/>
+
+</RelativeLayout>

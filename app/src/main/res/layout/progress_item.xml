@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/three">
+
+    <View
+        android:id="@+id/vProgress"
+        android:layout_width="@dimen/seven"
+        android:layout_height="@dimen/seven"
+        android:background="@drawable/state_oval_green"/>
+
+</FrameLayout>

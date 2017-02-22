@@ -21,6 +21,7 @@ import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.cache.SQLiteCache;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
+import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.constant.RequestCode;
@@ -28,12 +29,14 @@ import com.mobileoptima.core.TarkieFormLib;
 
 public class SplashFragment extends Fragment implements OnCreateDatabaseCallback,
 		OnUpgradeDatabaseCallback, OnPermissionGrantedCallback, OnFragmentCallback {
+
 	private final int DELAY = 2000;
 	private boolean isPause, isPending, isRequired;
 	private OnInitializeCallback initializeCallback;
 	private OnOverrideCallback overrideCallback;
 	private OnRefreshCallback refreshCallback;
 	private FragmentTransaction transaction;
+	private OnLoginCallback loginCallback;
 	private SQLiteAdapter db;
 
 	@Override
@@ -170,6 +173,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 				LoginFragment login = new LoginFragment();
 				login.setOnOverrideCallback(overrideCallback);
 				login.setOnRefreshCallback(refreshCallback);
+				login.setOnLoginCallback(loginCallback);
 				transaction = getActivity().getSupportFragmentManager().beginTransaction();
 				transaction.replace(R.id.rlMain, login);
 				transaction.addToBackStack(null);
@@ -206,5 +210,9 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		transaction.add(R.id.rlMain, alert);
 		transaction.addToBackStack(null);
 		transaction.commit();
+	}
+
+	public void setOnLoginCallback(OnLoginCallback loginCallback) {
+		this.loginCallback = loginCallback;
 	}
 }
