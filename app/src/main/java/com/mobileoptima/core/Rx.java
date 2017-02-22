@@ -188,8 +188,8 @@ public class Rx {
 		try {
 			JSONObject paramsObj = new JSONObject();
 			paramsObj.put("api_key", Session.API_KEY);
-			paramsObj.put("username", password);
-			paramsObj.put("password", username);
+			paramsObj.put("username", username);
+			paramsObj.put("password", password);
 			params = paramsObj.toString(INDENT);
 			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
 			Log.e("login PARAMS", params);
@@ -231,6 +231,7 @@ public class Rx {
 					ArrayList<FieldValue> list = new ArrayList<>();
 					list.add(new FieldValue("dDate", CodePanUtils.getDate()));
 					list.add(new FieldValue("dTime", CodePanUtils.getTime()));
+					list.add(new FieldValue("isLogOut", false));
 					list.add(new FieldValue("empID", empID));
 					String query = "SELECT ID FROM " + table + " WHERE ID = 1";
 					if(!db.isRecordExists(query)) {
@@ -239,6 +240,83 @@ public class Rx {
 					else {
 						binder.update(table, list, 1);
 					}
+				}
+				result = binder.finish();
+			}
+		}
+		catch(JSONException je) {
+			je.printStackTrace();
+			if(errorCallback != null) {
+				errorCallback.onError(je.getMessage(), params, response, false);
+			}
+			return false;
+		}
+		return result;
+	}
+
+	public static boolean getEmployee(SQLiteAdapter db, OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		final int TIMEOUT = 5000;
+		String action = "get-employee";
+		String url = App.WEB_URL + action;
+		String response = null;
+		String params = null;
+		try {
+			JSONObject paramsObj = new JSONObject();
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			paramsObj.put("api_key", apiKey);
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			Log.e("getEmployee PARAMS", params);
+			Log.e("getEmployee RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
+						if(errorCallback != null) {
+							errorCallback.onError(message, params, response, true);
+						}
+						return false;
+					}
+				}
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				String table = Tables.getName(Tables.TB.EMPLOYEE);
+				binder.truncate(table);
+				JSONArray dataArray = responseObj.getJSONArray("data");
+				for(int d = 0; d < dataArray.length(); d++) {
+					JSONObject dataObj = dataArray.getJSONObject(d);
+					String firstName = CodePanUtils.handleUniCode(dataObj.getString("fname"));
+					String lastName = CodePanUtils.handleUniCode(dataObj.getString("lname"));
+					String employeeNo = CodePanUtils.handleUniCode(dataObj.getString("employee_code"));
+					ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+					fieldValueList.add(new FieldValue("ID", dataObj.getString("user_id")));
+					fieldValueList.add(new FieldValue("firstName", firstName));
+					fieldValueList.add(new FieldValue("lastName", lastName));
+					fieldValueList.add(new FieldValue("employeeNo", employeeNo));
+					fieldValueList.add(new FieldValue("groupID", dataObj.getString("team_id")));
+					fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
+					fieldValueList.add(new FieldValue("isActive", dataObj.getInt("is_active")));
+					binder.insert(table, fieldValueList);
 				}
 				result = binder.finish();
 			}

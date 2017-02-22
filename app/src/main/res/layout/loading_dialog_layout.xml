@@ -38,7 +38,7 @@
                 android:layout_width="@dimen/seventy_five"
                 android:layout_height="@dimen/seventy_five"
                 android:layout_centerInParent="true"
-                progressWheel:barColor="@color/blue"
+                progressWheel:barColor="@color/green"
                 progressWheel:barWidth="@dimen/two"
                 progressWheel:circleRadius="@dimen/one_hundred"
                 progressWheel:contourColor="@color/transparent"

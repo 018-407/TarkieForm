@@ -87,13 +87,12 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		progressLoadingDialog = (ProgressWheel) view.findViewById(R.id.progressLoadingDialog);
 		tvTitleLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvTitleLoadingDialog);
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
-		String title;
 		switch(action) {
 			case AUTHORIZE_DEVICE:
-				setMax(2);
+				setMax(1);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
-				title = "Authorizing Device...";
+				String title = "Authorizing Device...";
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
@@ -128,6 +127,11 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
+					if(result) {
+						result = Rx.getEmployee(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
 				}
 				catch(Exception e) {
 					e.printStackTrace();
@@ -144,8 +148,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			public void run() {
 				Looper.prepare();
 				try {
-//					result = Rx.getEmployee(db, getErrorCallback());
-					result = true;
+					result = Rx.getEmployee(db, getErrorCallback());
 					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
 					if(result) {

@@ -31,6 +31,7 @@ public class TarkieFormLib {
 		db.execQuery(Tables.create(TB.SYNC_BATCH));
 		db.execQuery(Tables.create(TB.CREDENTIALS));
 		db.execQuery(Tables.create(TB.COMPANY));
+		db.execQuery(Tables.create(TB.EMPLOYEE));
 		db.execQuery(Tables.create(TB.PHOTO));
 	}
 

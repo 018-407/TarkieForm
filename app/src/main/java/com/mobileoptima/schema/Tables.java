@@ -7,6 +7,7 @@ public class Tables {
 		SYNC_BATCH,
 		CREDENTIALS,
 		COMPANY,
+		EMPLOYEE,
 		PHOTO
 	}
 
@@ -34,6 +35,12 @@ public class Tables {
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, " +
 						"address TEXT, email TEXT, contactNo TEXT, imageUrl TEXT)";
 				break;
+			case EMPLOYEE:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, employeeNo TEXT, " +
+						"firstName TEXT, lastName TEXT, email TEXT, groupID INTEGER, " +
+						"isActive INTEGER, imageUrl TEXT)";
+				break;
 			case PHOTO:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -59,6 +66,9 @@ public class Tables {
 				break;
 			case COMPANY:
 				name = "company_tb";
+				break;
+			case EMPLOYEE:
+				name = "employee_tb";
 				break;
 			case PHOTO:
 				name = "photo_tb";
