@@ -87,12 +87,13 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		progressLoadingDialog = (ProgressWheel) view.findViewById(R.id.progressLoadingDialog);
 		tvTitleLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvTitleLoadingDialog);
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
+		String title;
 		switch(action) {
 			case AUTHORIZE_DEVICE:
-				setMax(1);
+				setMax(2);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
-				String title = "Authorizing Device...";
+				title = "Authorizing Device...";
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
@@ -100,14 +101,14 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				break;
 
 			case LOGIN:
-				setMax(3);
+				setMax(2);
 				successMsg = "Login successful.";
 				failedMsg = "Failed to login.";
 				title = "Validating account...";
 				tvTitleLoadingDialog.setText(title);
 				String username = bundle.getString(Key.USERNAME);
 				String password = bundle.getString(Key.PASSWORD);
-				//login(db, username, password);
+				login(db, username, password);
 				break;
 		}
 		return view;
@@ -134,6 +135,31 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			}
 		});
 		bg.setName(Process.AUTHORIZATION);
+		bg.start();
+	}
+
+	public void login(final SQLiteAdapter db, final String username, final String password) {
+		bg = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Looper.prepare();
+				try {
+//					result = Rx.getEmployee(db, getErrorCallback());
+					result = true;
+					Thread.sleep(250);
+					handler.sendMessage(handler.obtainMessage());
+					if(result) {
+						result = Rx.login(db, username, password, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		bg.setName(Process.LOGIN);
 		bg.start();
 	}
 

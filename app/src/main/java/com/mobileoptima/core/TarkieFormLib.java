@@ -12,6 +12,7 @@ import com.mobileoptima.constant.App;
 import com.mobileoptima.object.GpsObj;
 import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.schema.Tables;
+import com.mobileoptima.session.Session;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +32,11 @@ public class TarkieFormLib {
 		db.execQuery(Tables.create(TB.CREDENTIALS));
 		db.execQuery(Tables.create(TB.COMPANY));
 		db.execQuery(Tables.create(TB.PHOTO));
+	}
+
+	public static void loadCredentials(SQLiteAdapter db) {
+		Session.API_KEY = getAPIKey(db);
+		Session.EMP_ID = getEmployeeID(db);
 	}
 
 	public static void alterTables(SQLiteAdapter db, int oldVersion, int newVersion) {
