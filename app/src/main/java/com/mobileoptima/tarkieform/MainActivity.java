@@ -54,6 +54,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		setContentView(R.layout.main_layout);
 		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
 		lvMain = (ListView) findViewById(R.id.lvMain);
+		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		btnSyncMain.setOnClickListener(this);
 		lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -69,8 +71,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				transaction.commit();
 			}
 		});
-		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
-		btnSyncMain.setOnClickListener(this);
 		init(savedInstanceState);
 	}
 
