@@ -5,6 +5,7 @@ import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.FormObj;
 import com.mobileoptima.object.ChoiceObj;
+import com.mobileoptima.schema.Tables;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,10 @@ public class Data {
 
 	public static ArrayList<FormObj> loadForms(SQLiteAdapter db) {
 		ArrayList<FormObj> formList = new ArrayList<>();
+		String table = Tables.getName(Tables.TB.FORMS);
+
+
+
 		FormObj form1 = new FormObj();
 		form1.ID = "1";
 		form1.dDesc = "Service Order Form";

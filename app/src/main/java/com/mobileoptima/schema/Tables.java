@@ -55,7 +55,8 @@ public class Tables {
 			case FORMS:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"name TEXT, description TEXT, dateCreated TEXT, timeCreated TEXT)";
+						"name TEXT, description TEXT, dateCreated TEXT, timeCreated TEXT, " +
+						"groupID INTEGER)";
 				break;
 			case FIELDS:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +

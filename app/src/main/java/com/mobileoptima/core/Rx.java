@@ -519,6 +519,7 @@ public class Rx {
 						fieldValueList.clear();
 						fieldValueList.add(new FieldValue("ID", formID));
 						fieldValueList.add(new FieldValue("name", name));
+						fieldValueList.add(new FieldValue("groupID", groupID));
 						fieldValueList.add(new FieldValue("description", description));
 						fieldValueList.add(new FieldValue("dateCreated", dataObj.getString("date_created")));
 						fieldValueList.add(new FieldValue("timeCreated", dataObj.getString("time_created")));
