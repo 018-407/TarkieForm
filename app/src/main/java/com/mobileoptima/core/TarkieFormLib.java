@@ -43,7 +43,7 @@ public class TarkieFormLib {
 
 	public static boolean isLoggedIn(SQLiteAdapter db) {
 		String table = Tables.getName(TB.CREDENTIALS);
-		String query = "SELECT ID FROM " + table + " WHERE ID = 1 AND employeeID != 0 AND isLogOut = 0";
+		String query = "SELECT ID FROM " + table + " WHERE ID = 1 AND empID != 0 AND isLogOut = 0";
 		return db.isRecordExists(query);
 	}
 

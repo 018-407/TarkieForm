@@ -37,13 +37,13 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 	@Override
 	public void onStart(){
 		super.onStart();
-		onAuthorize(true);
+		setOnBackStack(true);
 	}
 
 	@Override
 	public void onStop(){
 		super.onStop();
-		onAuthorize(false);
+		setOnBackStack(false);
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 		}
 	}
 
-	public void onAuthorize(boolean isOnBackStack){
+	public void setOnBackStack(boolean isOnBackStack){
 		if(overrideCallback != null){
 			overrideCallback.onOverride(isOnBackStack);
 		}
