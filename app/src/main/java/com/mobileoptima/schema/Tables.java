@@ -1,10 +1,12 @@
 package com.mobileoptima.schema;
 
 public class Tables {
+
 	public enum TB {
 		API_KEY,
 		SYNC_BATCH,
 		CREDENTIALS,
+		COMPANY,
 		PHOTO
 	}
 
@@ -27,9 +29,14 @@ public class Tables {
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, dDate TEXT, dTime TEXT, " +
 						"empID INTEGER, isLogOut INTEGER DEFAULT 0, isNewUser INTEGER DEFAULT 0 )";
 				break;
+			case COMPANY:
+				statement = "CREATE TABLE IF NOT EXISTS " + table +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, " +
+						"address TEXT, email TEXT, contactNo TEXT, imageUrl TEXT)";
+				break;
 			case PHOTO:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, dDesc TEXT, " +
+						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
 						"fileName TEXT, dDate TEXT, dTime TEXT, empID INTEGER, " +
 						"isDelete INTEGER DEFAULT 0, isUpload INTEGER DEFAULT 0, " +
 						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, syncBatchID TEXT)";
@@ -49,6 +56,9 @@ public class Tables {
 				break;
 			case CREDENTIALS:
 				name = "credentials_tb";
+				break;
+			case COMPANY:
+				name = "company_tb";
 				break;
 			case PHOTO:
 				name = "photo_tb";

@@ -87,13 +87,12 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		progressLoadingDialog = (ProgressWheel) view.findViewById(R.id.progressLoadingDialog);
 		tvTitleLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvTitleLoadingDialog);
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
-		String title;
 		switch(action) {
 			case AUTHORIZE_DEVICE:
 				setMax(1);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
-				title = "Authorizing Device...";
+				String title = "Authorizing Device...";
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
@@ -108,7 +107,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				tvTitleLoadingDialog.setText(title);
 				String username = bundle.getString(Key.USERNAME);
 				String password = bundle.getString(Key.PASSWORD);
-				login(db, username, password);
+				//login(db, username, password);
 				break;
 		}
 		return view;
@@ -120,34 +119,14 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			public void run() {
 				Looper.prepare();
 				try {
-//					result = Rx.authorizeDevice(db, authorizationCode, deviceID, getErrorCallback());
-					result = Rx.authorizeDevice(db);
-					Thread.sleep(5000);
+					result = Rx.authorizeDevice(db, authorizationCode, deviceID, getErrorCallback());
+					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		bg.setName(Process.AUTHORIZATION);
-		bg.start();
-	}
-
-	public void login(final SQLiteAdapter db, final String username, final String password) {
-		bg = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Looper.prepare();
-				try {
-//					result = Rx.login(db, username, password, getErrorCallback());
-					result = Rx.login(db);
-					Thread.sleep(5000);
-					handler.sendMessage(handler.obtainMessage());
-					Thread.sleep(5000);
-					handler.sendMessage(handler.obtainMessage());
-					Thread.sleep(5000);
-					handler.sendMessage(handler.obtainMessage());
+					if(result) {
+						result = Rx.getCompany(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
 				}
 				catch(Exception e) {
 					e.printStackTrace();

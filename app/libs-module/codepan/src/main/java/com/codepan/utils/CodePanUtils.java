@@ -1638,7 +1638,7 @@ public class CodePanUtils {
 		view.startAnimation(fadeOut);
 	}
 
-	public static String handleUniCodeToSQLite(String text) {
+	public static String handleUniCode(String text) {
 		String result = "";
 		if(text != null && !text.equals("null")) {
 			result = text.replace("'", "''").

@@ -17,29 +17,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class Rx {
-	public static boolean authorizeDevice(SQLiteAdapter db) {
-		SQLiteBinder binder = new SQLiteBinder(db);
-		String table = Tables.getName(Tables.TB.API_KEY);
-		TarkieFormLib.updateSyncBatchID(db, "1");
-		ArrayList<FieldValue> list = new ArrayList<>();
-		list.add(new FieldValue("apiKey", "R9J621vJg11W4WeDf3N7J2yK0Zgfjm"));
-		list.add(new FieldValue("authorizationCode", "10711251"));
-		list.add(new FieldValue("deviceID", "121"));
-		String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-		if(!db.isRecordExists(query)) {
-			binder.insert(table, list);
-		}
-		else {
-			binder.update(table, list, 1);
-		}
-		return binder.finish();
-	}
 
 	public static boolean authorizeDevice(SQLiteAdapter db, String authorizationCode, String deviceID,
 										  OnErrorCallback errorCallback) {
 		boolean result = false;
 		boolean hasData = false;
 		final int INDENT = 4;
+		final int TIMEOUT = 5000;
 		String action = "authorize-device";
 		String url = App.WEB_URL + action;
 		String response = null;
@@ -51,7 +35,7 @@ public class Rx {
 			paramsObj.put("api_key", App.API_KEY);
 			paramsObj.put("os_type", App.OS_TYPE);
 			params = paramsObj.toString(INDENT);
-			response = CodePanUtils.getHttpResponse(url, params, 5000);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
 			Log.e("authorization PARAMS", params);
 			Log.e("authorization RESPONSE", response);
 			JSONObject responseObj = new JSONObject(response);
@@ -87,7 +71,7 @@ public class Rx {
 				JSONArray dataArray = responseObj.getJSONArray("data");
 				for(int d = 0; d < dataArray.length(); d++) {
 					JSONObject dataObj = dataArray.getJSONObject(d);
-					String apiKey = dataObj.getString("request_code");
+					String apiKey = dataObj.getString("api_key");
 					String syncBatchID = dataObj.getString("sync_batch_id");
 					TarkieFormLib.updateSyncBatchID(db, syncBatchID);
 					ArrayList<FieldValue> list = new ArrayList<>();
@@ -115,44 +99,23 @@ public class Rx {
 		return result;
 	}
 
-	public static boolean login(SQLiteAdapter db) {
-		SQLiteBinder binder = new SQLiteBinder(db);
-		String table = Tables.getName(Tables.TB.CREDENTIALS);
-		TarkieFormLib.updateSyncBatchID(db, "2");
-		ArrayList<FieldValue> list = new ArrayList<>();
-		list.add(new FieldValue("companyID", "R9J621vJg11W4WeDf3N7J2yK0Zgfjm"));
-		list.add(new FieldValue("employeeID", "10711251"));
-		list.add(new FieldValue("dDate", "2017-02-22"));
-		list.add(new FieldValue("dTime", "09:00:00"));
-		String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-		if(!db.isRecordExists(query)) {
-			binder.insert(table, list);
-		}
-		else {
-			binder.update(table, list, 1);
-		}
-		return binder.finish();
-	}
-
-	public static boolean login(SQLiteAdapter db, String username, String password,
-										  OnErrorCallback errorCallback) {
+	public static boolean getCompany(SQLiteAdapter db, OnErrorCallback errorCallback) {
 		boolean result = false;
 		boolean hasData = false;
 		final int INDENT = 4;
-		String action = "get-employee";
+		final int TIMEOUT = 5000;
+		String action = "get-company";
 		String url = App.WEB_URL + action;
 		String response = null;
 		String params = null;
 		try {
 			JSONObject paramsObj = new JSONObject();
-			paramsObj.put("tablet_id", password);
-			paramsObj.put("authorization_code", username);
-			paramsObj.put("api_key", App.API_KEY);
-			paramsObj.put("os_type", App.OS_TYPE);
+			String apiKey = TarkieFormLib.getAPIKey(db);
+			paramsObj.put("api_key", apiKey);
 			params = paramsObj.toString(INDENT);
-			response = CodePanUtils.getHttpResponse(url, params, 5000);
-			Log.e("authorization PARAMS", params);
-			Log.e("authorization RESPONSE", response);
+			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			Log.e("getCompany PARAMS", params);
+			Log.e("getCompany RESPONSE", response);
 			JSONObject responseObj = new JSONObject(response);
 			if(responseObj.isNull("error")) {
 				JSONArray initArray = responseObj.getJSONArray("init");
@@ -182,24 +145,21 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.API_KEY);
+				String table = Tables.getName(Tables.TB.COMPANY);
+				binder.truncate(table);
 				JSONArray dataArray = responseObj.getJSONArray("data");
 				for(int d = 0; d < dataArray.length(); d++) {
 					JSONObject dataObj = dataArray.getJSONObject(d);
-					String apiKey = dataObj.getString("request_code");
-					String syncBatchID = dataObj.getString("sync_batch_id");
-					TarkieFormLib.updateSyncBatchID(db, syncBatchID);
-					ArrayList<FieldValue> list = new ArrayList<>();
-					list.add(new FieldValue("apiKey", apiKey));
-					list.add(new FieldValue("authorizationCode", username));
-					list.add(new FieldValue("deviceID", password));
-					String query = "SELECT ID FROM " + table + " WHERE ID = 1";
-					if(!db.isRecordExists(query)) {
-						binder.insert(table, list);
-					}
-					else {
-						binder.update(table, list, 1);
-					}
+					String company = CodePanUtils.handleUniCode(dataObj.getString("name"));
+					String address = CodePanUtils.handleUniCode(dataObj.getString("address"));
+					ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+					fieldValueList.add(new FieldValue("ID", dataObj.getString("company_id")));
+					fieldValueList.add(new FieldValue("name", company));
+					fieldValueList.add(new FieldValue("address", address));
+					fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
+					fieldValueList.add(new FieldValue("contactNo", dataObj.getString("contact_number")));
+					fieldValueList.add(new FieldValue("imageUrl", dataObj.getString("splash_screen_image")));
+					binder.insert(table, fieldValueList);
 				}
 				result = binder.finish();
 			}
