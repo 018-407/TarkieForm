@@ -9,10 +9,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.codepan.calendar.adapter.ViewPagerAdapter;
 import com.codepan.callback.Interface.OnBackPressedCallback;
@@ -33,10 +36,10 @@ import com.mobileoptima.core.TarkieFormLib;
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements OnClickListener, OnInitializeCallback,
-		OnOverrideCallback, OnRefreshCallback, OnLoginCallback {
+		OnOverrideCallback, OnRefreshCallback, OnLoginCallback, OnPageChangeListener {
 
+	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
-	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain;
 	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain;
 	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain;
 	private OnBackPressedCallback backPressedCallback;
@@ -45,7 +48,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	private FragmentTransaction transaction;
 	private CodePanButton btnSyncMain;
 	private ViewPagerAdapter adapter;
+	private ScrollView svMenuMain;
 	private RelativeLayout rlMain;
+	private DrawerLayout dlMain;
 	private int width, height;
 	private ViewPager vpMain;
 	private SQLiteAdapter db;
@@ -57,60 +62,26 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		btnHomeMain = (CodePanButton) findViewById(R.id.btnHomeMain);
 		btnEntriesMain = (CodePanButton) findViewById(R.id.btnEntriesMain);
 		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
+		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		btnMenuMain = (CodePanButton) findViewById(R.id.btnMenuMain);
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
 		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
 		ivPhotosMain = (ImageView) findViewById(R.id.ivPhotosMain);
 		tvHomeMain = (CodePanLabel) findViewById(R.id.tvHomeMain);
 		tvEntriesMain = (CodePanLabel) findViewById(R.id.tvEntriesMain);
 		tvPhotosMain = (CodePanLabel) findViewById(R.id.tvPhotosMain);
-		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		svMenuMain = (ScrollView) findViewById(R.id.svMenuMain);
 		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
+		dlMain = (DrawerLayout) findViewById(R.id.dlMain);
 		vpMain = (ViewPager) findViewById(R.id.vpMain);
 		btnSyncMain.setOnClickListener(this);
 		btnHomeMain.setOnClickListener(this);
 		btnEntriesMain.setOnClickListener(this);
 		btnPhotosMain.setOnClickListener(this);
-		vpMain.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				int green = getResources().getColor(R.color.green);
-				int graySec = getResources().getColor(R.color.gray_sec);
-				switch(position) {
-					case Tab.HOME:
-						ivHomeMain.setImageResource(R.drawable.ic_home_active);
-						ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
-						ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
-						tvHomeMain.setTextColor(green);
-						tvEntriesMain.setTextColor(graySec);
-						tvPhotosMain.setTextColor(graySec);
-						break;
-					case Tab.ENTRIES:
-						ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
-						ivEntriesMain.setImageResource(R.drawable.ic_entries_active);
-						ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
-						tvHomeMain.setTextColor(graySec);
-						tvEntriesMain.setTextColor(green);
-						tvPhotosMain.setTextColor(graySec);
-						break;
-					case Tab.PHOTOS:
-						ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
-						ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
-						ivPhotosMain.setImageResource(R.drawable.ic_photos_active);
-						tvHomeMain.setTextColor(graySec);
-						tvEntriesMain.setTextColor(graySec);
-						tvPhotosMain.setTextColor(green);
-						break;
-				}
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-			}
-		});
+		btnMenuMain.setOnClickListener(this);
+		vpMain.addOnPageChangeListener(this);
+		int color = getResources().getColor(R.color.black_trans_twenty);
+		dlMain.setScrimColor(color);
 		init(savedInstanceState);
 	}
 
@@ -141,6 +112,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				break;
 			case R.id.btnPhotosMain:
 				vpMain.setCurrentItem(Tab.PHOTOS);
+				break;
+			case R.id.btnMenuMain:
+				if(dlMain.isDrawerOpen(svMenuMain)){
+					dlMain.closeDrawer(svMenuMain);
+				}
+				else{
+					dlMain.openDrawer(svMenuMain);
+				}
 				break;
 		}
 	}
@@ -192,6 +171,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	@Override
 	public void onRefresh() {
 		authenticate();
+		reloadForms();
 	}
 
 	public void loadTabs() {
@@ -330,10 +310,56 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		}
 	}
 
+	public void switchTab(int tab) {
+		if(vpMain != null) {
+			vpMain.setCurrentItem(tab);
+		}
+	}
+
 	@Override
 	public void onLogin() {
 		reloadForms();
 		reloadEntries();
 		reloadPhotos();
+	}
+
+	@Override
+	public void onPageSelected(int position) {
+		int green = getResources().getColor(R.color.green);
+		int graySec = getResources().getColor(R.color.gray_sec);
+		switch(position) {
+			case Tab.HOME:
+				ivHomeMain.setImageResource(R.drawable.ic_home_active);
+				ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
+				ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
+				tvHomeMain.setTextColor(green);
+				tvEntriesMain.setTextColor(graySec);
+				tvPhotosMain.setTextColor(graySec);
+				break;
+			case Tab.ENTRIES:
+				ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
+				ivEntriesMain.setImageResource(R.drawable.ic_entries_active);
+				ivPhotosMain.setImageResource(R.drawable.ic_photos_inactive);
+				tvHomeMain.setTextColor(graySec);
+				tvEntriesMain.setTextColor(green);
+				tvPhotosMain.setTextColor(graySec);
+				break;
+			case Tab.PHOTOS:
+				ivHomeMain.setImageResource(R.drawable.ic_home_inactive);
+				ivEntriesMain.setImageResource(R.drawable.ic_entries_inactive);
+				ivPhotosMain.setImageResource(R.drawable.ic_photos_active);
+				tvHomeMain.setTextColor(graySec);
+				tvEntriesMain.setTextColor(graySec);
+				tvPhotosMain.setTextColor(green);
+				break;
+		}
+	}
+
+	@Override
+	public void onPageScrolled(int position, float offset, int px) {
+	}
+
+	@Override
+	public void onPageScrollStateChanged(int state) {
 	}
 }

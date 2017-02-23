@@ -36,7 +36,7 @@ public class Data {
 		ArrayList<PageObj> pageList = new ArrayList<>();
 		String table = Tables.getName(Tables.TB.FIELDS);
 		String query = "SELECT ID, orderNo FROM " + table + " WHERE type = '" +
-				FieldType.PB + "' ORDER BY orderNo";
+				FieldType.PB + "' AND formID = '" + formID + "' ORDER BY orderNo";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			PageObj obj = new PageObj();
@@ -141,7 +141,7 @@ public class Data {
 		String empID = TarkieFormLib.getEmployeeID(db);
 		String query = "SELECT e.ID, e.dDate, e.dTime, e.isSubmit, f.ID, f.name FROM " +
 				Tables.getName(Tables.TB.ENTRIES) + " e , " + Tables.getName(Tables.TB.FORMS) + " f " +
-				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID";
+				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID ORDER BY e.ID DESC";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			EntryObj entry = new EntryObj();
@@ -155,6 +155,7 @@ public class Data {
 			entry.form = form;
 			entryList.add(entry);
 		}
+		cursor.close();
 		return entryList;
 	}
 }

@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -97,9 +96,6 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
-				if(deviceID == null) {
-					deviceID = "000000000000000";
-				}
 				authorizeDevice(db, authorizationCode, deviceID);
 				break;
 			case LOGIN:
@@ -114,9 +110,9 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				break;
 			case UPDATE_MASTERLIST:
 				setMax(4);
-				successMsg = "Update masterlist successful.";
-				failedMsg = "Failed to update masterlist.";
-				title = "Updating masterlist...";
+				successMsg = "Update master list successful.";
+				failedMsg = "Failed to update master list.";
+				title = "Updating master list...";
 				tvTitleLoadingDialog.setText(title);
 				updateMasterlist(db);
 				break;

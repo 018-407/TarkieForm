@@ -201,11 +201,9 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 				flCamera.getLayoutParams().width = maxWidth;
 				flCamera.removeViewAt(0);
 				flCamera.addView(surfaceView, 0);
+				rlOptionsCamera.performClick();
 				break;
 			case R.id.btnClearCamera:
-				if(rlOptionsCamera.getVisibility() == View.VISIBLE) {
-					CodePanUtils.fadeOut(rlOptionsCamera);
-				}
 				if(!imageList.isEmpty()) {
 					final AlertDialogFragment alert = new AlertDialogFragment();
 					alert.setOnFragmentCallback(this);
@@ -237,6 +235,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 				else {
 					CodePanUtils.showAlertToast(getActivity(), "No photos to be cleared.");
 				}
+				rlOptionsCamera.performClick();
 				break;
 			case R.id.rlOptionsCamera:
 				if(rlOptionsCamera.getVisibility() == View.VISIBLE) {

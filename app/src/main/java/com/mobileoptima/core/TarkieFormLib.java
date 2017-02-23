@@ -247,6 +247,7 @@ public class TarkieFormLib {
 						}
 						break;
 					case FieldType.YON:
+					case FieldType.CB:
 						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
 						break;
 				}
@@ -297,6 +298,7 @@ public class TarkieFormLib {
 						}
 						break;
 					case FieldType.YON:
+					case FieldType.CB:
 						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
 						break;
 				}

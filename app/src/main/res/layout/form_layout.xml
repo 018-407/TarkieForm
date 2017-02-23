@@ -115,4 +115,55 @@
 
     </FrameLayout>
 
+    <RelativeLayout
+        android:id="@+id/rlOptionsForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/llOptionsForm"
+            android:layout_width="@dimen/one_hundred_eighty"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/three"
+            android:background="@color/gray_qui"
+            android:elevation="@dimen/eight"
+            android:orientation="vertical">
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnSaveForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/state_rect_trans_dark"
+                android:gravity="left"
+                android:padding="@dimen/twelve"
+                android:text="Save"
+                android:textColor="@color/gray_non"
+                android:textSize="@dimen/eighteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/one"
+                android:background="@color/gray_den"/>
+
+            <com.codepan.widget.CodePanButton
+                android:id="@+id/btnCancelForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/state_rect_trans_dark"
+                android:gravity="left"
+                android:padding="@dimen/twelve"
+                android:text="Cancel"
+                android:textColor="@color/gray_non"
+                android:textSize="@dimen/eighteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </RelativeLayout>

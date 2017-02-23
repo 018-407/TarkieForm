@@ -9,15 +9,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
-import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
+import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.core.TarkieFormLib;
 import com.mobileoptima.object.EntryObj;
@@ -30,10 +31,10 @@ import java.util.ArrayList;
 public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback,
 		OnFragmentCallback {
 
-	private CodePanButton btnNextForm, btnBackForm;
+	private CodePanButton btnNextForm, btnBackForm, btnSaveForm, btnCancelForm, btnOptionsForm;
 	private OnOverrideCallback overrideCallback;
-	private OnRefreshCallback refreshCallback;
 	private FragmentTransaction transaction;
+	private RelativeLayout rlOptionsForm;
 	private ArrayList<PageObj> pageList;
 	private LinearLayout llPageForm;
 	private FragmentManager manager;
@@ -74,12 +75,20 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.form_layout, container, false);
-		tvForm = (CodePanLabel) view.findViewById(R.id.tvNameForm);
+		rlOptionsForm = (RelativeLayout) view.findViewById(R.id.rlOptionsForm);
+		btnCancelForm = (CodePanButton) view.findViewById(R.id.btnCancelForm);
+		btnOptionsForm = (CodePanButton) view.findViewById(R.id.btnOptionsForm);
 		btnNextForm = (CodePanButton) view.findViewById(R.id.btnNextForm);
 		btnBackForm = (CodePanButton) view.findViewById(R.id.btnBackForm);
+		btnSaveForm = (CodePanButton) view.findViewById(R.id.btnSaveForm);
 		llPageForm = (LinearLayout) view.findViewById(R.id.llPageForm);
+		tvForm = (CodePanLabel) view.findViewById(R.id.tvNameForm);
 		btnNextForm.setOnClickListener(this);
 		btnBackForm.setOnClickListener(this);
+		btnSaveForm.setOnClickListener(this);
+		btnCancelForm.setOnClickListener(this);
+		btnOptionsForm.setOnClickListener(this);
+		rlOptionsForm.setOnClickListener(this);
 		tvForm.setText(form.name);
 		if(!pageList.isEmpty()) {
 			this.page = pageList.get(index);
@@ -184,28 +193,79 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 						transaction.commit();
 					}
 					else {
-						ArrayList<FieldObj> fieldList = new ArrayList<>();
-						for(PageObj obj : pageList) {
-							PageFragment page = (PageFragment) manager.findFragmentByTag(obj.tag);
-							fieldList.addAll(page.getFieldList());
-						}
-						boolean result = false;
-						if(entry != null) {
-							result = TarkieFormLib.updateEntry(db, form.ID, fieldList, false);
-						}
-						else {
-							result = TarkieFormLib.saveEntry(db, form.ID, fieldList, false);
-						}
-						if(result) {
-							if(refreshCallback != null) {
-								refreshCallback.onRefresh();
-							}
-							manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-							CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully saved");
-						}
+						saveEntry();
 					}
 				}
 				break;
+			case R.id.btnOptionsForm:
+				if(rlOptionsForm.getVisibility() == View.GONE) {
+					CodePanUtils.fadeIn(rlOptionsForm);
+				}
+				else {
+					CodePanUtils.fadeOut(rlOptionsForm);
+				}
+				break;
+			case R.id.btnSaveForm:
+				saveEntry();
+				rlOptionsForm.performClick();
+				break;
+			case R.id.btnCancelForm:
+				final AlertDialogFragment alert = new AlertDialogFragment();
+				alert.setDialogTitle("Discard this entry?");
+				alert.setDialogMessage("You will lose your work and you will have to start over.");
+				alert.setOnFragmentCallback(this);
+				alert.setPositiveButton("Yes", new OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+					}
+				});
+				alert.setNegativeButton("No", new OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+					}
+				});
+				transaction = manager.beginTransaction();
+				transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+						R.anim.fade_in, R.anim.fade_out);
+				transaction.add(R.id.rlMain, alert);
+				transaction.addToBackStack(null);
+				transaction.commit();
+				rlOptionsForm.performClick();
+				break;
+			case R.id.rlOptionsForm:
+				if(rlOptionsForm.getVisibility() == View.VISIBLE) {
+					CodePanUtils.fadeOut(rlOptionsForm);
+				}
+				break;
+		}
+	}
+
+	public void saveEntry() {
+		ArrayList<FieldObj> fieldList = new ArrayList<>();
+		for(PageObj obj : pageList) {
+			if(pageList.indexOf(obj) <= index) {
+				Fragment fragment = manager.findFragmentByTag(obj.tag);
+				PageFragment page = (PageFragment) fragment;
+				if(page != null) {
+					fieldList.addAll(page.getFieldList());
+				}
+			}
+		}
+		boolean result = false;
+		if(entry != null) {
+			result = TarkieFormLib.updateEntry(db, entry.ID, fieldList, false);
+			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully updated.");
+		}
+		else {
+			result = TarkieFormLib.saveEntry(db, form.ID, fieldList, false);
+			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully saved.");
+		}
+		if(result) {
+			((MainActivity) getActivity()).reloadEntries();
+			((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
+			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
 	}
 
@@ -235,11 +295,6 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 
 	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
 		this.overrideCallback = overrideCallback;
-	}
-
-
-	public void setOnRefreshCallback(OnRefreshCallback refreshCallback) {
-		this.refreshCallback = refreshCallback;
 	}
 
 	@Override

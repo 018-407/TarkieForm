@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.adapter.EntriesAdapter;
 import com.mobileoptima.callback.Interface;
@@ -21,7 +20,7 @@ import com.mobileoptima.object.EntryObj;
 
 import java.util.ArrayList;
 
-public class EntriesFragment extends Fragment implements OnRefreshCallback {
+public class EntriesFragment extends Fragment {
 
 	private Interface.OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
@@ -48,7 +47,6 @@ public class EntriesFragment extends Fragment implements OnRefreshCallback {
 				FormFragment form = new FormFragment();
 				form.setEntry(obj);
 				form.setOnOverrideCallback(overrideCallback);
-				form.setOnRefreshCallback(EntriesFragment.this);
 				transaction = getActivity().getSupportFragmentManager().beginTransaction();
 				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
 						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
@@ -88,10 +86,5 @@ public class EntriesFragment extends Fragment implements OnRefreshCallback {
 
 	public void setOnOverrideCallback(Interface.OnOverrideCallback overrideCallback) {
 		this.overrideCallback = overrideCallback;
-	}
-
-	@Override
-	public void onRefresh() {
-		loadEntries(db);
 	}
 }

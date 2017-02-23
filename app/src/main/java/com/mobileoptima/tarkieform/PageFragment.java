@@ -136,6 +136,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						view = inflater.inflate(R.layout.field_text_layout, container, false);
 						CodePanLabel tvQuestionText = (CodePanLabel) view.findViewById(R.id.tvQuestionText);
 						CodePanTextField etAnswerText = (CodePanTextField) view.findViewById(R.id.etAnswerText);
+						etAnswerText.setText(answer.value);
 						etAnswerText.addTextChangedListener(new TextWatcher() {
 							@Override
 							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
@@ -157,12 +158,12 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						else {
 							tvQuestionText.setText(field.name);
 						}
-						etAnswerText.setText(answer.value);
 						break;
 					case FieldType.NUM:
 						view = inflater.inflate(R.layout.field_numeric_layout, container, false);
 						CodePanLabel tvQuestionNum = (CodePanLabel) view.findViewById(R.id.tvQuestionNum);
 						CodePanTextField etAnswerNum = (CodePanTextField) view.findViewById(R.id.etAnswerNum);
+						etAnswerNum.setText(answer.value);
 						etAnswerNum.addTextChangedListener(new TextWatcher() {
 							@Override
 							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
@@ -184,12 +185,12 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						else {
 							tvQuestionNum.setText(field.name);
 						}
-						etAnswerNum.setText(answer.value);
 						break;
 					case FieldType.LTEXT:
 						view = inflater.inflate(R.layout.field_long_text_layout, container, false);
 						CodePanLabel tvQuestionLText = (CodePanLabel) view.findViewById(R.id.tvQuestionLText);
 						CodePanTextField etAnswerLText = (CodePanTextField) view.findViewById(R.id.etAnswerLText);
+						etAnswerLText.setText(answer.value);
 						etAnswerLText.addTextChangedListener(new TextWatcher() {
 							@Override
 							public void beforeTextChanged(CharSequence cs, int start, int count, int after) {
@@ -211,7 +212,6 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						else {
 							tvQuestionLText.setText(field.name);
 						}
-						etAnswerLText.setText(answer.value);
 						break;
 					case FieldType.DATE:
 						view = inflater.inflate(R.layout.field_date_layout, container, false);
@@ -582,6 +582,9 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 								camera.setOnCameraDoneCallback(new OnCameraDoneCallback() {
 									@Override
 									public void onCameraDone(ArrayList<ImageObj> imageList) {
+										if(answer.imageList != null) {
+											imageList.addAll(0, answer.imageList);
+										}
 										updatePhotoGrid(llGridPhoto, imageList);
 										answer.imageList = imageList;
 									}
