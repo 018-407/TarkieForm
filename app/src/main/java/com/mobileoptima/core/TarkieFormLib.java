@@ -36,6 +36,7 @@ import java.util.Locale;
 import static com.mobileoptima.schema.Tables.TB;
 import static com.mobileoptima.schema.Tables.TB.ANSWERS;
 import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
+import static com.mobileoptima.schema.Tables.TB.EMPLOYEE;
 import static com.mobileoptima.schema.Tables.TB.ENTRIES;
 import static com.mobileoptima.schema.Tables.TB.FIELDS;
 import static com.mobileoptima.schema.Tables.TB.PHOTO;
@@ -93,6 +94,20 @@ public class TarkieFormLib {
 		String table = Tables.getName(CREDENTIALS);
 		String query = "SELECT empID FROM " + table + " WHERE ID = 1";
 		return db.getString(query);
+	}
+
+	public static String getEmployeeName(SQLiteAdapter db, String empID) {
+		String name = null;
+		String table = Tables.getName(EMPLOYEE);
+		String query = "SELECT firstName, lastName FROM " + table + " WHERE ID = '" + empID + "'";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			String firstName = cursor.getString(0);
+			String lastName = cursor.getString(1);
+			name = firstName + " " + lastName;
+		}
+		cursor.close();
+		return name;
 	}
 
 	public static String getGroupID(SQLiteAdapter db) {
@@ -317,6 +332,14 @@ public class TarkieFormLib {
 				}
 			}
 		}
+		return binder.finish();
+	}
+
+	public static boolean deleteEntry(SQLiteAdapter db, String entryID) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("isDelete", true));
+		binder.update(Tables.getName(ENTRIES), fieldValueList, entryID);
 		return binder.finish();
 	}
 

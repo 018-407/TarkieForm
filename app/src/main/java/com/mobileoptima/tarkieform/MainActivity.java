@@ -42,8 +42,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
 			llAboutMain, llLogoutMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
+	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain, tvEmployeeMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
-	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain;
 	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain;
 	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
@@ -75,9 +75,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
 		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
 		ivPhotosMain = (ImageView) findViewById(R.id.ivPhotosMain);
-		tvHomeMain = (CodePanLabel) findViewById(R.id.tvHomeMain);
+		tvEmployeeMain = (CodePanLabel) findViewById(R.id.tvEmployeeMain);
 		tvEntriesMain = (CodePanLabel) findViewById(R.id.tvEntriesMain);
 		tvPhotosMain = (CodePanLabel) findViewById(R.id.tvPhotosMain);
+		tvHomeMain = (CodePanLabel) findViewById(R.id.tvHomeMain);
 		svMenuMain = (ScrollView) findViewById(R.id.svMenuMain);
 		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
 		dlMain = (DrawerLayout) findViewById(R.id.dlMain);
@@ -240,6 +241,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onInitialize(SQLiteAdapter db) {
 		this.isInitialized = true;
 		this.db = db;
+		updateUser();
 		loadTabs();
 	}
 
@@ -407,6 +409,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		reloadForms();
 		reloadEntries();
 		reloadPhotos();
+		updateUser();
+	}
+
+	public void updateUser() {
+		if(isInitialized) {
+			String empID = TarkieFormLib.getEmployeeID(db);
+			String name = TarkieFormLib.getEmployeeName(db, empID);
+			tvEmployeeMain.setText(name);
+		}
 	}
 
 	@Override

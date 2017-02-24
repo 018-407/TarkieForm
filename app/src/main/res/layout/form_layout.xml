@@ -162,6 +162,31 @@
                 android:textSize="@dimen/eighteen"
                 codePan:typeface="@string/proxima_nova_light"/>
 
+            <LinearLayout
+                android:id="@+id/llDeleteForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/one"
+                    android:background="@color/gray_den"/>
+
+                <com.codepan.widget.CodePanButton
+                    android:id="@+id/btnDeleteForm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/state_rect_trans_dark"
+                    android:gravity="left"
+                    android:padding="@dimen/twelve"
+                    android:text="Delete"
+                    android:textColor="@color/gray_non"
+                    android:textSize="@dimen/eighteen"
+                    codePan:typeface="@string/proxima_nova_light"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </RelativeLayout>

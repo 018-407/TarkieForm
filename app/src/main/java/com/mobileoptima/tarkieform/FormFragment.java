@@ -31,12 +31,13 @@ import java.util.ArrayList;
 public class FormFragment extends Fragment implements OnClickListener, OnBackPressedCallback,
 		OnFragmentCallback {
 
-	private CodePanButton btnNextForm, btnBackForm, btnSaveForm, btnCancelForm, btnOptionsForm;
+	private CodePanButton btnNextForm, btnBackForm, btnSaveForm, btnCancelForm,
+			btnDeleteForm, btnOptionsForm;
+	private LinearLayout llPageForm, llDeleteForm;
 	private OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
 	private RelativeLayout rlOptionsForm;
 	private ArrayList<PageObj> pageList;
-	private LinearLayout llPageForm;
 	private FragmentManager manager;
 	private CodePanLabel tvForm;
 	private ViewGroup container;
@@ -77,16 +78,19 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		View view = inflater.inflate(R.layout.form_layout, container, false);
 		rlOptionsForm = (RelativeLayout) view.findViewById(R.id.rlOptionsForm);
 		btnCancelForm = (CodePanButton) view.findViewById(R.id.btnCancelForm);
+		btnDeleteForm = (CodePanButton) view.findViewById(R.id.btnDeleteForm);
 		btnOptionsForm = (CodePanButton) view.findViewById(R.id.btnOptionsForm);
 		btnNextForm = (CodePanButton) view.findViewById(R.id.btnNextForm);
 		btnBackForm = (CodePanButton) view.findViewById(R.id.btnBackForm);
 		btnSaveForm = (CodePanButton) view.findViewById(R.id.btnSaveForm);
+		llDeleteForm = (LinearLayout) view.findViewById(R.id.llDeleteForm);
 		llPageForm = (LinearLayout) view.findViewById(R.id.llPageForm);
 		tvForm = (CodePanLabel) view.findViewById(R.id.tvNameForm);
 		btnNextForm.setOnClickListener(this);
 		btnBackForm.setOnClickListener(this);
 		btnSaveForm.setOnClickListener(this);
 		btnCancelForm.setOnClickListener(this);
+		btnDeleteForm.setOnClickListener(this);
 		btnOptionsForm.setOnClickListener(this);
 		rlOptionsForm.setOnClickListener(this);
 		tvForm.setText(form.name);
@@ -102,6 +106,9 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 					R.anim.slide_in_ltr, R.anim.slide_out_ltr);
 			transaction.add(R.id.flForm, first, page.tag);
 			transaction.commit();
+		}
+		if(entry == null) {
+			llDeleteForm.setVisibility(View.GONE);
 		}
 		this.container = container;
 		setProgress();
@@ -206,33 +213,16 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				}
 				break;
 			case R.id.btnSaveForm:
-				saveEntry();
 				rlOptionsForm.performClick();
+				saveEntry();
 				break;
 			case R.id.btnCancelForm:
-				final AlertDialogFragment alert = new AlertDialogFragment();
-				alert.setDialogTitle("Discard this entry?");
-				alert.setDialogMessage("You will lose your work and you will have to start over.");
-				alert.setOnFragmentCallback(this);
-				alert.setPositiveButton("Yes", new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-					}
-				});
-				alert.setNegativeButton("No", new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
-					}
-				});
-				transaction = manager.beginTransaction();
-				transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
-						R.anim.fade_in, R.anim.fade_out);
-				transaction.add(R.id.rlMain, alert);
-				transaction.addToBackStack(null);
-				transaction.commit();
 				rlOptionsForm.performClick();
+				cancelEntry();
+				break;
+			case R.id.btnDeleteForm:
+				rlOptionsForm.performClick();
+				deleteEntry();
 				break;
 			case R.id.rlOptionsForm:
 				if(rlOptionsForm.getVisibility() == View.VISIBLE) {
@@ -267,6 +257,59 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 			((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
 			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
+	}
+
+	public void cancelEntry() {
+		final AlertDialogFragment alert = new AlertDialogFragment();
+		alert.setDialogTitle("Discard this entry?");
+		alert.setDialogMessage("You will lose your work and you will have to start over.");
+		alert.setOnFragmentCallback(this);
+		alert.setPositiveButton("Yes", new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			}
+		});
+		alert.setNegativeButton("No", new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+			}
+		});
+		transaction = manager.beginTransaction();
+		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+				R.anim.fade_in, R.anim.fade_out);
+		transaction.add(R.id.rlMain, alert);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
+
+	public void deleteEntry() {
+		final AlertDialogFragment alert = new AlertDialogFragment();
+		alert.setDialogTitle("Delete this Entry?");
+		alert.setDialogMessage("Are you sure you want to delete this entry?");
+		alert.setOnFragmentCallback(this);
+		alert.setPositiveButton("Yes", new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				TarkieFormLib.deleteEntry(db, entry.ID);
+				((MainActivity) getActivity()).reloadEntries();
+				((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
+				manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			}
+		});
+		alert.setNegativeButton("No", new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+			}
+		});
+		transaction = manager.beginTransaction();
+		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+				R.anim.fade_in, R.anim.fade_out);
+		transaction.add(R.id.rlMain, alert);
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 
 	public boolean incrementPage() {
