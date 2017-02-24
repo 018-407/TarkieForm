@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.codepan.database.SQLiteAdapter;
+import com.codepan.widget.CodePanTextField;
 import com.mobileoptima.adapter.FormAdapter;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Tag;
@@ -22,16 +25,22 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
+	private final long IDLE_TIME = 500;
 	private OnOverrideCallback overrideCallback;
 	private FragmentTransaction transaction;
+	private CodePanTextField etSearchHome;
 	private ArrayList<FormObj> formList;
+	private Handler inputFinishHandler;
 	private FormAdapter adapter;
 	private SQLiteAdapter db;
 	private ListView lvHome;
+	private String search;
+	private long lastEdit;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		inputFinishHandler = new Handler();
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
 	}
@@ -39,6 +48,7 @@ public class HomeFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.home_layout, container, false);
+		etSearchHome = (CodePanTextField) view.findViewById(R.id.etSearchHome);
 		lvHome = (ListView) view.findViewById(R.id.lvHome);
 		lvHome.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -55,6 +65,23 @@ public class HomeFragment extends Fragment {
 				transaction.commit();
 			}
 		});
+		etSearchHome.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				search = s.toString();
+				lastEdit = System.currentTimeMillis();
+				inputFinishHandler.removeCallbacks(inputFinishChecker);
+				inputFinishHandler.postDelayed(inputFinishChecker, IDLE_TIME);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+			}
+		});
 		loadForms(db);
 		return view;
 	}
@@ -64,7 +91,7 @@ public class HomeFragment extends Fragment {
 			@Override
 			public void run() {
 				try {
-					formList = Data.loadForms(db);
+					formList = Data.loadForms(db, search);
 					handler.sendMessage(handler.obtainMessage());
 				}
 				catch(Exception e) {
@@ -87,4 +114,14 @@ public class HomeFragment extends Fragment {
 	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
 		this.overrideCallback = overrideCallback;
 	}
+
+	private Runnable inputFinishChecker = new Runnable() {
+		@Override
+		public void run() {
+			long current = System.currentTimeMillis();
+			if(current > lastEdit + IDLE_TIME - 500) {
+				loadForms(db);
+			}
+		}
+	};
 }

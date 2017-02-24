@@ -40,16 +40,16 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/flBackImagePreview"
-            android:layout_toLeftOf="@+id/flOptionsImagePreview"
+            android:layout_toLeftOf="@+id/flDeleteImagePreview"
             android:layout_toRightOf="@+id/flBackImagePreview"
-            android:layout_toStartOf="@+id/flOptionsImagePreview"
+            android:layout_toStartOf="@+id/flDeleteImagePreview"
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="@dimen/eighteen"
             codePan:typeface="@string/proxima_nova_light"/>
 
         <FrameLayout
-            android:id="@+id/flOptionsImagePreview"
+            android:id="@+id/flDeleteImagePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

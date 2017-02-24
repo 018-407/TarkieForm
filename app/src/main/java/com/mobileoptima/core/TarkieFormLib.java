@@ -336,6 +336,15 @@ public class TarkieFormLib {
 		return answer;
 	}
 
+	public static boolean logout(SQLiteAdapter db) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		String table = Tables.getName(CREDENTIALS);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
+		fieldValueList.add(new FieldValue("isLogOut", true));
+		binder.update(table, fieldValueList, 1);
+		return binder.finish();
+	}
+
 	public static void showAlertDialog(FragmentActivity activity, String title, String message) {
 		final AlertDialogFragment alert = new AlertDialogFragment();
 		alert.setDialogTitle(title);

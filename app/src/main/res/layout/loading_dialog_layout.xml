@@ -42,7 +42,7 @@
                 progressWheel:barWidth="@dimen/two"
                 progressWheel:circleRadius="@dimen/one_hundred"
                 progressWheel:contourColor="@color/transparent"
-                progressWheel:font="@string/helvetica_neue_light"
+                progressWheel:font="@string/proxima_nova_light"
                 progressWheel:max="100"
                 progressWheel:progress="0"
                 progressWheel:progressIndeterminate="false"
@@ -61,7 +61,7 @@
                 android:text="0/0"
                 android:textColor="@color/gray_sec"
                 android:textSize="@dimen/fourteen"
-                codePan:typeface="@string/helvetica_neue_light"/>
+                codePan:typeface="@string/proxima_nova_light"/>
 
         </RelativeLayout>
 

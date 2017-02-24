@@ -228,7 +228,7 @@
 
         <ScrollView
             android:id="@+id/svMenuMain"
-            android:layout_width="@dimen/three_hundred"
+            android:layout_width="@dimen/two_hundred_eighty"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:background="@color/white"
@@ -241,7 +241,7 @@
 
                 <RelativeLayout
                     android:id="@+id/rlCoverMain"
-                    android:layout_width="@dimen/three_hundred_five"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/one_hundred_twenty_nine">
 
                     <ImageView
@@ -280,6 +280,238 @@
                     </LinearLayout>
 
                 </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/rlCoverMain"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/llSettingsMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/state_rect_trans_dark"
+                        android:clickable="true"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/fifteen">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/twenty_five"
+                            android:layout_height="@dimen/twenty_five">
+
+                            <ImageView
+                                android:id="@+id/ivSettingsMain"
+                                android:layout_width="@dimen/twenty_three"
+                                android:layout_height="@dimen/twenty_three"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_settings"/>
+
+                        </FrameLayout>
+
+                        <com.codepan.widget.CodePanLabel
+                            android:id="@+id/tvSettingsMain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/twenty"
+                            android:layout_marginStart="@dimen/twenty"
+                            android:text="@string/settings"
+                            android:textColor="@color/gray_pri"
+                            android:textSize="@dimen/eighteen"
+                            codePan:typeface="@string/proxima_nova_light"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@color/gray_qui"/>
+
+                    <LinearLayout
+                        android:id="@+id/llSyncDataMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/state_rect_trans_dark"
+                        android:clickable="true"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/fifteen">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/twenty_five"
+                            android:layout_height="@dimen/twenty_five">
+
+                            <ImageView
+                                android:id="@+id/ivSyncDataMain"
+                                android:layout_width="@dimen/twenty_three"
+                                android:layout_height="@dimen/twenty_three"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_sync_data"/>
+
+                        </FrameLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <com.codepan.widget.CodePanLabel
+                                android:id="@+id/tvSyncDataMain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/twenty"
+                                android:layout_marginStart="@dimen/twenty"
+                                android:text="@string/sync_data"
+                                android:textColor="@color/gray_pri"
+                                android:textSize="@dimen/eighteen"
+                                codePan:typeface="@string/proxima_nova_light"/>
+
+                            <com.codepan.widget.CodePanLabel
+                                android:id="@+id/tvSyncNotifMain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginLeft="@dimen/twenty"
+                                android:layout_marginStart="@dimen/twenty"
+                                android:background="@drawable/bg_oval_gray_oct"
+                                android:gravity="center"
+                                android:padding="@dimen/three"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/fifteen"
+                                android:visibility="gone"
+                                codePan:reference="dynamic"
+                                codePan:setSquare="true"
+                                codePan:typeface="@string/proxima_nova_light"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@color/gray_qui"/>
+
+                    <LinearLayout
+                        android:id="@+id/llUpdateMasterMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/state_rect_trans_dark"
+                        android:clickable="true"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/fifteen">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/twenty_five"
+                            android:layout_height="@dimen/twenty_five">
+
+                            <ImageView
+                                android:id="@+id/ivUpdateMasterlistMain"
+                                android:layout_width="@dimen/twenty_three"
+                                android:layout_height="@dimen/twenty_three"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_update_masterlist"/>
+
+                        </FrameLayout>
+
+                        <com.codepan.widget.CodePanLabel
+                            android:id="@+id/tvUpdateMasterlistMain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/twenty"
+                            android:layout_marginStart="@dimen/twenty"
+                            android:text="@string/update_masterlist"
+                            android:textColor="@color/gray_pri"
+                            android:textSize="@dimen/eighteen"
+                            codePan:typeface="@string/proxima_nova_light"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@color/gray_qui"/>
+
+                    <LinearLayout
+                        android:id="@+id/llAboutMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/state_rect_trans_dark"
+                        android:clickable="true"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/fifteen">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/twenty_five"
+                            android:layout_height="@dimen/twenty_five">
+
+                            <ImageView
+                                android:id="@+id/ivAboutMain"
+                                android:layout_width="@dimen/twenty_three"
+                                android:layout_height="@dimen/twenty_three"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_about"/>
+
+                        </FrameLayout>
+
+                        <com.codepan.widget.CodePanLabel
+                            android:id="@+id/tvAboutMain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/twenty"
+                            android:layout_marginStart="@dimen/twenty"
+                            android:text="@string/about"
+                            android:textColor="@color/gray_pri"
+                            android:textSize="@dimen/eighteen"
+                            codePan:typeface="@string/proxima_nova_light"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@color/gray_qui"/>
+
+                    <LinearLayout
+                        android:id="@+id/llLogoutMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/state_rect_trans_dark"
+                        android:clickable="true"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/fifteen">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/twenty_five"
+                            android:layout_height="@dimen/twenty_five">
+
+                            <ImageView
+                                android:id="@+id/ivLogoutMain"
+                                android:layout_width="@dimen/twenty_three"
+                                android:layout_height="@dimen/twenty_three"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_logout"/>
+
+                        </FrameLayout>
+
+                        <com.codepan.widget.CodePanLabel
+                            android:id="@+id/tvLogoutMain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/twenty"
+                            android:layout_marginStart="@dimen/twenty"
+                            android:text="@string/logout"
+                            android:textColor="@color/gray_pri"
+                            android:textSize="@dimen/eighteen"
+                            codePan:typeface="@string/proxima_nova_light"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@color/gray_qui"/>
+
+                </LinearLayout>
 
             </RelativeLayout>
 

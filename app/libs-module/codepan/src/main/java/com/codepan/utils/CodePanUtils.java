@@ -64,6 +64,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -1161,6 +1162,10 @@ public class CodePanUtils {
 		return Patterns.EMAIL_ADDRESS.matcher(email).matches();
 	}
 
+	public static boolean isValidURL(String url) {
+		return URLUtil.isValidUrl(url) && Patterns.WEB_URL.matcher(url).matches();
+	}
+
 	public static void removeNotification(Context context, int notifID) {
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		manager.cancel(notifID);
@@ -1824,5 +1829,16 @@ public class CodePanUtils {
 			result = true;
 		}
 		return result;
+	}
+
+	public static String validateURL(String url) {
+		String https = "https://";
+		String http = "http://";
+		if(url != null) {
+			if(!url.contains(https) && !url.contains(http)) {
+				return https + url;
+			}
+		}
+		return url;
 	}
 }

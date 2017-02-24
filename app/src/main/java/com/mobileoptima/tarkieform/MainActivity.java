@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
@@ -38,6 +39,8 @@ import java.util.ArrayList;
 public class MainActivity extends FragmentActivity implements OnClickListener, OnInitializeCallback,
 		OnOverrideCallback, OnRefreshCallback, OnLoginCallback, OnPageChangeListener {
 
+	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
+			llAboutMain, llLogoutMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
 	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain;
@@ -59,6 +62,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
+		llUpdateMasterMain = (LinearLayout) findViewById(R.id.llUpdateMasterMain);
+		llSettingsMain = (LinearLayout) findViewById(R.id.llSettingsMain);
+		llSyncDataMain = (LinearLayout) findViewById(R.id.llSyncDataMain);
+		llAboutMain = (LinearLayout) findViewById(R.id.llAboutMain);
+		llLogoutMain = (LinearLayout) findViewById(R.id.llLogoutMain);
 		btnHomeMain = (CodePanButton) findViewById(R.id.btnHomeMain);
 		btnEntriesMain = (CodePanButton) findViewById(R.id.btnEntriesMain);
 		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
@@ -74,6 +82,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		rlMain = (RelativeLayout) findViewById(R.id.rlMain);
 		dlMain = (DrawerLayout) findViewById(R.id.dlMain);
 		vpMain = (ViewPager) findViewById(R.id.vpMain);
+		llUpdateMasterMain.setOnClickListener(this);
+		llSettingsMain.setOnClickListener(this);
+		llSyncDataMain.setOnClickListener(this);
+		llAboutMain.setOnClickListener(this);
+		llLogoutMain.setOnClickListener(this);
 		btnSyncMain.setOnClickListener(this);
 		btnHomeMain.setOnClickListener(this);
 		btnEntriesMain.setOnClickListener(this);
@@ -88,22 +101,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {
-			case R.id.btnSyncMain:
-				if(CodePanUtils.isInternetConnected(this)) {
-					LoadingDialogFragment loading = new LoadingDialogFragment();
-					Bundle bundle = new Bundle();
-					loading.setArguments(bundle);
-					loading.setAction(Module.Action.UPDATE_MASTERLIST);
-					loading.setOnRefreshCallback(this);
-					FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-					transaction.add(R.id.rlMain, loading);
-					transaction.addToBackStack(null);
-					transaction.commit();
-				}
-				else {
-					CodePanUtils.showAlertToast(this, "Internet connection required.");
-				}
-				break;
 			case R.id.btnHomeMain:
 				vpMain.setCurrentItem(Tab.HOME);
 				break;
@@ -114,12 +111,90 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				vpMain.setCurrentItem(Tab.PHOTOS);
 				break;
 			case R.id.btnMenuMain:
-				if(dlMain.isDrawerOpen(svMenuMain)){
+				if(dlMain.isDrawerOpen(svMenuMain)) {
 					dlMain.closeDrawer(svMenuMain);
 				}
-				else{
+				else {
 					dlMain.openDrawer(svMenuMain);
 				}
+				break;
+			case R.id.btnSyncMain:
+				break;
+			case R.id.llSettingsMain:
+				dlMain.closeDrawer(svMenuMain);
+				break;
+			case R.id.llSyncDataMain:
+				dlMain.closeDrawer(svMenuMain);
+				break;
+			case R.id.llUpdateMasterMain:
+				dlMain.closeDrawer(svMenuMain);
+				if(CodePanUtils.isInternetConnected(this)) {
+					final AlertDialogFragment alert = new AlertDialogFragment();
+					alert.setDialogTitle("Update Master list");
+					alert.setDialogMessage("Do you want to download the latest master list?");
+					alert.setPositiveButton("Yes", new View.OnClickListener() {
+						@Override
+						public void onClick(View view) {
+							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+							LoadingDialogFragment loading = new LoadingDialogFragment();
+							Bundle bundle = new Bundle();
+							loading.setArguments(bundle);
+							loading.setAction(Module.Action.UPDATE_MASTERLIST);
+							loading.setOnRefreshCallback(MainActivity.this);
+							FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+							transaction.add(R.id.rlMain, loading);
+							transaction.addToBackStack(null);
+							transaction.commit();
+						}
+					});
+					alert.setNegativeButton("Cancel", new View.OnClickListener() {
+						@Override
+						public void onClick(View view) {
+							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+						}
+					});
+					transaction = getSupportFragmentManager().beginTransaction();
+					transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+							R.anim.fade_in, R.anim.fade_out);
+					transaction.add(R.id.rlMain, alert);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+				else {
+					CodePanUtils.showAlertToast(this, "Internet connection required.");
+				}
+				break;
+			case R.id.llAboutMain:
+				dlMain.closeDrawer(svMenuMain);
+				break;
+			case R.id.llLogoutMain:
+				dlMain.closeDrawer(svMenuMain);
+				final AlertDialogFragment alert = new AlertDialogFragment();
+				alert.setDialogTitle("Logout");
+				alert.setDialogMessage("Are you sure you want to logout?");
+				alert.setPositiveButton("Yes", new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+						boolean result = TarkieFormLib.logout(db);
+						if(result) {
+							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+							onRefresh();
+						}
+					}
+				});
+				alert.setNegativeButton("Cancel", new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+					}
+				});
+				transaction = getSupportFragmentManager().beginTransaction();
+				transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+						R.anim.fade_in, R.anim.fade_out);
+				transaction.add(R.id.rlMain, alert);
+				transaction.addToBackStack(null);
+				transaction.commit();
 				break;
 		}
 	}
@@ -239,7 +314,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				}
 			}
 			else {
-				super.onBackPressed();
+				int count = getSupportFragmentManager().getBackStackEntryCount();
+				if(count != 0) {
+					super.onBackPressed();
+				}
+				else {
+					if(vpMain.getCurrentItem() != Tab.HOME) {
+						vpMain.setCurrentItem(Tab.HOME);
+					}
+					else {
+						super.onBackPressed();
+					}
+				}
 			}
 		}
 		else {

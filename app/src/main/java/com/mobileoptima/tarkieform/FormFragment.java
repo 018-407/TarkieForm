@@ -162,7 +162,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				if(field != null) {
 					final AlertDialogFragment alert = new AlertDialogFragment();
 					alert.setDialogTitle("Required Field");
-					alert.setDialogMessage(field.name + " is required.");
+					alert.setDialogMessage("\"" + field.name + "\" is required.");
 					alert.setOnFragmentCallback(this);
 					alert.setPositiveButton("Ok", new OnClickListener() {
 						@Override

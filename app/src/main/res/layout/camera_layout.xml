@@ -198,10 +198,10 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/state_rect_trans_dark"
                 android:gravity="left"
-                android:padding="@dimen/eleven"
+                android:padding="@dimen/twelve"
                 android:text="Save"
                 android:textColor="@color/gray_non"
-                android:textSize="@dimen/seventeen"
+                android:textSize="@dimen/eighteen"
                 codePan:typeface="@string/proxima_nova_light"/>
 
             <View
@@ -221,10 +221,10 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/state_rect_trans_dark"
                     android:gravity="left"
-                    android:padding="@dimen/eleven"
+                    android:padding="@dimen/twelve"
                     android:text="Switch Camera"
                     android:textColor="@color/gray_non"
-                    android:textSize="@dimen/seventeen"
+                    android:textSize="@dimen/eighteen"
                     codePan:typeface="@string/proxima_nova_light"/>
 
                 <View
@@ -240,10 +240,10 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/state_rect_trans_dark"
                 android:gravity="left"
-                android:padding="@dimen/eleven"
+                android:padding="@dimen/twelve"
                 android:text="Clear All"
                 android:textColor="@color/gray_non"
-                android:textSize="@dimen/seventeen"
+                android:textSize="@dimen/eighteen"
                 codePan:typeface="@string/proxima_nova_light"/>
 
         </LinearLayout>

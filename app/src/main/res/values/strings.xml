@@ -18,4 +18,9 @@
     <string name="camera">Camera</string>
     <string name="capture">Take Photo</string>
     <string name="taken">Photos Taken</string>
+    <string name="settings">App Settings</string>
+    <string name="sync_data">Sync Data</string>
+    <string name="update_masterlist">Update Masterlist</string>
+    <string name="about">About</string>
+    <string name="logout">Log out</string>
 </resources>

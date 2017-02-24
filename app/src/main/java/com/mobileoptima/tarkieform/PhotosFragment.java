@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.codepan.database.SQLiteAdapter;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 
 public class PhotosFragment extends Fragment {
 
+	private FragmentTransaction transaction;
 	private ArrayList<ImageObj> imageList;
 	private PhotosAdapter adapter;
 	private GridView gvPhotos;
@@ -39,6 +42,25 @@ public class PhotosFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.photos_layout, container, false);
 		gvPhotos = (GridView) view.findViewById(R.id.gvPhotos);
+		gvPhotos.setNumColumns(numCol);
+		gvPhotos.setVerticalSpacing(spacing);
+		gvPhotos.setHorizontalSpacing(spacing);
+		gvPhotos.setPadding(spacing, spacing, spacing, spacing);
+		gvPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+				ImagePreviewFragment imagePreview = new ImagePreviewFragment();
+				imagePreview.setImageList(imageList, position);
+				imagePreview.setIsDeletable(false);
+				transaction = getActivity().getSupportFragmentManager().beginTransaction();
+				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+				transaction.add(R.id.rlMain, imagePreview);
+				transaction.hide(PhotosFragment.this);
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
+		});
 		loadPhotos(db);
 		return view;
 	}

@@ -1,6 +1,7 @@
 package com.mobileoptima.core;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.codepan.database.SQLiteAdapter;
 import com.mobileoptima.constant.FieldType;
@@ -16,11 +17,12 @@ import java.util.ArrayList;
 
 public class Data {
 
-	public static ArrayList<FormObj> loadForms(SQLiteAdapter db) {
+	public static ArrayList<FormObj> loadForms(SQLiteAdapter db, String search) {
 		ArrayList<FormObj> formList = new ArrayList<>();
 		String groupID = TarkieFormLib.getGroupID(db);
 		String table = Tables.getName(Tables.TB.FORMS);
-		String query = "SELECT ID, name FROM " + table + " WHERE groupID = '" + groupID + "'";
+		String condition = search != null ? "name LIKE '%" + search + "%' AND " : "";
+		String query = "SELECT ID, name FROM " + table + " WHERE " + condition + "groupID = '" + groupID + "'";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			FormObj obj = new FormObj();

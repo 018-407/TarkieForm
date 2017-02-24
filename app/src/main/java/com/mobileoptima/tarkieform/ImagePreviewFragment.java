@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
@@ -25,11 +26,13 @@ public class ImagePreviewFragment extends Fragment implements OnClickListener {
 	private CodePanButton btnBackImagePreview, btnDeleteImagePreview;
 	private OnDeletePhotoCallback deletePhotoCallback;
 	private OnFragmentCallback fragmentCallback;
+	private FrameLayout flDeleteImagePreview;
 	private FragmentTransaction transaction;
 	private ArrayList<ImageObj> imageList;
 	private CodePanLabel tvImagePreview;
 	private ImagePreviewAdapter adapter;
 	private ViewPager vpImagePreview;
+	private boolean isDeletable = true;
 	private SQLiteAdapter db;
 	private int position;
 
@@ -58,6 +61,7 @@ public class ImagePreviewFragment extends Fragment implements OnClickListener {
 		tvImagePreview = (CodePanLabel) view.findViewById(R.id.tvImagePreview);
 		btnBackImagePreview = (CodePanButton) view.findViewById(R.id.btnBackImagePreview);
 		btnDeleteImagePreview = (CodePanButton) view.findViewById(R.id.btnDeleteImagePreview);
+		flDeleteImagePreview = (FrameLayout) view.findViewById(R.id.flDeleteImagePreview);
 		vpImagePreview = (ViewPager) view.findViewById(R.id.vpImagePreview);
 		btnDeleteImagePreview.setOnClickListener(this);
 		btnBackImagePreview.setOnClickListener(this);
@@ -82,6 +86,9 @@ public class ImagePreviewFragment extends Fragment implements OnClickListener {
 		});
 		ImageObj obj = imageList.get(position);
 		tvImagePreview.setText(obj.fileName);
+		if(!isDeletable) {
+			flDeleteImagePreview.setVisibility(View.INVISIBLE);
+		}
 		return view;
 	}
 
@@ -146,6 +153,10 @@ public class ImagePreviewFragment extends Fragment implements OnClickListener {
 
 	public void setOnFragmentCallback(OnFragmentCallback fragmentCallback) {
 		this.fragmentCallback = fragmentCallback;
+	}
+
+	public void setIsDeletable(boolean isDeletable) {
+		this.isDeletable = isDeletable;
 	}
 
 	public void setOnBackStack(boolean isOnBackStack) {

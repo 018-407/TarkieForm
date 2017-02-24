@@ -4,8 +4,9 @@
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="true"
     android:background="@color/blue"
+    android:clickable="true"
+    android:focusableInTouchMode="true"
     android:padding="@dimen/thirteen">
 
     <FrameLayout
@@ -14,19 +15,25 @@
         android:layout_height="wrap_content">
 
         <com.codepan.widget.CodePanTextField
+            android:id="@+id/etSearchHome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_rect_black_trans_thirty_rad_four"
             android:hint="@string/search"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
             android:paddingBottom="@dimen/eight"
             android:paddingEnd="@dimen/thirty"
             android:paddingLeft="@dimen/ten"
             android:paddingRight="@dimen/thirty"
             android:paddingStart="@dimen/ten"
             android:paddingTop="@dimen/eight"
+            android:singleLine="false"
             android:textColor="@color/white"
             android:textColorHint="@color/gray_ter"
             android:textSize="@dimen/eighteen"
+            codePan:autoHideKeyboard="true"
             codePan:typeface="@string/proxima_nova_light"/>
 
         <ImageView

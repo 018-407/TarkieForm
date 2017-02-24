@@ -396,9 +396,22 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						btnUrlLink.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Intent intent = new Intent(Intent.ACTION_VIEW);
-								intent.setData(Uri.parse(field.description));
-								startActivity(intent);
+								String url = CodePanUtils.validateURL(field.description);
+								if(url != null && !url.isEmpty()) {
+									if(CodePanUtils.isValidURL(url)) {
+										Intent intent = new Intent(Intent.ACTION_VIEW);
+										intent.setData(Uri.parse(url));
+										startActivity(intent);
+									}
+									else {
+										String title = "Invalid URL";
+										String message = "\"" + field.description + "\"";
+										TarkieFormLib.showAlertDialog(getActivity(), title, message);
+									}
+								}
+								else {
+									CodePanUtils.showAlertToast(getActivity(), "No inputted URL.");
+								}
 							}
 						});
 						tvQuestionLink.setText(field.name);
