@@ -24,6 +24,10 @@ import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.Process;
 import com.mobileoptima.core.Rx;
+import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.Tx;
+import com.mobileoptima.object.ImageObj;
+import com.mobileoptima.schema.Tables;
 
 import static com.codepan.callback.Interface.OnRefreshCallback;
 
@@ -115,6 +119,14 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				title = "Updating master list...";
 				tvTitleLoadingDialog.setText(title);
 				updateMasterlist(db);
+				break;
+			case SYNC_DATA:
+				setMax(4);
+				successMsg = "Sync Data successful.";
+				failedMsg = "Failed to sync data.";
+				title = "Syncing data...";
+				tvTitleLoadingDialog.setText(title);
+				syncData(db);
 				break;
 		}
 		return view;
@@ -219,6 +231,48 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			}
 		});
 		bg.setName(Process.UPDATE_MASTERFILE);
+		bg.start();
+	}
+
+	public void syncData(final SQLiteAdapter db) {
+
+		bg = new Thread(new Runnable(){
+
+			@Override
+			public void run(){
+
+				Looper.prepare();
+
+				try{
+					result = Rx.getSyncBatchID(db, getErrorCallback());
+					if(!result){
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+
+					for(ImageObj imageObj : TarkieFormLib.getIDsUpload(db, Tables.TB.PHOTO)){
+						if(result){
+							result = Tx.uploadPhoto(db, imageObj, getErrorCallback());
+							Thread.sleep(250);
+							handler.sendMessage(handler.obtainMessage());
+						}
+					}
+
+					for(String entryID : TarkieFormLib.getIDsSync(db, Tables.TB.ENTRIES)){
+						if(result){
+							result = Tx.syncEntry(db, entryID, getErrorCallback());
+							Thread.sleep(250);
+							handler.sendMessage(handler.obtainMessage());
+						}
+					}
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		});
+
+		bg.setName(Process.SYNC_DATA);
 		bg.start();
 	}
 

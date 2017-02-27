@@ -9,4 +9,5 @@ public class ImageObj {
 	public String dDate;
 	public String dTime;
 	public Bitmap bitmap;
+	public String syncBatchID;
 }

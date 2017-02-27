@@ -43,7 +43,6 @@ import static com.mobileoptima.schema.Tables.TB.PHOTO;
 import static com.mobileoptima.schema.Tables.TB.SYNC_BATCH;
 
 public class TarkieFormLib {
-
 	public static void createTables(SQLiteAdapter db) {
 		db.execQuery(Tables.create(TB.API_KEY));
 		db.execQuery(Tables.create(TB.SYNC_BATCH));
@@ -385,5 +384,70 @@ public class TarkieFormLib {
 		transaction.add(R.id.rlMain, alert);
 		transaction.addToBackStack(null);
 		transaction.commit();
+	}
+
+	public static int getCountUpload(SQLiteAdapter db) {
+		String table = Tables.getName(PHOTO);
+		String query = "SELECT COUNT(ID) FROM " + table + " WHERE isUpload = 0 AND isActive = 1 AND isDelete = 0";
+		return db.getInt(query);
+	}
+
+	public static int getCountSync(SQLiteAdapter db) {
+		String table = Tables.getName(TB.ENTRIES);
+		String query = "SELECT COUNT(ID) FROM " + table + " WHERE isSync = 0 AND isSubmit = 1 AND isDelete = 0";
+		return db.getInt(query);
+	}
+
+	public static ArrayList<ImageObj> getIDsUpload(SQLiteAdapter db, TB tb) {
+		ArrayList<ImageObj> imageObjList = new ArrayList<>();
+		String table = Tables.getName(tb);
+		String query = "SELECT ID, fileName, syncBatchID FROM " + table + " WHERE isUpload = 0 AND isActive = 1 AND isDelete = 0";
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			ImageObj imageObj = new ImageObj();
+			imageObj.ID = cursor.getString(0);
+			imageObj.fileName = cursor.getString(1);
+			imageObj.syncBatchID = cursor.getString(2);
+			imageObjList.add(imageObj);
+		}
+		cursor.close();
+		return imageObjList;
+	}
+
+	public static ArrayList<String> getIDsSync(SQLiteAdapter db, TB tb) {
+		ArrayList<String> IDList = new ArrayList<>();
+		String table = Tables.getName(tb);
+		String query = "SELECT ID FROM " + table + " WHERE isSync = 0";
+		switch(tb) {
+			case ENTRIES:
+				query += " AND isActive = 1 AND isDelete = 0";
+				break;
+		}
+		Cursor cursor = db.read(query);
+		while(cursor.moveToNext()) {
+			IDList.add(cursor.getString(0));
+		}
+		cursor.close();
+		return IDList;
+	}
+
+	public static int getCountSyncTotal(SQLiteAdapter db) {
+		return getCountUpload(db) + getCountSync(db);
+	}
+
+	public static boolean updateStatusUpload(SQLiteAdapter db, String ID, String table) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("isUpload", true));
+		binder.update(table, fieldValueList, ID);
+		return binder.finish();
+	}
+
+	public static boolean updateStatusSync(SQLiteAdapter db, String ID, String table) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("isSync", true));
+		binder.update(table, fieldValueList, ID);
+		return binder.finish();
 	}
 }

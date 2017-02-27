@@ -4,7 +4,8 @@ public class Module {
 	public enum Action {
 		AUTHORIZE_DEVICE,
 		LOGIN,
-		UPDATE_MASTERLIST
+		UPDATE_MASTERLIST,
+		SYNC_DATA
 	}
 
 	public static String getTitle(Action action) {
@@ -20,6 +21,10 @@ public class Module {
 
 			case UPDATE_MASTERLIST:
 				title = "Update Masterlist";
+				break;
+
+			case SYNC_DATA:
+				title = "Sync Data";
 				break;
 		}
 		return title;
