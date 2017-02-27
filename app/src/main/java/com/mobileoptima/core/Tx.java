@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Tx {
+
 	public static boolean uploadPhoto(SQLiteAdapter db, ImageObj image, OnErrorCallback errorCallback) {
 		boolean result = false;
 		boolean hasData = false;
@@ -47,7 +48,7 @@ public class Tx {
 					"/" + fileName;
 			String table = Tables.getName(TB.PHOTO);
 			File file = new File(path);
-			if(!file.exists() || file.isDirectory()){
+			if(!file.exists() || file.isDirectory()) {
 				return TarkieFormLib.updateStatusUpload(db, image.ID, table);
 			}
 			response = CodePanUtils.uploadFile(url, params, "image", file);
@@ -79,31 +80,25 @@ public class Tx {
 					errorCallback.onError(message, params, response, true);
 				}
 			}
-
-			if(hasData){
+			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				JSONArray dataArray = responseObj.getJSONArray("data");
-
-				for(int i = 0; i < dataArray.length(); i++){
-
-					try{
+				for(int i = 0; i < dataArray.length(); i++) {
+					try {
 						JSONObject dataObj = dataArray.getJSONObject(i);
-
 						ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 						fieldValueList.add(new FieldValue("webPhotoID", dataObj.getString("photo_id")));
 						fieldValueList.add(new FieldValue("isUpload", true));
-
 						binder.update(table, fieldValueList, image.ID);
 					}
-					catch(Exception e){
+					catch(Exception e) {
 						e.printStackTrace();
-						if(errorCallback != null){
+						if(errorCallback != null) {
 							errorCallback.onError(e.getMessage(), params, response, false);
 						}
 						return false;
 					}
 				}
-
 				result = binder.finish();
 			}
 		}
@@ -185,27 +180,22 @@ public class Tx {
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
 				JSONArray dataArray = responseObj.getJSONArray("data");
-
-				for(int i = 0; i < dataArray.length(); i++){
-
-					try{
+				for(int i = 0; i < dataArray.length(); i++) {
+					try {
 						JSONObject dataObj = dataArray.getJSONObject(i);
-
 						ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 						fieldValueList.add(new FieldValue("webEntryID", dataObj.getString("form_answer_id")));
 						fieldValueList.add(new FieldValue("isSync", true));
-
 						binder.update(Tables.getName(TB.ENTRIES), fieldValueList, entry.ID);
 					}
-					catch(Exception e){
+					catch(Exception e) {
 						e.printStackTrace();
-						if(errorCallback != null){
+						if(errorCallback != null) {
 							errorCallback.onError(e.getMessage(), params, response, false);
 						}
 						return false;
 					}
 				}
-
 				result = binder.finish();
 			}
 		}

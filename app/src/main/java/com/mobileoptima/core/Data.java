@@ -165,7 +165,7 @@ public class Data {
 		ArrayList<ImageObj> imageList = new ArrayList<>();
 		String table = Tables.getName(TB.PHOTO);
 		String query = "SELECT ID, fileName, syncBatchID FROM " + table + " WHERE isUpload = 0 AND " +
-				"isActive = 1 AND isDelete = 0";
+				"isDelete = 0";
 		net.sqlcipher.Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			ImageObj imageObj = new ImageObj();

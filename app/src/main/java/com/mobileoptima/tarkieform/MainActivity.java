@@ -30,7 +30,6 @@ import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
-import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tab;
@@ -130,20 +129,17 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			case R.id.llSyncDataMain:
 				dlMain.closeDrawer(svMenuMain);
 				int count = TarkieFormLib.getCountSyncTotal(db);
-
-				if(count > 0){
+				if(count > 0) {
 					String transactions = count == 1 ? "transaction" : "transactions";
 					String message = "You have " + count + " unsaved " + transactions + ". " +
 							"Do you want to send it to the server now?";
-
 					final AlertDialogFragment alert = new AlertDialogFragment();
 					alert.setDialogTitle("Sync Data");
 					alert.setDialogMessage(message);
-					alert.setPositiveButton("Yes", new OnClickListener(){
+					alert.setPositiveButton("Yes", new OnClickListener() {
 						@Override
-						public void onClick(View v){
+						public void onClick(View v) {
 							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
-
 							LoadingDialogFragment loading = new LoadingDialogFragment();
 							loading.setAction(Action.SYNC_DATA);
 							loading.setOnRefreshCallback(MainActivity.this);
@@ -154,22 +150,20 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 							transaction.commit();
 						}
 					});
-
-					alert.setNegativeButton("No", new OnClickListener(){
+					alert.setNegativeButton("No", new OnClickListener() {
 						@Override
-						public void onClick(View v){
+						public void onClick(View v) {
 							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 						}
 					});
-
 					transaction = getSupportFragmentManager().beginTransaction();
 					transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
-								R.anim.fade_in, R.anim.fade_out);
+							R.anim.fade_in, R.anim.fade_out);
 					transaction.add(R.id.rlMain, alert);
 					transaction.addToBackStack(null);
 					transaction.commit();
 				}
-				else{
+				else {
 					CodePanUtils.showAlertToast(this, "No data to be synced.", Toast.LENGTH_SHORT);
 				}
 				break;
@@ -189,7 +183,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 							loading.setAction(Action.UPDATE_MASTERLIST);
 							loading.setOnRefreshCallback(MainActivity.this);
 							loading.setOnOverrideCallback(MainActivity.this);
-							FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+							transaction = getSupportFragmentManager().beginTransaction();
+							transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+									R.anim.fade_in, R.anim.fade_out);
 							transaction.add(R.id.rlMain, loading);
 							transaction.addToBackStack(null);
 							transaction.commit();

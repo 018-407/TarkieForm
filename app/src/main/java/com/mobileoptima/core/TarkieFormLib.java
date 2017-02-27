@@ -403,7 +403,7 @@ public class TarkieFormLib {
 
 	public static int getCountUpload(SQLiteAdapter db) {
 		String table = Tables.getName(PHOTO);
-		String query = "SELECT COUNT(ID) FROM " + table + " WHERE isUpload = 0 AND isActive = 1 AND isDelete = 0";
+		String query = "SELECT COUNT(ID) FROM " + table + " WHERE isUpload = 0 AND isDelete = 0";
 		return db.getInt(query);
 	}
 

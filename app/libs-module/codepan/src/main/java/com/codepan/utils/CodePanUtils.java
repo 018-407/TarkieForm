@@ -746,7 +746,7 @@ public class CodePanUtils {
 			connection.setReadTimeout(timeOut);
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-//			connection.setRequestProperty("Content-Length", String.valueOf(params.length()));
+//			connection.setRequestProperty("Content-2", String.valueOf(params.length()));
 			connection.setRequestProperty("Content-Language", "en-US");
 			connection.setRequestProperty("connection", "close");
 			connection.setRequestProperty("Accept-Encoding", "");

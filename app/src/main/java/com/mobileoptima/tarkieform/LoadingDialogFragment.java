@@ -29,7 +29,6 @@ import com.mobileoptima.core.TarkieFormLib;
 import com.mobileoptima.core.Tx;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.ImageObj;
-import com.mobileoptima.schema.Tables;
 
 import static com.codepan.callback.Interface.OnRefreshCallback;
 
@@ -239,43 +238,37 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 	}
 
 	public void syncData(final SQLiteAdapter db) {
-
-		bg = new Thread(new Runnable(){
+		bg = new Thread(new Runnable() {
 
 			@Override
-			public void run(){
-
+			public void run() {
 				Looper.prepare();
-
-				try{
+				try {
 					result = Rx.getSyncBatchID(db, getErrorCallback());
-					if(!result){
+					if(!result) {
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
-
-					for(ImageObj imageObj : Data.loadPhotosUpload(db)){
-						if(result){
+					for(ImageObj imageObj : Data.loadPhotosUpload(db)) {
+						if(result) {
 							result = Tx.uploadPhoto(db, imageObj, getErrorCallback());
 							Thread.sleep(250);
 							handler.sendMessage(handler.obtainMessage());
 						}
 					}
-
-					for(EntryObj entryObj : Data.loadEntrySync(db)){
-						if(result){
+					for(EntryObj entryObj : Data.loadEntrySync(db)) {
+						if(result) {
 							result = Tx.syncEntry(db, entryObj, getErrorCallback());
 							Thread.sleep(250);
 							handler.sendMessage(handler.obtainMessage());
 						}
 					}
 				}
-				catch(Exception e){
+				catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-
 		bg.setName(Process.SYNC_DATA);
 		bg.start();
 	}

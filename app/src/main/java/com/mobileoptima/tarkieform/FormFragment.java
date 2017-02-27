@@ -254,6 +254,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		}
 		if(result) {
 			((MainActivity) getActivity()).reloadEntries();
+			((MainActivity) getActivity()).reloadPhotos();
 			((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
 			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}
@@ -294,6 +295,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 			public void onClick(View view) {
 				TarkieFormLib.deleteEntry(db, entry.ID);
 				((MainActivity) getActivity()).reloadEntries();
+				((MainActivity) getActivity()).reloadPhotos();
 				((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
 				manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			}
