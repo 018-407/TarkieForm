@@ -168,6 +168,7 @@ public class Tx {
 //				errorCallback.onError(je.getMessage(), params, response, false);
 //			}
 //		}
+		result = true;
 		return result;
 	}
 }
