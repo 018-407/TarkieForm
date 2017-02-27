@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.codepan.calendar.adapter.ViewPagerAdapter;
 import com.codepan.callback.Interface.OnBackPressedCallback;
@@ -30,6 +31,7 @@ import com.mobileoptima.callback.Interface.OnInitializeCallback;
 import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Module;
+import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.TarkieFormLib;
@@ -120,12 +122,56 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				}
 				break;
 			case R.id.btnSyncMain:
+				llSyncDataMain.performClick();
 				break;
 			case R.id.llSettingsMain:
 				dlMain.closeDrawer(svMenuMain);
 				break;
 			case R.id.llSyncDataMain:
 				dlMain.closeDrawer(svMenuMain);
+				int count = TarkieFormLib.getCountSyncTotal(db);
+
+				if(count > 0){
+					String transactions = count == 1 ? "transaction" : "transactions";
+					String message = "You have " + count + " unsaved " + transactions + ". " +
+							"Do you want to send it to the server now?";
+
+					final AlertDialogFragment alert = new AlertDialogFragment();
+					alert.setDialogTitle("Sync Data");
+					alert.setDialogMessage(message);
+					alert.setPositiveButton("Yes", new OnClickListener(){
+						@Override
+						public void onClick(View v){
+							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+
+							LoadingDialogFragment loading = new LoadingDialogFragment();
+							loading.setAction(Action.SYNC_DATA);
+							loading.setOnRefreshCallback(MainActivity.this);
+							loading.setOnOverrideCallback(MainActivity.this);
+							transaction = getSupportFragmentManager().beginTransaction();
+							transaction.add(R.id.rlMain, loading);
+							transaction.addToBackStack(null);
+							transaction.commit();
+						}
+					});
+
+					alert.setNegativeButton("No", new OnClickListener(){
+						@Override
+						public void onClick(View v){
+							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+						}
+					});
+
+					transaction = getSupportFragmentManager().beginTransaction();
+					transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+								R.anim.fade_in, R.anim.fade_out);
+					transaction.add(R.id.rlMain, alert);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+				else{
+					CodePanUtils.showAlertToast(this, "No data to be synced.", Toast.LENGTH_SHORT);
+				}
 				break;
 			case R.id.llUpdateMasterMain:
 				dlMain.closeDrawer(svMenuMain);
@@ -140,8 +186,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 							LoadingDialogFragment loading = new LoadingDialogFragment();
 							Bundle bundle = new Bundle();
 							loading.setArguments(bundle);
-							loading.setAction(Module.Action.UPDATE_MASTERLIST);
+							loading.setAction(Action.UPDATE_MASTERLIST);
 							loading.setOnRefreshCallback(MainActivity.this);
+							loading.setOnOverrideCallback(MainActivity.this);
 							FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 							transaction.add(R.id.rlMain, loading);
 							transaction.addToBackStack(null);

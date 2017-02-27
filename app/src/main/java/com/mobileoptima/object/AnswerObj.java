@@ -10,4 +10,5 @@ public class AnswerObj {
 	public boolean isActive;
 	public ArrayList<ChoiceObj> choiceList;
 	public ArrayList<ImageObj> imageList;
+	public String syncBatchID;
 }

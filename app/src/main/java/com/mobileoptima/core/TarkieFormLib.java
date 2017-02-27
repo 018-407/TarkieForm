@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.codepan.database.SQLiteBinder.DataType.INTEGER;
+import static com.codepan.database.SQLiteBinder.DataType.TEXT;
 import static com.mobileoptima.schema.Tables.TB;
 import static com.mobileoptima.schema.Tables.TB.ANSWERS;
 import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
@@ -63,6 +65,19 @@ public class TarkieFormLib {
 	}
 
 	public static void alterTables(SQLiteAdapter db, int oldVersion, int newVersion) {
+
+		SQLiteBinder binder = new SQLiteBinder(db);
+
+		String table = Tables.getName(ENTRIES);
+		if(!db.isColumnExists(db, table, "dateSubmitted")){
+			binder.addColumn(table, TEXT, "dateSubmitted", 0, false);
+		}
+
+		if(!db.isColumnExists(db, table, "timeSubmitted")){
+			binder.addColumn(table, INTEGER, "timeSubmitted", 0, false);
+		}
+
+		binder.finish();
 	}
 
 	public static boolean isAuthorized(SQLiteAdapter db) {
@@ -396,39 +411,6 @@ public class TarkieFormLib {
 		String table = Tables.getName(TB.ENTRIES);
 		String query = "SELECT COUNT(ID) FROM " + table + " WHERE isSync = 0 AND isSubmit = 1 AND isDelete = 0";
 		return db.getInt(query);
-	}
-
-	public static ArrayList<ImageObj> getIDsUpload(SQLiteAdapter db, TB tb) {
-		ArrayList<ImageObj> imageObjList = new ArrayList<>();
-		String table = Tables.getName(tb);
-		String query = "SELECT ID, fileName, syncBatchID FROM " + table + " WHERE isUpload = 0 AND isActive = 1 AND isDelete = 0";
-		Cursor cursor = db.read(query);
-		while(cursor.moveToNext()) {
-			ImageObj imageObj = new ImageObj();
-			imageObj.ID = cursor.getString(0);
-			imageObj.fileName = cursor.getString(1);
-			imageObj.syncBatchID = cursor.getString(2);
-			imageObjList.add(imageObj);
-		}
-		cursor.close();
-		return imageObjList;
-	}
-
-	public static ArrayList<String> getIDsSync(SQLiteAdapter db, TB tb) {
-		ArrayList<String> IDList = new ArrayList<>();
-		String table = Tables.getName(tb);
-		String query = "SELECT ID FROM " + table + " WHERE isSync = 0";
-		switch(tb) {
-			case ENTRIES:
-				query += " AND isActive = 1 AND isDelete = 0";
-				break;
-		}
-		Cursor cursor = db.read(query);
-		while(cursor.moveToNext()) {
-			IDList.add(cursor.getString(0));
-		}
-		cursor.close();
-		return IDList;
 	}
 
 	public static int getCountSyncTotal(SQLiteAdapter db) {

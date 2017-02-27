@@ -23,9 +23,11 @@ import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module;
 import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.Process;
+import com.mobileoptima.core.Data;
 import com.mobileoptima.core.Rx;
 import com.mobileoptima.core.TarkieFormLib;
 import com.mobileoptima.core.Tx;
+import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.schema.Tables;
 
@@ -91,12 +93,13 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 		progressLoadingDialog = (ProgressWheel) view.findViewById(R.id.progressLoadingDialog);
 		tvTitleLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvTitleLoadingDialog);
 		tvCountLoadingDialog = (CodePanLabel) view.findViewById(R.id.tvCountLoadingDialog);
+		String title = null;
 		switch(action) {
 			case AUTHORIZE_DEVICE:
 				setMax(4);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
-				String title = "Authorizing Device...";
+				title = "Authorizing Device...";
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
@@ -121,7 +124,8 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				updateMasterlist(db);
 				break;
 			case SYNC_DATA:
-				setMax(4);
+				int count = TarkieFormLib.getCountSyncTotal(db);
+				setMax(count + 1);
 				successMsg = "Sync Data successful.";
 				failedMsg = "Failed to sync data.";
 				title = "Syncing data...";
@@ -250,7 +254,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 						handler.sendMessage(handler.obtainMessage());
 					}
 
-					for(ImageObj imageObj : TarkieFormLib.getIDsUpload(db, Tables.TB.PHOTO)){
+					for(ImageObj imageObj : Data.loadPhotosUpload(db)){
 						if(result){
 							result = Tx.uploadPhoto(db, imageObj, getErrorCallback());
 							Thread.sleep(250);
@@ -258,9 +262,9 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 						}
 					}
 
-					for(String entryID : TarkieFormLib.getIDsSync(db, Tables.TB.ENTRIES)){
+					for(EntryObj entryObj : Data.loadEntrySync(db)){
 						if(result){
-							result = Tx.syncEntry(db, entryID, getErrorCallback());
+							result = Tx.syncEntry(db, entryObj, getErrorCallback());
 							Thread.sleep(250);
 							handler.sendMessage(handler.obtainMessage());
 						}

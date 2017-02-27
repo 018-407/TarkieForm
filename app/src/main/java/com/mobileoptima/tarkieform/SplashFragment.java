@@ -79,6 +79,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 					db.setOnUpgradeDatabaseCallback(SplashFragment.this);
 					db.openConnection();
 					TarkieFormLib.createTables(db);
+					TarkieFormLib.alterTables(db, 0, 0);
 					TarkieFormLib.loadCredentials(db);
 					Thread.sleep(DELAY);
 					handler.sendMessage(handler.obtainMessage());

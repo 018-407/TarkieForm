@@ -73,8 +73,9 @@ public class Tables {
 			case ENTRIES:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, empID INTEGER, " +
-						"formID INTEGER, dDate TEXt, dTime TEXT, isSync INTEGER DEFAULT 0, " +
-						"syncBatchID TEXT, isSubmit INTEGER DEFAULT 0, webEntryID INTEGER, " +
+						"formID INTEGER, dDate TEXt, dTime TEXT, dateSubmitted TEXT, " +
+						"timeSubmitted TEXT, isSync INTEGER DEFAULT 0, syncBatchID TEXT, " +
+						"isSubmit INTEGER DEFAULT 0, webEntryID INTEGER, " +
 						"isDelete INTEGER DEFAULT 0)";
 				break;
 			case ANSWERS:
