@@ -126,7 +126,8 @@ public class Data {
 		ArrayList<ImageObj> imageList = new ArrayList<>();
 		String empID = TarkieFormLib.getEmployeeID(db);
 		String table = Tables.getName(TB.PHOTO);
-		String query = "SELECT ID, fileName FROM " + table + " WHERE empID = '" + empID + "' AND isDelete = 0";
+		String query = "SELECT ID, fileName FROM " + table + " WHERE empID = '" + empID + "' AND " +
+				"isDelete = 0 AND isSignature = 0 ORDER BY ID DESC";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			ImageObj obj = new ImageObj();
@@ -164,15 +165,16 @@ public class Data {
 	public static ArrayList<ImageObj> loadPhotosUpload(SQLiteAdapter db) {
 		ArrayList<ImageObj> imageList = new ArrayList<>();
 		String table = Tables.getName(TB.PHOTO);
-		String query = "SELECT ID, fileName, syncBatchID FROM " + table + " WHERE isUpload = 0 AND " +
-				"isDelete = 0";
+		String query = "SELECT ID, fileName, syncBatchID, isSignature FROM " + table + " WHERE " +
+				"isUpload = 0 AND isDelete = 0";
 		net.sqlcipher.Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
-			ImageObj imageObj = new ImageObj();
-			imageObj.ID = cursor.getString(0);
-			imageObj.fileName = cursor.getString(1);
-			imageObj.syncBatchID = cursor.getString(2);
-			imageList.add(imageObj);
+			ImageObj image = new ImageObj();
+			image.ID = cursor.getString(0);
+			image.fileName = cursor.getString(1);
+			image.syncBatchID = cursor.getString(2);
+			image.isSignature = cursor.getInt(3) == 1;
+			imageList.add(image);
 		}
 		cursor.close();
 		return imageList;
@@ -182,7 +184,7 @@ public class Data {
 		ArrayList<EntryObj> entryList = new ArrayList<>();
 		String query = "SELECT ID, dDate, dTime, dateSubmitted, timeSubmitted, syncBatchID, formID " +
 				"FROM " + Tables.getName(TB.ENTRIES) + " WHERE isSync = 0 AND isSubmit = 1 AND " +
-				"AND isDelete = 0";
+				"isDelete = 0";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			EntryObj entry = new EntryObj();
@@ -194,10 +196,12 @@ public class Data {
 			entry.syncBatchID = cursor.getString(5);
 			FormObj form = new FormObj();
 			form.ID = cursor.getString(6);
+			entry.form = form;
 			ArrayList<FieldObj> fieldList = new ArrayList<>();
 			query = "SELECT f.ID, f.type, a.ID, a.value FROM " + Tables.getName(TB.ANSWERS) + " a, " +
 					Tables.getName(TB.FIELDS) + " f WHERE f.formID = " + form.ID + " " +
-					"AND a.entryID = " + entry.ID + " AND a.fieldID = f.ID";
+					"AND a.entryID = " + entry.ID + " AND a.fieldID = f.ID " +
+					"AND a.value NOT NULL";
 			Cursor c = db.read(query);
 			while(c.moveToNext()) {
 				FieldObj field = new FieldObj();
@@ -205,7 +209,16 @@ public class Data {
 				field.type = c.getString(1);
 				AnswerObj answer = new AnswerObj();
 				answer.ID = c.getString(2);
-				answer.value = c.getString(3);
+				String value = c.getString(3);
+				switch(field.type) {
+					case FieldType.PHOTO:
+					case FieldType.SIG:
+						answer.value = TarkieFormLib.getWebPhotoIDs(db, value);
+						break;
+					default:
+						answer.value = value;
+						break;
+				}
 				answer.syncBatchID = entry.syncBatchID;
 				field.answer = answer;
 				fieldList.add(field);

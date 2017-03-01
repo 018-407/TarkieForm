@@ -245,20 +245,18 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				Looper.prepare();
 				try {
 					result = Rx.getSyncBatchID(db, getErrorCallback());
-					if(!result) {
-						Thread.sleep(250);
-						handler.sendMessage(handler.obtainMessage());
-					}
-					for(ImageObj imageObj : Data.loadPhotosUpload(db)) {
+					Thread.sleep(250);
+					handler.sendMessage(handler.obtainMessage());
+					for(ImageObj obj : Data.loadPhotosUpload(db)) {
 						if(result) {
-							result = Tx.uploadPhoto(db, imageObj, getErrorCallback());
+							result = Tx.uploadPhoto(db, obj, getErrorCallback());
 							Thread.sleep(250);
 							handler.sendMessage(handler.obtainMessage());
 						}
 					}
-					for(EntryObj entryObj : Data.loadEntrySync(db)) {
+					for(EntryObj obj : Data.loadEntrySync(db)) {
 						if(result) {
-							result = Tx.syncEntry(db, entryObj, getErrorCallback());
+							result = Tx.syncEntry(db, obj, getErrorCallback());
 							Thread.sleep(250);
 							handler.sendMessage(handler.obtainMessage());
 						}

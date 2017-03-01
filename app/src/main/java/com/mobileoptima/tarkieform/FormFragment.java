@@ -200,7 +200,30 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 						transaction.commit();
 					}
 					else {
-						saveEntry();
+						final AlertDialogFragment alert = new AlertDialogFragment();
+						alert.setDialogTitle("Submit Entry");
+						alert.setDialogMessage("Do you want to finalize and submit this entry?");
+						alert.setOnFragmentCallback(this);
+						alert.setPositiveButton("Submit", new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+								saveEntry(true);
+							}
+						});
+						alert.setNegativeButton("Save", new OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+								saveEntry(false);
+							}
+						});
+						transaction = manager.beginTransaction();
+						transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+								R.anim.fade_in, R.anim.fade_out);
+						transaction.add(R.id.rlMain, alert);
+						transaction.addToBackStack(null);
+						transaction.commit();
 					}
 				}
 				break;
@@ -214,7 +237,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				break;
 			case R.id.btnSaveForm:
 				rlOptionsForm.performClick();
-				saveEntry();
+				saveEntry(false);
 				break;
 			case R.id.btnCancelForm:
 				rlOptionsForm.performClick();
@@ -232,7 +255,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		}
 	}
 
-	public void saveEntry() {
+	public void saveEntry(boolean isSubmit) {
 		ArrayList<FieldObj> fieldList = new ArrayList<>();
 		for(PageObj obj : pageList) {
 			if(pageList.indexOf(obj) <= index) {
@@ -245,16 +268,17 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		}
 		boolean result = false;
 		if(entry != null) {
-			result = TarkieFormLib.updateEntry(db, entry.ID, fieldList, false);
+			result = TarkieFormLib.updateEntry(db, entry.ID, fieldList, isSubmit);
 			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully updated.");
 		}
 		else {
-			result = TarkieFormLib.saveEntry(db, form.ID, fieldList, false);
+			result = TarkieFormLib.saveEntry(db, form.ID, fieldList, isSubmit);
 			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully saved.");
 		}
 		if(result) {
 			((MainActivity) getActivity()).reloadEntries();
 			((MainActivity) getActivity()).reloadPhotos();
+			((MainActivity) getActivity()).updateSyncCount();
 			((MainActivity) getActivity()).switchTab(Tab.ENTRIES);
 			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		}

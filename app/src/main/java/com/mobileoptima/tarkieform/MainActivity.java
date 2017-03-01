@@ -2,6 +2,7 @@ package com.mobileoptima.tarkieform;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -34,6 +36,11 @@ import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.TarkieFormLib;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 
@@ -42,10 +49,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
 			llAboutMain, llLogoutMain;
+	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain,
+			tvEmployeeMain, tvSyncNotifMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
-	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain, tvEmployeeMain;
+	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain, ivLogoMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
-	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain;
 	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
 	private ArrayList<Fragment> fragmentList;
@@ -73,10 +81,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
 		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
 		tvSyncCountMain = (CodePanLabel) findViewById(R.id.tvSyncCountMain);
+		tvSyncNotifMain = (CodePanLabel) findViewById(R.id.tvSyncNotifMain);
 		btnMenuMain = (CodePanButton) findViewById(R.id.btnMenuMain);
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
 		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
 		ivPhotosMain = (ImageView) findViewById(R.id.ivPhotosMain);
+		ivLogoMain = (ImageView) findViewById(R.id.ivLogoMain);
 		tvEmployeeMain = (CodePanLabel) findViewById(R.id.tvEmployeeMain);
 		tvEntriesMain = (CodePanLabel) findViewById(R.id.tvEntriesMain);
 		tvPhotosMain = (CodePanLabel) findViewById(R.id.tvPhotosMain);
@@ -285,7 +295,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onInitialize(SQLiteAdapter db) {
 		this.isInitialized = true;
 		this.db = db;
+		updateSyncCount();
 		updateUser();
+		updateLogo();
 		loadTabs();
 	}
 
@@ -293,6 +305,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onRefresh() {
 		authenticate();
 		reloadForms();
+		updateSyncCount();
+		updateUser();
+		updateLogo();
 	}
 
 	public void loadTabs() {
@@ -454,6 +469,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		reloadEntries();
 		reloadPhotos();
 		updateUser();
+		updateLogo();
 	}
 
 	public void updateUser() {
@@ -461,7 +477,55 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			String empID = TarkieFormLib.getEmployeeID(db);
 			String name = TarkieFormLib.getEmployeeName(db, empID);
 			tvEmployeeMain.setText(name);
-			tvSyncCountMain.setText(String.valueOf(TarkieFormLib.getCountSyncTotal(db)));
+		}
+	}
+
+	public void updateLogo() {
+		ImageLoader imageLoader = ImageLoader.getInstance();
+		imageLoader.init(ImageLoaderConfiguration.createDefault(this));
+		DisplayImageOptions options = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.color.transparent)
+				.showImageForEmptyUri(R.color.transparent)
+				.cacheInMemory(true)
+				.cacheOnDisk(true)
+				.build();
+		String logoUrl = TarkieFormLib.getCompanyLogo(db);
+		imageLoader.displayImage(logoUrl, ivLogoMain, options, new ImageLoadingListener() {
+			@Override
+			public void onLoadingStarted(String imageUri, View view) {
+			}
+
+			@Override
+			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+			}
+
+			@Override
+			public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+				float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+				ivLogoMain.getLayoutParams().width = (int) ((float) ivLogoMain.getHeight() * ratio);
+			}
+
+			@Override
+			public void onLoadingCancelled(String imageUri, View view) {
+			}
+		});
+	}
+
+	public void updateSyncCount() {
+		int count = TarkieFormLib.getCountSyncTotal(db);
+		if(count > 0) {
+			tvSyncCountMain.setVisibility(View.VISIBLE);
+			tvSyncNotifMain.setVisibility(View.VISIBLE);
+			tvSyncCountMain.setText(String.valueOf(count));
+			tvSyncNotifMain.setText(String.valueOf(count));
+			if(count > 99) {
+				float textSize = getResources().getDimension(R.dimen.nine);
+				tvSyncCountMain.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			}
+		}
+		else {
+			tvSyncCountMain.setVisibility(View.GONE);
+			tvSyncNotifMain.setVisibility(View.GONE);
 		}
 	}
 

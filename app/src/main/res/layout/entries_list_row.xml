@@ -48,7 +48,7 @@
                 android:id="@+id/tvStatusEntries"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Draft"
+                android:text="@string/draft"
                 android:textColor="@color/red"
                 android:textSize="@dimen/fifteen"
                 codePan:typeface="@string/proxima_nova_light"/>

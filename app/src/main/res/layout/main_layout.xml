@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/rlMain"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rlMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue"
@@ -12,7 +12,10 @@
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/dlMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -26,6 +29,7 @@
                 android:background="@color/white">
 
                 <FrameLayout
+                    android:id="@+id/flMenuMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -45,9 +49,19 @@
 
                 </FrameLayout>
 
-                <FrameLayout
+                <ImageView
+                    android:id="@+id/ivLogoMain"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/forty"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/flMenuMain"
+                    android:layout_toRightOf="@+id/flMenuMain"
+                    android:scaleType="fitXY"/>
+
+                <RelativeLayout
+                    android:id="@+id/rlSyncMain"
+                    android:layout_width="@dimen/forty_eight"
+                    android:layout_height="@dimen/forty_eight"
                     android:layout_marginEnd="@dimen/ten"
                     android:layout_marginRight="@dimen/ten"
                     android:layout_toLeftOf="@+id/flOptionsMain"
@@ -56,7 +70,7 @@
                     <ImageView
                         android:layout_width="@dimen/thirty"
                         android:layout_height="@dimen/twenty_one"
-                        android:layout_gravity="center"
+                        android:layout_centerInParent="true"
                         android:src="@drawable/ic_sync"/>
 
                     <com.codepan.widget.CodePanButton
@@ -69,16 +83,22 @@
                         android:id="@+id/tvSyncCountMain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="@dimen/five"
-                        android:layout_marginStart="@dimen/five"
-                        android:background="@drawable/bg_oval_gray_oct"
-                        android:text="0"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="@dimen/five"
+                        android:layout_marginRight="@dimen/five"
+                        android:layout_marginTop="@dimen/five"
+                        android:background="@drawable/bg_oval_red"
+                        android:gravity="center"
+                        android:padding="@dimen/two"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/ten"
+                        android:textSize="@dimen/eleven"
+                        android:visibility="gone"
+                        codePan:reference="dynamic"
+                        codePan:setSquare="true"
                         codePan:typeface="@string/proxima_nova_light"/>
 
-                </FrameLayout>
+                </RelativeLayout>
 
                 <FrameLayout
                     android:id="@+id/flOptionsMain"

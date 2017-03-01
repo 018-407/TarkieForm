@@ -38,7 +38,8 @@ public class Tables {
 			case COMPANY:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, " +
-						"address TEXT, email TEXT, contactNo TEXT, imageUrl TEXT)";
+						"address TEXT, email TEXT, contactNo TEXT, imageUrl TEXT, " +
+						"logoUrl TEXT)";
 				break;
 			case EMPLOYEE:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
@@ -51,7 +52,8 @@ public class Tables {
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
 						"fileName TEXT, dDate TEXT, dTime TEXT, empID INTEGER, " +
 						"isDelete INTEGER DEFAULT 0, isUpload INTEGER DEFAULT 0, " +
-						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, syncBatchID TEXT)";
+						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, " +
+						"isSignature INTEGER DEFAULT 0, syncBatchID TEXT)";
 				break;
 			case FORMS:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +

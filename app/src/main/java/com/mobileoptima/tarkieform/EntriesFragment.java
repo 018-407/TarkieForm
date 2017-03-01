@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.codepan.database.SQLiteAdapter;
+import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.adapter.EntriesAdapter;
 import com.mobileoptima.callback.Interface;
 import com.mobileoptima.constant.Tag;
@@ -44,15 +45,20 @@ public class EntriesFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 				EntryObj obj = entryList.get(i);
-				FormFragment form = new FormFragment();
-				form.setEntry(obj);
-				form.setOnOverrideCallback(overrideCallback);
-				transaction = getActivity().getSupportFragmentManager().beginTransaction();
-				transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
-						R.anim.slide_in_ltr, R.anim.slide_out_ltr);
-				transaction.replace(R.id.rlMain, form, Tag.FORM);
-				transaction.addToBackStack(null);
-				transaction.commit();
+				if(!obj.isSubmit) {
+					FormFragment form = new FormFragment();
+					form.setEntry(obj);
+					form.setOnOverrideCallback(overrideCallback);
+					transaction = getActivity().getSupportFragmentManager().beginTransaction();
+					transaction.setCustomAnimations(R.anim.slide_in_rtl, R.anim.slide_out_rtl,
+							R.anim.slide_in_ltr, R.anim.slide_out_ltr);
+					transaction.replace(R.id.rlMain, form, Tag.FORM);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+				else {
+					CodePanUtils.showAlertToast(getActivity(), "This entry has already been submitted.");
+				}
 			}
 		});
 		loadEntries(db);

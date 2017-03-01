@@ -37,6 +37,7 @@ import static com.codepan.database.SQLiteBinder.DataType.INTEGER;
 import static com.codepan.database.SQLiteBinder.DataType.TEXT;
 import static com.mobileoptima.schema.Tables.TB;
 import static com.mobileoptima.schema.Tables.TB.ANSWERS;
+import static com.mobileoptima.schema.Tables.TB.COMPANY;
 import static com.mobileoptima.schema.Tables.TB.CREDENTIALS;
 import static com.mobileoptima.schema.Tables.TB.EMPLOYEE;
 import static com.mobileoptima.schema.Tables.TB.ENTRIES;
@@ -65,18 +66,22 @@ public class TarkieFormLib {
 	}
 
 	public static void alterTables(SQLiteAdapter db, int oldVersion, int newVersion) {
-
 		SQLiteBinder binder = new SQLiteBinder(db);
-
 		String table = Tables.getName(ENTRIES);
-		if(!db.isColumnExists(db, table, "dateSubmitted")){
+		if(!db.isColumnExists(db, table, "dateSubmitted")) {
 			binder.addColumn(table, TEXT, "dateSubmitted", 0, false);
 		}
-
-		if(!db.isColumnExists(db, table, "timeSubmitted")){
+		if(!db.isColumnExists(db, table, "timeSubmitted")) {
 			binder.addColumn(table, INTEGER, "timeSubmitted", 0, false);
 		}
-
+		table = Tables.getName(TB.PHOTO);
+		if(!db.isColumnExists(db, table, "isSignature")) {
+			binder.addColumn(table, INTEGER, "isSignature", 0, true);
+		}
+		table = Tables.getName(TB.COMPANY);
+		if(!db.isColumnExists(db, table, "logoUrl")) {
+			binder.addColumn(table, TEXT, "logoUrl", 0, false);
+		}
 		binder.finish();
 	}
 
@@ -107,6 +112,12 @@ public class TarkieFormLib {
 	public static String getEmployeeID(SQLiteAdapter db) {
 		String table = Tables.getName(CREDENTIALS);
 		String query = "SELECT empID FROM " + table + " WHERE ID = 1";
+		return db.getString(query);
+	}
+
+	public static String getCompanyLogo(SQLiteAdapter db) {
+		String table = Tables.getName(COMPANY);
+		String query = "SELECT logoUrl FROM " + table + " LIMIT 1";
 		return db.getString(query);
 	}
 
@@ -194,11 +205,23 @@ public class TarkieFormLib {
 		fieldValueList.add(new FieldValue("fileName", obj.fileName));
 		fieldValueList.add(new FieldValue("dDate", obj.dDate));
 		fieldValueList.add(new FieldValue("dTime", obj.dTime));
-		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
+		fieldValueList.add(new FieldValue("isSignature", obj.isSignature));
 		fieldValueList.add(new FieldValue("empID", empID));
+		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
 		String photoID = binder.insert(Tables.getName(PHOTO), fieldValueList);
 		binder.finish();
 		return photoID;
+	}
+
+	public static boolean deletePhoto(Context context, SQLiteAdapter db, String photoID) {
+		SQLiteBinder binder = new SQLiteBinder(db);
+		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		fieldValueList.add(new FieldValue("isDelete", true));
+		binder.update(Tables.getName(PHOTO), fieldValueList, photoID);
+		String fileName = TarkieFormLib.getFileName(db, photoID);
+		String path = context.getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() + "/" + fileName;
+		CodePanUtils.deleteFile(path);
+		return binder.finish();
 	}
 
 	public static boolean deletePhoto(Context context, SQLiteAdapter db, ImageObj obj) {
@@ -226,7 +249,7 @@ public class TarkieFormLib {
 
 	public static String getFileName(SQLiteAdapter db, String photoID) {
 		String table = Tables.getName(TB.PHOTO);
-		String query = "SELECT fileName FROM " + table + " WHERE ID = '" + photoID + "'";
+		String query = "SELECT fileName FROM " + table + " WHERE ID = '" + photoID + "' AND isDelete = 0";
 		return db.getString(query);
 	}
 
@@ -243,6 +266,10 @@ public class TarkieFormLib {
 		fieldValueList.add(new FieldValue("empID", empID));
 		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
 		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
+		if(isSubmit) {
+			fieldValueList.add(new FieldValue("dateSubmitted", dDate));
+			fieldValueList.add(new FieldValue("timeSubmitted", dTime));
+		}
 		String entryID = binder.insert(Tables.getName(ENTRIES), fieldValueList);
 		for(FieldObj field : fieldList) {
 			if(field.isQuestion) {
@@ -276,8 +303,10 @@ public class TarkieFormLib {
 						}
 						break;
 					case FieldType.YON:
-					case FieldType.CB:
 						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
+						break;
+					case FieldType.CB:
+						value = answer.isCheck ? AnswerType.CHECK : AnswerType.UNCHECK;
 						break;
 				}
 				fieldValueList.clear();
@@ -294,6 +323,12 @@ public class TarkieFormLib {
 		SQLiteBinder binder = new SQLiteBinder(db);
 		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
 		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
+		if(isSubmit) {
+			String date = CodePanUtils.getDate();
+			String time = CodePanUtils.getTime();
+			fieldValueList.add(new FieldValue("dateSubmitted", date));
+			fieldValueList.add(new FieldValue("timeSubmitted", time));
+		}
 		binder.update(Tables.getName(ENTRIES), fieldValueList, entryID);
 		for(FieldObj field : fieldList) {
 			if(field.isQuestion) {
@@ -327,8 +362,10 @@ public class TarkieFormLib {
 						}
 						break;
 					case FieldType.YON:
-					case FieldType.CB:
 						value = answer.isCheck ? AnswerType.YES : AnswerType.NO;
+						break;
+					case FieldType.CB:
+						value = answer.isCheck ? AnswerType.CHECK : AnswerType.UNCHECK;
 						break;
 				}
 				fieldValueList.clear();
@@ -371,6 +408,27 @@ public class TarkieFormLib {
 			cursor.close();
 		}
 		return answer;
+	}
+
+	public static String getWebPhotoIDs(SQLiteAdapter db, String value) {
+		String webPhotoIDs = "";
+		String table = Tables.getName(TB.PHOTO);
+		if(value != null && !value.isEmpty()) {
+			String condition = "ID = " + value.replace(",", " OR ID = ");
+			String query = "SELECT webPhotoID FROM " + table + " WHERE (" + condition + ") " +
+					"AND isDelete = 0 AND isUpload = 1";
+			Cursor cursor = db.read(query);
+			while(cursor.moveToNext()) {
+				if(cursor.getPosition() != cursor.getCount() - 1) {
+					webPhotoIDs += cursor.getString(0) + ",";
+				}
+				else {
+					webPhotoIDs += cursor.getString(0);
+				}
+			}
+			cursor.close();
+		}
+		return webPhotoIDs;
 	}
 
 	public static boolean logout(SQLiteAdapter db) {

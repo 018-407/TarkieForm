@@ -23,4 +23,8 @@
     <string name="update_masterlist">Update Masterlist</string>
     <string name="about">About</string>
     <string name="logout">Log out</string>
+    <string name="draft">Draft</string>
+    <string name="submitted">Submitted</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
 </resources>

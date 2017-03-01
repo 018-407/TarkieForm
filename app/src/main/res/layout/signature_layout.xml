@@ -26,19 +26,35 @@
             android:textSize="@dimen/seventeen"
             codePan:typeface="@string/proxima_nova_light"/>
 
-        <com.codepan.widget.SignatureView
-            android:id="@+id/svAddSignature"
+        <FrameLayout
+            android:id="@+id/flSignature"
             android:layout_width="match_parent"
             android:layout_height="@dimen/one_hundred_fifty"
             android:layout_below="@+id/tvTitleSignature"
-            android:layout_marginTop="@dimen/ten"
-            android:background="@drawable/bg_layer_rect_white_rad_five_str_green"/>
+            android:layout_marginTop="@dimen/ten">
+
+            <com.codepan.widget.SignatureView
+                android:id="@+id/svSignature"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_layer_rect_white_rad_five_str_green"/>
+
+            <ImageView
+                android:id="@+id/ivSignature"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_layer_rect_white_rad_five_str_green"
+                android:padding="@dimen/five"
+                android:src="@drawable/ic_about"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <LinearLayout
-            android:id="@+id/llButtonSignature"
+            android:id="@+id/llSignature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/svAddSignature"
+            android:layout_below="@+id/flSignature"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/ten"
             android:orientation="horizontal">

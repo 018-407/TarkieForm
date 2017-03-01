@@ -35,6 +35,7 @@
                 android:src="@drawable/ic_signature"/>
 
             <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvAddSignature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/five"

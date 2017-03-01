@@ -25,7 +25,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "authorize-device";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -112,7 +112,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-sync-batch-id";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -194,7 +194,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-company";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -250,6 +250,7 @@ public class Rx {
 						fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
 						fieldValueList.add(new FieldValue("contactNo", dataObj.getString("contact_number")));
 						fieldValueList.add(new FieldValue("imageUrl", dataObj.getString("splash_screen_image")));
+						fieldValueList.add(new FieldValue("logoUrl", dataObj.getString("company_logo")));
 						String query = "SELECT ID FROM " + table + " WHERE ID = '" + coID + "'";
 						if(!db.isRecordExists(query)) {
 							binder.insert(table, fieldValueList);
@@ -285,7 +286,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "login";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -373,7 +374,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-employee";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -465,7 +466,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-forms";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -557,7 +558,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-forms-fields";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {

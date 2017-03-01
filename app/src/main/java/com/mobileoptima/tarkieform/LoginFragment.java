@@ -1,5 +1,6 @@
 package com.mobileoptima.tarkieform;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -25,9 +26,12 @@ import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module.Action;
+import com.mobileoptima.core.TarkieFormLib;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 public class LoginFragment extends Fragment implements OnClickListener, OnRefreshCallback,
 		OnBackPressedCallback, Interface.OnFragmentCallback {
@@ -37,6 +41,7 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 	private OnRefreshCallback refreshCallback;
 	private OnLoginCallback loginCallback;
 	private DisplayImageOptions options;
+	private ImageView ivLogoLogin;
 	private ImageLoader imageLoader;
 	private boolean inOtherFragment;
 	private CodePanButton btnLogin;
@@ -73,8 +78,7 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.login_layout, container, false);
-		ImageView ivCompanyLogo = (ImageView) view.findViewById(R.id.ivLogoAuthorization);
-		imageLoader.displayImage("https://hatscripts.com/r/03d6.png", ivCompanyLogo, options);
+		ivLogoLogin = (ImageView) view.findViewById(R.id.ivLogoLogin);
 		etUsernameLogin = (CodePanTextField) view.findViewById(R.id.etUsernameLogin);
 		etPasswordLogin = (CodePanTextField) view.findViewById(R.id.etPasswordLogin);
 		etPasswordLogin.setTransformationMethod(new PasswordTransformationMethod());
@@ -90,6 +94,31 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 			}
 		});
 		return view;
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		String logoUrl = TarkieFormLib.getCompanyLogo(db);
+		imageLoader.displayImage(logoUrl, ivLogoLogin, options, new ImageLoadingListener() {
+			@Override
+			public void onLoadingStarted(String imageUri, View view) {
+			}
+
+			@Override
+			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+			}
+
+			@Override
+			public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+				float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+				ivLogoLogin.getLayoutParams().width = (int) ((float) ivLogoLogin.getHeight() * ratio);
+			}
+
+			@Override
+			public void onLoadingCancelled(String imageUri, View view) {
+			}
+		});
 	}
 
 	@Override

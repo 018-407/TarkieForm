@@ -29,8 +29,7 @@ public class Tx {
 		boolean hasData = false;
 		final int INDENT = 4;
 		String action = "sync-photos";
-		String url = App.WEB_URL + action;
-		String fileName = image.fileName;
+		String url = App.WEB_URL_V11 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -43,9 +42,10 @@ public class Tx {
 			paramsObj.put("team_id", groupID);
 			paramsObj.put("local_record_id", image.ID);
 			paramsObj.put("sync_batch_id", image.syncBatchID);
+			paramsObj.put("is_signature", image.isSignature ? 1 : 0);
 			params = paramsObj.toString(INDENT);
 			String path = db.getContext().getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() +
-					"/" + fileName;
+					"/" + image.fileName;
 			String table = Tables.getName(TB.PHOTO);
 			File file = new File(path);
 			if(!file.exists() || file.isDirectory()) {
@@ -117,7 +117,7 @@ public class Tx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "sync-forms-answers";
-		String url = App.WEB_URL + action;
+		String url = App.WEB_URL_V10 + action;
 		String response = null;
 		String params = null;
 		try {

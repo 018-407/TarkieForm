@@ -13,24 +13,24 @@
         android:src="@drawable/ic_bg_login"/>
 
     <ImageView
-        android:id="@+id/ivLogoAuthorization"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/eighty_four"
+        android:id="@+id/ivLogoLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/eighty"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/eighteen"
         android:layout_marginEnd="@dimen/eighteen"
         android:layout_marginLeft="@dimen/eighteen"
         android:layout_marginRight="@dimen/eighteen"
         android:layout_marginStart="@dimen/eighteen"
         android:layout_marginTop="@dimen/thirty_six"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_logo"/>
+        android:scaleType="fitXY"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/ivPoweredByLogoLogin"
-        android:layout_below="@+id/ivLogoAuthorization"
+        android:layout_below="@+id/ivLogoLogin"
         android:layout_marginEnd="@dimen/forty_six"
         android:layout_marginLeft="@dimen/forty_six"
         android:layout_marginRight="@dimen/forty_six"
@@ -99,7 +99,7 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/twenty_two"
                 codePan:typeface="@string/proxima_nova_bold"/>
-            
+
         </LinearLayout>
 
     </RelativeLayout>

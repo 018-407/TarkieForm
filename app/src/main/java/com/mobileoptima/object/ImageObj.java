@@ -10,4 +10,5 @@ public class ImageObj {
 	public String dTime;
 	public Bitmap bitmap;
 	public String syncBatchID;
+	public boolean isSignature;
 }

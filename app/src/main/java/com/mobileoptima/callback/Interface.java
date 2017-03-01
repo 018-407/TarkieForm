@@ -30,7 +30,11 @@ public class Interface {
 	}
 
 	public interface OnSignCallback {
-		void onSign(String fileName);
+		void onSign(ImageObj image);
+	}
+
+	public interface OnClearCallback {
+		void onClear();
 	}
 
 	public interface OnCameraDoneCallback {
