@@ -481,34 +481,36 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	}
 
 	public void updateLogo() {
-		ImageLoader imageLoader = ImageLoader.getInstance();
-		imageLoader.init(ImageLoaderConfiguration.createDefault(this));
-		DisplayImageOptions options = new DisplayImageOptions.Builder()
-				.showImageOnLoading(R.color.transparent)
-				.showImageForEmptyUri(R.color.transparent)
-				.cacheInMemory(true)
-				.cacheOnDisk(true)
-				.build();
-		String logoUrl = TarkieFormLib.getCompanyLogo(db);
-		imageLoader.displayImage(logoUrl, ivLogoMain, options, new ImageLoadingListener() {
-			@Override
-			public void onLoadingStarted(String imageUri, View view) {
-			}
+		if(isInitialized) {
+			ImageLoader imageLoader = ImageLoader.getInstance();
+			imageLoader.init(ImageLoaderConfiguration.createDefault(this));
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+					.showImageOnLoading(R.color.transparent)
+					.showImageForEmptyUri(R.color.transparent)
+					.cacheInMemory(true)
+					.cacheOnDisk(true)
+					.build();
+			String logoUrl = TarkieFormLib.getCompanyLogo(db);
+			imageLoader.displayImage(logoUrl, ivLogoMain, options, new ImageLoadingListener() {
+				@Override
+				public void onLoadingStarted(String imageUri, View view) {
+				}
 
-			@Override
-			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-			}
+				@Override
+				public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+				}
 
-			@Override
-			public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
-				float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
-				ivLogoMain.getLayoutParams().width = (int) ((float) ivLogoMain.getHeight() * ratio);
-			}
+				@Override
+				public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+					float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+					ivLogoMain.getLayoutParams().width = (int) ((float) ivLogoMain.getHeight() * ratio);
+				}
 
-			@Override
-			public void onLoadingCancelled(String imageUri, View view) {
-			}
-		});
+				@Override
+				public void onLoadingCancelled(String imageUri, View view) {
+				}
+			});
+		}
 	}
 
 	public void updateSyncCount() {
