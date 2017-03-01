@@ -30,7 +30,7 @@ public class Tx {
 		final int INDENT = 4;
 		String action = "sync-photos";
 		String url = App.WEB_URL + action;
-		String fileName = null;
+		String fileName = image.fileName;
 		String response = null;
 		String params = null;
 		try {

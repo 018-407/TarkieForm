@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
 			llAboutMain, llLogoutMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
-	private CodePanLabel tvHomeMain, tvEntriesMain, tvPhotosMain, tvEmployeeMain;
+	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain, tvEmployeeMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
 	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain;
 	private OnBackPressedCallback backPressedCallback;
@@ -72,6 +72,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		btnEntriesMain = (CodePanButton) findViewById(R.id.btnEntriesMain);
 		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
 		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
+		tvSyncCountMain = (CodePanLabel) findViewById(R.id.tvSyncCountMain);
 		btnMenuMain = (CodePanButton) findViewById(R.id.btnMenuMain);
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
 		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
@@ -460,6 +461,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			String empID = TarkieFormLib.getEmployeeID(db);
 			String name = TarkieFormLib.getEmployeeName(db, empID);
 			tvEmployeeMain.setText(name);
+			tvSyncCountMain.setText(String.valueOf(TarkieFormLib.getCountSyncTotal(db)));
 		}
 	}
 
