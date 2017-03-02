@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.tarkieform.R;
@@ -54,6 +55,7 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 				view = inflater.inflate(R.layout.entries_list_row, parent, false);
 				holder = new ViewHolder();
 				holder.tvNameEntries = (CodePanLabel) view.findViewById(R.id.tvNameEntries);
+				holder.tvDateEntries = (CodePanLabel) view.findViewById(R.id.tvDateEntries);
 				holder.tvStatusEntries = (CodePanLabel) view.findViewById(R.id.tvStatusEntries);
 				holder.ivLogoEntries = (ImageView) view.findViewById(R.id.ivLogoEntries);
 				view.setTag(holder);
@@ -75,6 +77,10 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 				holder.tvStatusEntries.setTextColor(red);
 				holder.tvStatusEntries.setText(R.string.draft);
 			}
+			if(obj.dDate != null) {
+				String date = CodePanUtils.getCalendarDate(obj.dDate, true, false);
+				holder.tvDateEntries.setText(date);
+			}
 		}
 		return view;
 	}
@@ -82,6 +88,7 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 	private class ViewHolder {
 		public CodePanLabel tvNameEntries;
 		public CodePanLabel tvStatusEntries;
+		public CodePanLabel tvDateEntries;
 		public ImageView ivLogoEntries;
 	}
 }

@@ -426,6 +426,8 @@ public class Rx {
 						String firstName = CodePanUtils.handleUniCode(dataObj.getString("fname"));
 						String lastName = CodePanUtils.handleUniCode(dataObj.getString("lname"));
 						String employeeNo = CodePanUtils.handleUniCode(dataObj.getString("employee_code"));
+						String imageUrl = CodePanUtils.handleUniCode(dataObj.getString("profile_picture"));
+						CodePanUtils.clearImageUrl(db.getContext(), imageUrl);
 						fieldValueList.clear();
 						fieldValueList.add(new FieldValue("ID", empID));
 						fieldValueList.add(new FieldValue("firstName", firstName));
@@ -434,6 +436,7 @@ public class Rx {
 						fieldValueList.add(new FieldValue("groupID", dataObj.getString("team_id")));
 						fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
 						fieldValueList.add(new FieldValue("isActive", dataObj.getInt("is_active")));
+						fieldValueList.add(new FieldValue("imageUrl", imageUrl));
 						String query = "SELECT ID FROM " + table + " WHERE ID = '" + empID + "'";
 						if(!db.isRecordExists(query)) {
 							binder.insert(table, fieldValueList);

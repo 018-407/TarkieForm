@@ -133,6 +133,12 @@ public class TarkieFormLib {
 		return db.getString(query);
 	}
 
+	public static String getEmployeeUrl(SQLiteAdapter db, String empID) {
+		String table = Tables.getName(EMPLOYEE);
+		String query = "SELECT imageUrl FROM " + table + " WHERE ID = '" + empID + "'";
+		return db.getString(query);
+	}
+
 	public static String getEmployeeName(SQLiteAdapter db, String empID) {
 		String name = null;
 		String table = Tables.getName(EMPLOYEE);

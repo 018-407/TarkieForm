@@ -21,7 +21,7 @@
             android:layout_centerVertical="true"
             android:src="@color/gray_qua"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -48,12 +48,24 @@
                 android:id="@+id/tvStatusEntries"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/tvNameEntries"
                 android:text="@string/draft"
                 android:textColor="@color/red"
                 android:textSize="@dimen/fifteen"
                 codePan:typeface="@string/proxima_nova_light"/>
 
-        </LinearLayout>
+            <com.codepan.widget.CodePanLabel
+                android:id="@+id/tvDateEntries"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/tvNameEntries"
+                android:textColor="@color/gray_oct"
+                android:textSize="@dimen/fifteen"
+                codePan:typeface="@string/proxima_nova_light"/>
+
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/ivNextEntries"

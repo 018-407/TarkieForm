@@ -48,8 +48,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			llAboutMain, llLogoutMain;
 	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain,
 			tvEmployeeMain, tvSyncNotifMain;
+	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain, ivLogoMain, ivEmployeeMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
-	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain, ivLogoMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
 	private OnBackPressedCallback backPressedCallback;
 	private boolean isInitialized, isOverridden;
@@ -80,6 +80,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		tvSyncCountMain = (CodePanLabel) findViewById(R.id.tvSyncCountMain);
 		tvSyncNotifMain = (CodePanLabel) findViewById(R.id.tvSyncNotifMain);
 		btnMenuMain = (CodePanButton) findViewById(R.id.btnMenuMain);
+		ivEmployeeMain = (ImageView) findViewById(R.id.ivEmployeeMain);
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
 		ivEntriesMain = (ImageView) findViewById(R.id.ivEntriesMain);
 		ivPhotosMain = (ImageView) findViewById(R.id.ivPhotosMain);
@@ -473,8 +474,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void updateUser() {
 		if(isInitialized) {
 			String empID = TarkieFormLib.getEmployeeID(db);
+			String imageUrl = TarkieFormLib.getEmployeeUrl(db, empID);
 			String name = TarkieFormLib.getEmployeeName(db, empID);
 			tvEmployeeMain.setText(name);
+			if(imageUrl != null) {
+				CodePanUtils.displayImage(ivEmployeeMain, imageUrl,
+						R.drawable.ic_user_placeholder);
+			}
 		}
 	}
 
