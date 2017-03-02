@@ -352,8 +352,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 			this.index++;
 			this.page = pageList.get(index);
 			if(index == pageList.size() - 1) {
-				String finish = "Finish";
-				btnNextForm.setText(finish);
+				btnNextForm.setText(R.string.finish);
 			}
 			updateProgress();
 			return true;
@@ -365,8 +364,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		if(index != 0) {
 			this.index--;
 			this.page = pageList.get(index);
-			String next = "Next";
-			btnNextForm.setText(next);
+			btnNextForm.setText(R.string.next);
 			updateProgress();
 		}
 	}
