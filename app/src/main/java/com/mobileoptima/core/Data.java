@@ -207,7 +207,7 @@ public class Data {
 			query = "SELECT f.ID, f.type, a.ID, a.value FROM " + Tables.getName(TB.ANSWERS) + " a, " +
 					Tables.getName(TB.FIELDS) + " f WHERE f.formID = " + form.ID + " " +
 					"AND a.entryID = " + entry.ID + " AND a.fieldID = f.ID " +
-					"AND a.value NOT NULL";
+					"AND f.isActive = 1 AND a.value NOT NULL";
 			Cursor c = db.read(query);
 			while(c.moveToNext()) {
 				FieldObj field = new FieldObj();
