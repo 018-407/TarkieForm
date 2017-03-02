@@ -82,6 +82,18 @@ public class TarkieFormLib {
 		if(!db.isColumnExists(db, table, "logoUrl")) {
 			binder.addColumn(table, TEXT, "logoUrl", 0, false);
 		}
+		table = Tables.getName(TB.FORMS);
+		if(!db.isColumnExists(db, table, "logoUrl")) {
+			binder.addColumn(table, TEXT, "logoUrl", 0, false);
+		}
+		table = Tables.getName(TB.FORMS);
+		if(!db.isColumnExists(db, table, "isActive")) {
+			binder.addColumn(table, INTEGER, "isActive", 1, true);
+		}
+		table = Tables.getName(TB.FIELDS);
+		if(!db.isColumnExists(db, table, "isActive")) {
+			binder.addColumn(table, INTEGER, "isActive", 1, true);
+		}
 		binder.finish();
 	}
 

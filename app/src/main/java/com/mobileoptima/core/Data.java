@@ -17,17 +17,20 @@ import net.sqlcipher.Cursor;
 import java.util.ArrayList;
 
 public class Data {
+
 	public static ArrayList<FormObj> loadForms(SQLiteAdapter db, String search) {
 		ArrayList<FormObj> formList = new ArrayList<>();
 		String groupID = TarkieFormLib.getGroupID(db);
 		String table = Tables.getName(TB.FORMS);
 		String condition = search != null ? "name LIKE '%" + search + "%' AND " : "";
-		String query = "SELECT ID, name FROM " + table + " WHERE " + condition + "groupID = '" + groupID + "'";
+		String query = "SELECT ID, name, logoUrl FROM " + table + " WHERE " + condition +
+				"groupID = '" + groupID + "' AND isActive = 1";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			FormObj obj = new FormObj();
 			obj.ID = cursor.getString(0);
 			obj.name = cursor.getString(1);
+			obj.logoUrl = cursor.getString(2);
 			formList.add(obj);
 		}
 		cursor.close();
@@ -38,7 +41,8 @@ public class Data {
 		ArrayList<PageObj> pageList = new ArrayList<>();
 		String table = Tables.getName(TB.FIELDS);
 		String query = "SELECT ID, orderNo FROM " + table + " WHERE type = '" +
-				FieldType.PB + "' AND formID = '" + formID + "' ORDER BY orderNo";
+				FieldType.PB + "' AND formID = '" + formID + "' AND isActive = 1 " +
+				"ORDER BY orderNo";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			PageObj obj = new PageObj();
@@ -79,7 +83,7 @@ public class Data {
 		String table = Tables.getName(TB.FIELDS);
 		String query = "SELECT ID, name, description, type, isRequired FROM " + table + " WHERE " +
 				"formID = '" + form.ID + "' AND orderNo BETWEEN '" + page.start + "' AND '" +
-				page.end + "' ORDER BY orderNo";
+				page.end + "' AND isActive = 1 ORDER BY orderNo";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			FieldObj field = new FieldObj();
@@ -142,9 +146,10 @@ public class Data {
 	public static ArrayList<EntryObj> loadEntries(SQLiteAdapter db) {
 		ArrayList<EntryObj> entryList = new ArrayList<>();
 		String empID = TarkieFormLib.getEmployeeID(db);
-		String query = "SELECT e.ID, e.dDate, e.dTime, e.isSubmit, f.ID, f.name FROM " +
+		String query = "SELECT e.ID, e.dDate, e.dTime, e.isSubmit, f.ID, f.name, f.logoUrl FROM " +
 				Tables.getName(TB.ENTRIES) + " e , " + Tables.getName(TB.FORMS) + " f " +
-				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID ORDER BY e.ID DESC";
+				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID " +
+				"ORDER BY e.ID DESC";
 		Cursor cursor = db.read(query);
 		while(cursor.moveToNext()) {
 			EntryObj entry = new EntryObj();
@@ -155,6 +160,7 @@ public class Data {
 			FormObj form = new FormObj();
 			form.ID = cursor.getString(4);
 			form.name = cursor.getString(5);
+			form.logoUrl = cursor.getString(6);
 			entry.form = form;
 			entryList.add(entry);
 		}

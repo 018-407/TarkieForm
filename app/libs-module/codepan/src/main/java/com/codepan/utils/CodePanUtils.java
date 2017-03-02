@@ -74,6 +74,10 @@ import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CustomTypefaceSpan;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
@@ -1840,5 +1844,84 @@ public class CodePanUtils {
 			}
 		}
 		return url;
+	}
+
+	public static boolean clearImageUrl(Context context, String url) {
+		boolean result = false;
+		ImageLoader imageLoader = ImageLoader.getInstance();
+		if(!imageLoader.isInited()) {
+			imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+		}
+		File image = imageLoader.getDiskCache().get(url);
+		if(image.exists()) {
+			result = image.delete();
+		}
+		else {
+			result = true;
+		}
+		imageLoader.clearDiskCache();
+		imageLoader.clearMemoryCache();
+		return result;
+	}
+
+	public static void displayImage(ImageView view, String uri) {
+		if(view != null) {
+			ImageLoader imageLoader = ImageLoader.getInstance();
+			if(!imageLoader.isInited()) {
+				imageLoader.init(ImageLoaderConfiguration.createDefault(view.getContext()));
+			}
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+					.cacheInMemory(true)
+					.cacheOnDisk(true)
+					.build();
+			imageLoader.displayImage(uri, view, options);
+		}
+	}
+
+	public static void displayImage(ImageView view, String uri, ImageLoadingListener listener) {
+		if(view != null) {
+			ImageLoader imageLoader = ImageLoader.getInstance();
+			if(!imageLoader.isInited()) {
+				imageLoader.init(ImageLoaderConfiguration.createDefault(view.getContext()));
+			}
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+					.cacheInMemory(true)
+					.cacheOnDisk(true)
+					.build();
+			imageLoader.displayImage(uri, view, options, listener);
+		}
+	}
+
+	public static void displayImage(ImageView view, String uri, int placeholder) {
+		if(view != null) {
+			ImageLoader imageLoader = ImageLoader.getInstance();
+			if(!imageLoader.isInited()) {
+				imageLoader.init(ImageLoaderConfiguration.createDefault(view.getContext()));
+			}
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+					.showImageOnLoading(placeholder)
+					.showImageForEmptyUri(placeholder)
+					.cacheInMemory(true)
+					.cacheOnDisk(true)
+					.build();
+			imageLoader.displayImage(uri, view, options);
+		}
+	}
+
+	public static void displayImage(ImageView view, String uri, int placeholder,
+									ImageLoadingListener listener) {
+		if(view != null) {
+			ImageLoader imageLoader = ImageLoader.getInstance();
+			if(!imageLoader.isInited()) {
+				imageLoader.init(ImageLoaderConfiguration.createDefault(view.getContext()));
+			}
+			DisplayImageOptions options = new DisplayImageOptions.Builder()
+					.showImageOnLoading(placeholder)
+					.showImageForEmptyUri(placeholder)
+					.cacheInMemory(true)
+					.cacheOnDisk(true)
+					.build();
+			imageLoader.displayImage(uri, view, options, listener);
+		}
 	}
 }

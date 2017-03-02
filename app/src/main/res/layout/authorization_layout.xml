@@ -22,10 +22,10 @@
 
         <ImageView
             android:id="@+id/ivLogoAuthorization"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/eighty_four"
+            android:layout_width="@dimen/one_hundred_fifty_three"
+            android:layout_height="@dimen/seventy"
             android:layout_margin="@dimen/eighteen"
-            android:scaleType="centerInside"
+            android:layout_centerHorizontal="true"
             android:src="@drawable/ic_logo"/>
 
         <LinearLayout

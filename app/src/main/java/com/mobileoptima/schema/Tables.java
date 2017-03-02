@@ -59,13 +59,13 @@ public class Tables {
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
 						"name TEXT, description TEXT, dateCreated TEXT, timeCreated TEXT, " +
-						"groupID INTEGER)";
+						"groupID INTEGER, logoUrl TEXT, isActive INTEGER DEFAULT 1)";
 				break;
 			case FIELDS:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +
 						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, formID INTEGER, " +
 						"name TEXT, description TEXT, type TEXT, orderNo INTEGER, " +
-						"isRequired INTEGER)";
+						"isRequired INTEGER, isActive INTEGER DEFAULT 1)";
 				break;
 			case CHOICES:
 				statement = "CREATE TABLE IF NOT EXISTS " + table +

@@ -6,17 +6,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.tarkieform.R;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
 public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 
+	private DisplayImageOptions options;
 	private ArrayList<EntryObj> items;
 	private LayoutInflater inflater;
+	private ImageLoader imageLoader;
 	private int red, green;
 
 	public EntriesAdapter(Context context, ArrayList<EntryObj> items) {
@@ -26,6 +32,16 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 		Resources res = context.getResources();
 		this.red = res.getColor(R.color.red);
 		this.green = res.getColor(R.color.green);
+		this.imageLoader = ImageLoader.getInstance();
+		if(!imageLoader.isInited()) {
+			imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+		}
+		options = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.color.gray_qua)
+				.showImageForEmptyUri(R.color.gray_qua)
+				.cacheInMemory(true)
+				.cacheOnDisk(true)
+				.build();
 	}
 
 	@Override
@@ -39,6 +55,7 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 				holder = new ViewHolder();
 				holder.tvNameEntries = (CodePanLabel) view.findViewById(R.id.tvNameEntries);
 				holder.tvStatusEntries = (CodePanLabel) view.findViewById(R.id.tvStatusEntries);
+				holder.ivLogoEntries = (ImageView) view.findViewById(R.id.ivLogoEntries);
 				view.setTag(holder);
 			}
 			else {
@@ -46,6 +63,9 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 			}
 			if(obj.form.name != null) {
 				holder.tvNameEntries.setText(obj.form.name);
+			}
+			if(obj.form.logoUrl != null) {
+				imageLoader.displayImage(obj.form.logoUrl, holder.ivLogoEntries, options);
 			}
 			if(obj.isSubmit) {
 				holder.tvStatusEntries.setTextColor(green);
@@ -62,5 +82,6 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 	private class ViewHolder {
 		public CodePanLabel tvNameEntries;
 		public CodePanLabel tvStatusEntries;
+		public ImageView ivLogoEntries;
 	}
 }

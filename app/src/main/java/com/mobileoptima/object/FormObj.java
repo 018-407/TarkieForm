@@ -6,5 +6,5 @@ public class FormObj {
 	public String name;
 	public String date;
 	public String time;
-	public String url;
+	public String logoUrl;
 }

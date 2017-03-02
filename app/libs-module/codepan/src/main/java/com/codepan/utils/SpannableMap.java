@@ -1,6 +1,9 @@
 package com.codepan.utils;
 
+import android.content.Context;
 import android.graphics.Typeface;
+
+import com.codepan.cache.TypefaceCache;
 
 public class SpannableMap {
 
@@ -22,6 +25,13 @@ public class SpannableMap {
 
 	public SpannableMap(int start, int end, Typeface typeface) {
 		this.typeface = typeface;
+		this.start = start;
+		this.end = end;
+		this.type = FONT;
+	}
+
+	public SpannableMap(Context context, String typeface, int start, int end) {
+		this.typeface = TypefaceCache.get(context.getAssets(), typeface);
 		this.start = start;
 		this.end = end;
 		this.type = FONT;

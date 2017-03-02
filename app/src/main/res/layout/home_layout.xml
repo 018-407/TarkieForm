@@ -7,7 +7,12 @@
     android:background="@color/blue"
     android:clickable="true"
     android:focusableInTouchMode="true"
-    android:padding="@dimen/thirteen">
+    android:paddingBottom="@dimen/ten"
+    android:paddingEnd="@dimen/thirteen"
+    android:paddingLeft="@dimen/thirteen"
+    android:paddingRight="@dimen/thirteen"
+    android:paddingStart="@dimen/thirteen"
+    android:paddingTop="@dimen/thirteen">
 
     <FrameLayout
         android:id="@+id/flSearchHome"

@@ -1,6 +1,5 @@
 package com.mobileoptima.tarkieform;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -81,10 +80,10 @@ public class AlertDialogFragment extends Fragment {
 		this.dialogMessageVisbility = View.GONE;
 	}
 
-	public void setFont(ArrayList<SpannableMap> list, Typeface typeface) {
+	public void setSpannableList(ArrayList<SpannableMap> list) {
 		ssb = new SpannableStringBuilder(dialogMessage);
 		for(SpannableMap obj : list) {
-			ssb.setSpan(new CustomTypefaceSpan(typeface), obj.start, obj.end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+			ssb.setSpan(new CustomTypefaceSpan(obj.typeface), obj.start, obj.end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		}
 		hasFont = true;
 	}

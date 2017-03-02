@@ -25,7 +25,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "authorize-device";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -112,7 +112,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-sync-batch-id";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -194,7 +194,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-company";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -243,6 +243,8 @@ public class Rx {
 						String coID = dataObj.getString("company_id");
 						String company = CodePanUtils.handleUniCode(dataObj.getString("name"));
 						String address = CodePanUtils.handleUniCode(dataObj.getString("address"));
+						String logoUrl = dataObj.getString("company_logo");
+						CodePanUtils.clearImageUrl(db.getContext(), logoUrl);
 						fieldValueList.clear();
 						fieldValueList.add(new FieldValue("ID", coID));
 						fieldValueList.add(new FieldValue("name", company));
@@ -250,7 +252,7 @@ public class Rx {
 						fieldValueList.add(new FieldValue("email", dataObj.getString("email")));
 						fieldValueList.add(new FieldValue("contactNo", dataObj.getString("contact_number")));
 						fieldValueList.add(new FieldValue("imageUrl", dataObj.getString("splash_screen_image")));
-						fieldValueList.add(new FieldValue("logoUrl", dataObj.getString("company_logo")));
+						fieldValueList.add(new FieldValue("logoUrl", logoUrl));
 						String query = "SELECT ID FROM " + table + " WHERE ID = '" + coID + "'";
 						if(!db.isRecordExists(query)) {
 							binder.insert(table, fieldValueList);
@@ -286,7 +288,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "login";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -374,7 +376,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-employee";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -466,7 +468,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-forms";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -517,13 +519,17 @@ public class Rx {
 						String formID = dataObj.getString("form_id");
 						String name = CodePanUtils.handleUniCode(dataObj.getString("form_name"));
 						String description = CodePanUtils.handleUniCode(dataObj.getString("form_description"));
+						String logoUrl = dataObj.getString("form_logo");
+						CodePanUtils.clearImageUrl(db.getContext(), logoUrl);
 						fieldValueList.clear();
 						fieldValueList.add(new FieldValue("ID", formID));
 						fieldValueList.add(new FieldValue("name", name));
 						fieldValueList.add(new FieldValue("groupID", groupID));
 						fieldValueList.add(new FieldValue("description", description));
-						fieldValueList.add(new FieldValue("dateCreated", dataObj.getString("date_created")));
-						fieldValueList.add(new FieldValue("timeCreated", dataObj.getString("time_created")));
+						fieldValueList.add(new FieldValue("dateCreated", dataObj.getString("form_date_created")));
+						fieldValueList.add(new FieldValue("timeCreated", dataObj.getString("form_time_created")));
+						fieldValueList.add(new FieldValue("isActive", dataObj.getString("form_is_active")));
+						fieldValueList.add(new FieldValue("logoUrl", logoUrl));
 						String query = "SELECT ID FROM " + table + " WHERE ID = '" + formID + "'";
 						if(!db.isRecordExists(query)) {
 							binder.insert(table, fieldValueList);
@@ -558,7 +564,7 @@ public class Rx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "get-forms-fields";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -608,7 +614,8 @@ public class Rx {
 						String fieldID = dataObj.getString("field_id");
 						String type = dataObj.getString("field_type");
 						String name = CodePanUtils.handleUniCode(dataObj.getString("field_name"));
-						String description = CodePanUtils.handleUniCode(dataObj.getString("field_description"));
+						String uniCode = CodePanUtils.handleUniCode(dataObj.getString("field_description"));
+						String description = CodePanUtils.handleNextLine(uniCode, false);
 						fieldValueList.clear();
 						fieldValueList.add(new FieldValue("ID", fieldID));
 						fieldValueList.add(new FieldValue("name", name));
@@ -617,6 +624,7 @@ public class Rx {
 						fieldValueList.add(new FieldValue("formID", dataObj.getString("field_form_id")));
 						fieldValueList.add(new FieldValue("orderNo", dataObj.getString("field_order_number")));
 						fieldValueList.add(new FieldValue("isRequired", dataObj.getInt("field_is_required")));
+						fieldValueList.add(new FieldValue("isActive", dataObj.getInt("field_is_active")));
 						String table = Tables.getName(Tables.TB.FIELDS);
 						String query = "SELECT ID FROM " + table + " WHERE ID = '" + fieldID + "'";
 						if(!db.isRecordExists(query)) {

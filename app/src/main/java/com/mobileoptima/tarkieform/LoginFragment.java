@@ -15,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.codepan.callback.Interface;
 import com.codepan.callback.Interface.OnBackPressedCallback;
+import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.callback.Interface.OnRefreshCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
@@ -27,23 +27,18 @@ import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.core.TarkieFormLib;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 public class LoginFragment extends Fragment implements OnClickListener, OnRefreshCallback,
-		OnBackPressedCallback, Interface.OnFragmentCallback {
+		OnBackPressedCallback, OnFragmentCallback, ImageLoadingListener {
 
 	private CodePanTextField etUsernameLogin, etPasswordLogin;
 	private OnOverrideCallback overrideCallback;
 	private OnRefreshCallback refreshCallback;
 	private OnLoginCallback loginCallback;
-	private DisplayImageOptions options;
-	private ImageView ivLogoLogin;
-	private ImageLoader imageLoader;
 	private boolean inOtherFragment;
+	private ImageView ivLogoLogin;
 	private CodePanButton btnLogin;
 	private SQLiteAdapter db;
 
@@ -65,14 +60,6 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 		((MainActivity) getActivity()).setOnBackPressedCallback(this);
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
-		imageLoader = ImageLoader.getInstance();
-		imageLoader.init(ImageLoaderConfiguration.createDefault(getActivity()));
-		options = new DisplayImageOptions.Builder()
-				.showImageOnLoading(R.drawable.ic_logo)
-				.showImageForEmptyUri(R.drawable.ic_logo)
-				.cacheInMemory(true)
-				.cacheOnDisk(true)
-				.build();
 	}
 
 	@Override
@@ -100,32 +87,8 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		String logoUrl = TarkieFormLib.getCompanyLogo(db);
-		imageLoader.displayImage(logoUrl, ivLogoLogin, options, new ImageLoadingListener() {
-			@Override
-			public void onLoadingStarted(String imageUri, View view) {
-			}
-
-			@Override
-			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-			}
-
-			@Override
-			public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
-				float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
-				ivLogoLogin.getLayoutParams().width = (int) ((float) ivLogoLogin.getHeight() * ratio);
-			}
-
-			@Override
-			public void onLoadingCancelled(String imageUri, View view) {
-			}
-		});
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if(imageLoader != null) {
-			imageLoader.destroy();
+		if(logoUrl != null) {
+			CodePanUtils.displayImage(ivLogoLogin, logoUrl, this);
 		}
 	}
 
@@ -210,5 +173,25 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 				overrideCallback.onOverride(true);
 			}
 		}
+	}
+
+	@Override
+	public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+		if(bitmap != null) {
+			float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+			ivLogoLogin.getLayoutParams().width = (int) ((float) ivLogoLogin.getHeight() * ratio);
+		}
+	}
+
+	@Override
+	public void onLoadingStarted(String imageUri, View view) {
+	}
+
+	@Override
+	public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+	}
+
+	@Override
+	public void onLoadingCancelled(String imageUri, View view) {
 	}
 }

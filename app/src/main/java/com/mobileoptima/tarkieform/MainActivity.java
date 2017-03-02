@@ -36,16 +36,13 @@ import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.TarkieFormLib;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements OnClickListener, OnInitializeCallback,
-		OnOverrideCallback, OnRefreshCallback, OnLoginCallback, OnPageChangeListener {
+		OnOverrideCallback, OnRefreshCallback, OnLoginCallback, OnPageChangeListener, ImageLoadingListener {
 
 	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
 			llAboutMain, llLogoutMain;
@@ -305,6 +302,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onRefresh() {
 		authenticate();
 		reloadForms();
+		reloadEntries();
 		updateSyncCount();
 		updateUser();
 		updateLogo();
@@ -482,34 +480,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	public void updateLogo() {
 		if(isInitialized) {
-			ImageLoader imageLoader = ImageLoader.getInstance();
-			imageLoader.init(ImageLoaderConfiguration.createDefault(this));
-			DisplayImageOptions options = new DisplayImageOptions.Builder()
-					.showImageOnLoading(R.color.transparent)
-					.showImageForEmptyUri(R.color.transparent)
-					.cacheInMemory(true)
-					.cacheOnDisk(true)
-					.build();
 			String logoUrl = TarkieFormLib.getCompanyLogo(db);
-			imageLoader.displayImage(logoUrl, ivLogoMain, options, new ImageLoadingListener() {
-				@Override
-				public void onLoadingStarted(String imageUri, View view) {
-				}
-
-				@Override
-				public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-				}
-
-				@Override
-				public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
-					float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
-					ivLogoMain.getLayoutParams().width = (int) ((float) ivLogoMain.getHeight() * ratio);
-				}
-
-				@Override
-				public void onLoadingCancelled(String imageUri, View view) {
-				}
-			});
+			if(logoUrl != null) {
+				CodePanUtils.displayImage(ivLogoMain, logoUrl, this);
+			}
 		}
 	}
 
@@ -561,6 +535,26 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				tvPhotosMain.setTextColor(green);
 				break;
 		}
+	}
+
+	@Override
+	public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+		if(bitmap != null) {
+			float ratio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+			ivLogoMain.getLayoutParams().width = (int) ((float) ivLogoMain.getHeight() * ratio);
+		}
+	}
+
+	@Override
+	public void onLoadingStarted(String imageUri, View view) {
+	}
+
+	@Override
+	public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+	}
+
+	@Override
+	public void onLoadingCancelled(String imageUri, View view) {
 	}
 
 	@Override

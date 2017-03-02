@@ -96,7 +96,7 @@ public class SQLiteAdapter {
 	}
 
 	public String getString(String query) {
-		String value = "";
+		String value = null;
 		Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 		while(cursor.moveToNext()) {
 			value = cursor.getString(0);

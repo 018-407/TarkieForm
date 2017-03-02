@@ -15,6 +15,7 @@ import com.codepan.callback.Interface.OnBackPressedCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
+import com.codepan.utils.SpannableMap;
 import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
@@ -169,7 +170,15 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 				if(field != null) {
 					final AlertDialogFragment alert = new AlertDialogFragment();
 					alert.setDialogTitle("Required Field");
-					alert.setDialogMessage("\"" + field.name + "\" is required.");
+					if(field.name != null && !field.name.isEmpty()) {
+						String message = "\"" + field.name + "\" is required.";
+						alert.setDialogMessage(message);
+						String font = getActivity().getResources().getString(R.string.proxima_nova_bold);
+						ArrayList<SpannableMap> list = new ArrayList<>();
+						int length = field.name.length() + 2;
+						list.add(new SpannableMap(getActivity(), font, 0, length));
+						alert.setSpannableList(list);
+					}
 					alert.setOnFragmentCallback(this);
 					alert.setPositiveButton("Ok", new OnClickListener() {
 						@Override

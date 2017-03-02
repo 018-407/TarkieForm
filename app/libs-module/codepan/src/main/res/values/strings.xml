@@ -12,9 +12,9 @@
     <string name="nexa_black">fonts/Nexa-Black.otf</string>
     <string name="proxima_nova_bold">fonts/Proxima-Nova-Bold.otf</string>
     <string name="proxima_nova_light">fonts/Proxima-Nova-Light.otf</string>
-    <string name="calendar">Calendar</string>
-    <string name="cancel">CANCEL</string>
-    <string name="save">SAVE</string>
+    <string name="cal_title">Calendar</string>
+    <string name="cal_cancel">CANCEL</string>
+    <string name="cal_save">SAVE</string>
 
     <string name="toast_font">@string/helvetica_neue_light</string>
 

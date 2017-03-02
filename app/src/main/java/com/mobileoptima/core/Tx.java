@@ -29,7 +29,7 @@ public class Tx {
 		boolean hasData = false;
 		final int INDENT = 4;
 		String action = "sync-photos";
-		String url = App.WEB_URL_V11 + action;
+		String url = App.API_V11 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -117,7 +117,7 @@ public class Tx {
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
 		String action = "sync-forms-answers";
-		String url = App.WEB_URL_V10 + action;
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
