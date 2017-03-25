@@ -19,7 +19,10 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.widget.LinearLayout.LayoutParams;
 
+import com.codepan.callback.Interface.OnCameraErrorCallback;
 import com.codepan.callback.Interface.OnCaptureCallback;
 import com.codepan.widget.FocusIndicatorView;
 
@@ -48,29 +51,37 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	private Camera camera;
 
 	@SuppressWarnings("deprecation")
-	public CameraSurfaceView(Context context, int cameraSelection, String flashMode, String folder,
+	public CameraSurfaceView(Context context, OnCameraErrorCallback cameraErrorCallback,
+							 int cameraSelection, String flashMode, String folder,
 							 int maxWidth, int maxHeight) {
 		super(context);
 		this.hasFrontCam = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
 		this.hasAutoFocus = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
 		this.camera = getAvailableCamera(cameraSelection);
-		this.cameraSelection = cameraSelection;
-		this.flashMode = flashMode;
-		this.maxHeight = maxHeight;
-		this.maxWidth = maxWidth;
-		this.context = context;
-		this.folder = folder;
-		this.params = camera.getParameters();
-		this.surfaceHolder = getHolder();
-		this.surfaceHolder.addCallback(this);
-		this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		List<String> flashModeList = params.getSupportedFlashModes();
-		if(flashModeList != null && !flashModeList.isEmpty()) {
-			for(String mode : flashModeList) {
-				if(mode.equals(Parameters.FLASH_MODE_ON)) {
-					this.hasFlash = true;
-					break;
+		if(camera != null) {
+			this.cameraSelection = cameraSelection;
+			this.flashMode = flashMode;
+			this.maxHeight = maxHeight;
+			this.maxWidth = maxWidth;
+			this.context = context;
+			this.folder = folder;
+			this.params = camera.getParameters();
+			this.surfaceHolder = getHolder();
+			this.surfaceHolder.addCallback(this);
+			this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+			List<String> flashModeList = params.getSupportedFlashModes();
+			if(flashModeList != null && !flashModeList.isEmpty()) {
+				for(String mode : flashModeList) {
+					if(mode.equals(Parameters.FLASH_MODE_ON)) {
+						this.hasFlash = true;
+						break;
+					}
 				}
+			}
+		}
+		else {
+			if(cameraErrorCallback != null) {
+				cameraErrorCallback.onCameraError();
 			}
 		}
 	}
@@ -118,12 +129,10 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 			for(Size s : previewSizes) {
 				float ratio = (float) s.width / (float) s.height;
 				float outputHeight = (float) maxWidth * ratio;
-				if(outputHeight <= maxHeight) {
-					if(maxOutputHeight < outputHeight) {
-						maxOutputHeight = outputHeight;
-						previewHeight = s.height;
-						previewWidth = s.width;
-					}
+				if(maxOutputHeight < outputHeight) {
+					maxOutputHeight = outputHeight;
+					previewHeight = s.height;
+					previewWidth = s.width;
 				}
 			}
 			ArrayList<Size> sizes = new ArrayList<Size>();
@@ -193,8 +202,10 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	}
 
 	public void takePicture() {
-		isCaptured = true;
-		camera.takePicture(null, null, CameraSurfaceView.this);
+		if(camera != null) {
+			isCaptured = true;
+			camera.takePicture(null, null, this);
+		}
 	}
 
 	public void reset() {
@@ -267,32 +278,39 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 			camera.release();
 			camera = null;
 		}
-		surfaceHolder.removeCallback(this);
+		if(surfaceHolder != null) {
+			surfaceHolder.removeCallback(this);
+		}
 	}
 
-
-	public float getAspectRatio(int maxWidth, int maxHeight) {
+	/**
+	 * @param container must be nested in LinearLayout to enable
+	 *                  centerCrop scale
+	 */
+	public void fullScreenToContainer(ViewGroup container) {
 		if(camera != null) {
 			Parameters params = camera.getParameters();
 			float maxOutputHeight = 0f;
-			int previewWidth = 0;
-			int previewHeight = 0;
+			float maxRatio = 0f;
 			List<Size> sizes = params.getSupportedPreviewSizes();
 			for(Size s : sizes) {
 				float ratio = (float) s.width / (float) s.height;
 				float outputHeight = (float) maxWidth * ratio;
-				if(outputHeight <= maxHeight) {
-					if(maxOutputHeight < outputHeight) {
-						maxOutputHeight = outputHeight;
-						previewHeight = s.height;
-						previewWidth = s.width;
-					}
+				if(maxOutputHeight < outputHeight) {
+					maxOutputHeight = outputHeight;
+					maxRatio = ratio;
 				}
 			}
-			return ((float) previewWidth / (float) previewHeight);
-		}
-		else {
-			return 0f;
+			LayoutParams lp = (LayoutParams) container.getLayoutParams();
+			if(maxOutputHeight >= maxHeight) {
+				lp.width = maxWidth;
+				lp.height = (int) maxOutputHeight;
+			}
+			else {
+				float maxOutputWidth = (float) maxHeight / maxRatio;
+				lp.height = maxHeight;
+				lp.width = (int) maxOutputWidth;
+			}
 		}
 	}
 

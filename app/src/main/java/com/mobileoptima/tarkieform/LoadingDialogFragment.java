@@ -12,12 +12,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
+import com.codepan.callback.Interface.OnErrorCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.ProgressWheel;
-import com.mobileoptima.callback.Interface.OnErrorCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module;
@@ -25,7 +25,7 @@ import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.Process;
 import com.mobileoptima.core.Data;
 import com.mobileoptima.core.Rx;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.core.Tx;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.ImageObj;
@@ -98,7 +98,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				setMax(4);
 				successMsg = "Authorization successful.";
 				failedMsg = "Failed to authorize the device.";
-				title = "Authorizing Device...";
+				title = "Authorizing Device";
 				tvTitleLoadingDialog.setText(title);
 				String authorizationCode = bundle.getString(Key.AUTH_CODE);
 				String deviceID = CodePanUtils.getDeviceID(db.getContext());
@@ -108,7 +108,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				setMax(4);
 				successMsg = "Login successful.";
 				failedMsg = "Failed to login.";
-				title = "Validating account...";
+				title = "Validating Account";
 				tvTitleLoadingDialog.setText(title);
 				String username = bundle.getString(Key.USERNAME);
 				String password = bundle.getString(Key.PASSWORD);
@@ -118,16 +118,16 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				setMax(4);
 				successMsg = "Update master list successful.";
 				failedMsg = "Failed to update master list.";
-				title = "Updating master list...";
+				title = "Updating Master List";
 				tvTitleLoadingDialog.setText(title);
 				updateMasterlist(db);
 				break;
 			case SYNC_DATA:
-				int count = TarkieFormLib.getCountSyncTotal(db);
+				int count = TarkieLib.getCountSyncTotal(db);
 				setMax(count + 1);
 				successMsg = "Sync Data successful.";
 				failedMsg = "Failed to sync data.";
-				title = "Syncing data...";
+				title = "Syncing Data";
 				tvTitleLoadingDialog.setText(title);
 				syncData(db);
 				break;
@@ -155,7 +155,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 						handler.sendMessage(handler.obtainMessage());
 					}
 					if(result) {
-						result = Rx.getEmployee(db, getErrorCallback());
+						result = Rx.getEmployees(db, getErrorCallback());
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
@@ -175,7 +175,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 			public void run() {
 				Looper.prepare();
 				try {
-					result = Rx.getEmployee(db, getErrorCallback());
+					result = Rx.getEmployees(db, getErrorCallback());
 					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
 					if(result) {
@@ -213,7 +213,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 					Thread.sleep(250);
 					handler.sendMessage(handler.obtainMessage());
 					if(result) {
-						result = Rx.getEmployee(db, getErrorCallback());
+						result = Rx.getEmployees(db, getErrorCallback());
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
@@ -254,7 +254,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 							handler.sendMessage(handler.obtainMessage());
 						}
 					}
-					for(EntryObj obj : Data.loadEntrySync(db)) {
+					for(EntryObj obj : Data.loadEntriesSync(db)) {
 						if(result) {
 							result = Tx.syncEntry(db, obj, getErrorCallback());
 							Thread.sleep(250);

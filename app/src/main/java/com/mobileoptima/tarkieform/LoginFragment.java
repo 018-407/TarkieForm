@@ -26,7 +26,7 @@ import com.mobileoptima.callback.Interface.OnLoginCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Key;
 import com.mobileoptima.constant.Module.Action;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
@@ -86,7 +86,7 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		String logoUrl = TarkieFormLib.getCompanyLogo(db);
+		String logoUrl = TarkieLib.getCompanyLogo(db);
 		if(logoUrl != null) {
 			CodePanUtils.displayImage(ivLogoLogin, logoUrl, this);
 		}
@@ -99,7 +99,7 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 				String username = etUsernameLogin.getText().toString().trim();
 				String password = etPasswordLogin.getText().toString().trim();
 				if(!username.isEmpty() && !password.isEmpty()) {
-					if(CodePanUtils.isInternetConnected(getActivity())) {
+					if(CodePanUtils.hasInternet(getActivity())) {
 						LoadingDialogFragment loading = new LoadingDialogFragment();
 						Bundle bundle = new Bundle();
 						bundle.putString(Key.USERNAME, username);
@@ -115,11 +115,11 @@ public class LoginFragment extends Fragment implements OnClickListener, OnRefres
 						transaction.commit();
 					}
 					else {
-						CodePanUtils.showAlertToast(getActivity(), "Internet connection required.");
+						CodePanUtils.alertToast(getActivity(), "Internet connection required.");
 					}
 				}
 				else {
-					CodePanUtils.showAlertToast(getActivity(), "Please input username and password.");
+					CodePanUtils.alertToast(getActivity(), "Please input username and password.");
 				}
 				break;
 		}

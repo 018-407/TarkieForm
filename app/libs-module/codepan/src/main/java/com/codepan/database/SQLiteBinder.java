@@ -4,11 +4,9 @@ import net.sqlcipher.database.SQLiteStatement;
 
 import java.util.ArrayList;
 
-public class SQLiteBinder {
+import static com.codepan.database.SQLiteQuery.DataType;
 
-	public enum DataType {
-		INTEGER, TEXT
-	}
+public class SQLiteBinder {
 
 	private SQLiteAdapter db;
 
@@ -17,30 +15,14 @@ public class SQLiteBinder {
 		this.db.beginTransaction();
 	}
 
-	public String insert(String table, ArrayList<FieldValue> list) {
-		String fields = "";
-		String values = "";
-		for(FieldValue obj : list) {
-			if(list.indexOf(obj) == list.size() - 1) {
-				fields += obj.field;
-				if(obj.value != null) {
-					values += "'" + obj.value + "'";
-				}
-				else {
-					values += "NULL";
-				}
-			}
-			else {
-				fields += obj.field + ",";
-				if(obj.value != null) {
-					values += "'" + obj.value + "',";
-				}
-				else {
-					values += "NULL,";
-				}
-			}
-		}
-		String sql = "INSERT INTO " + table + " (" + fields + ") VALUES (" + values + ")";
+	public String insert(String table, ArrayList<FieldValue> fields) {
+		SQLiteQuery query = new SQLiteQuery();
+		query.setFieldValueList(fields);
+		return insert(table, query);
+	}
+
+	public String insert(String table, SQLiteQuery query) {
+		String sql = query.insert(table);
 		SQLiteStatement insert = db.compileStatement(sql);
 		long id = insert.executeInsert();
 		insert.close();
@@ -52,207 +34,86 @@ public class SQLiteBinder {
 		}
 	}
 
-	public void update(String table, ArrayList<FieldValue> list, String locRecID) {
-		String fieldsValues = "";
-		for(FieldValue obj : list) {
-			if(list.indexOf(obj) == list.size() - 1) {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "'";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL";
-				}
-			}
-			else {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "',";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL,";
-				}
-			}
-		}
-		String sql = "UPDATE " + table + " SET " + fieldsValues + " WHERE ID = '" + locRecID + "'";
+	public void update(String table, ArrayList<FieldValue> fields, String recID) {
+		SQLiteQuery query = new SQLiteQuery();
+		query.setFieldValueList(fields);
+		update(table, query, recID);
+	}
+
+	public void update(String table, ArrayList<FieldValue> fields, int recID) {
+		SQLiteQuery query = new SQLiteQuery();
+		query.setFieldValueList(fields);
+		update(table, query, recID);
+	}
+
+	public void update(String table, ArrayList<FieldValue> fields, ArrayList<Condition> conditions) {
+		SQLiteQuery query = new SQLiteQuery();
+		query.setFieldValueList(fields);
+		query.setConditionList(conditions);
+		update(table, query);
+	}
+
+	public void update(String table, SQLiteQuery query) {
+		String sql = query.update(table);
 		SQLiteStatement update = db.compileStatement(sql);
 		update.execute();
 		update.close();
 	}
 
-	public void update(String table, ArrayList<FieldValue> list, int locRecID) {
-		String fieldsValues = "";
-		for(FieldValue obj : list) {
-			if(list.indexOf(obj) == list.size() - 1) {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "'";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL";
-				}
-			}
-			else {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "',";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL,";
-				}
-			}
-		}
-		String sql = "UPDATE " + table + " SET " + fieldsValues + " WHERE ID = '" + locRecID + "'";
+	public void update(String table, SQLiteQuery query, String recID) {
+		String sql = query.update(table, recID);
 		SQLiteStatement update = db.compileStatement(sql);
 		update.execute();
 		update.close();
 	}
 
-	public void update(String table, ArrayList<FieldValue> list, ArrayList<Condition> conditionList) {
-		String fieldsValues = "";
-		String condition = "";
-		for(FieldValue obj : list) {
-			if(list.indexOf(obj) == list.size() - 1) {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "'";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL";
-				}
-			}
-			else {
-				if(obj.value != null) {
-					fieldsValues += obj.field + " = '" + obj.value + "',";
-				}
-				else {
-					fieldsValues += obj.field + " = NULL,";
-				}
-			}
-		}
-		for(Condition obj : conditionList) {
-			switch(obj.operator) {
-				case EQUALS:
-					condition += obj.field + " = '" + obj.value + "'";
-					break;
-				case NOT_EQUALS:
-					condition += obj.field + " != '" + obj.value + "'";
-					break;
-				case GREATER_THAN:
-					condition += obj.field + " > '" + obj.value + "'";
-					break;
-				case LESS_THAN:
-					condition += obj.field + " < '" + obj.value + "'";
-					break;
-				case GREATER_THAN_OR_EQUALS:
-					condition += obj.field + " >= '" + obj.value + "'";
-					break;
-				case LESS_THAN_OR_EQUALS:
-					condition += obj.field + " <= '" + obj.value + "'";
-					break;
-				case BETWEEN:
-					condition += obj.field + " BETWEEN '" + obj.start + "' AND '" + obj.end + "'";
-					break;
-				case IS_NULL:
-					condition += obj.field + " IS NULL";
-					break;
-			}
-			if(conditionList.indexOf(obj) < conditionList.size() - 1) {
-				condition += " AND ";
-			}
-		}
-		String sql = "UPDATE " + table + " SET " + fieldsValues + " WHERE " + condition;
+	public void update(String table, SQLiteQuery query, int recID) {
+		String sql = query.update(table, recID);
 		SQLiteStatement update = db.compileStatement(sql);
 		update.execute();
 		update.close();
 	}
 
-	public void delete(String table, ArrayList<Condition> conditionList) {
-		String condition = "";
-		for(Condition obj : conditionList) {
-			switch(obj.operator) {
-				case EQUALS:
-					condition += obj.field + " = '" + obj.value + "'";
-					break;
-				case NOT_EQUALS:
-					condition += obj.field + " != '" + obj.value + "'";
-					break;
-				case GREATER_THAN:
-					condition += obj.field + " > '" + obj.value + "'";
-					break;
-				case LESS_THAN:
-					condition += obj.field + " < '" + obj.value + "'";
-					break;
-				case GREATER_THAN_OR_EQUALS:
-					condition += obj.field + " >= '" + obj.value + "'";
-					break;
-				case LESS_THAN_OR_EQUALS:
-					condition += obj.field + " <= '" + obj.value + "'";
-					break;
-				case BETWEEN:
-					condition += obj.field + " BETWEEN '" + obj.start + "' AND '" + obj.end + "'";
-					break;
-				case IS_NULL:
-					condition += obj.field + " IS NULL";
-					break;
-			}
-			if(conditionList.indexOf(obj) < conditionList.size() - 1) {
-				condition += " AND ";
-			}
-		}
-		String sql = "DELETE FROM " + table + " WHERE " + condition;
+	public void delete(String table, ArrayList<Condition> conditions) {
+		SQLiteQuery query = new SQLiteQuery();
+		query.setConditionList(conditions);
+		delete(table, query);
+	}
+
+	public void delete(String table, SQLiteQuery query) {
+		String sql = query.delete(table);
 		SQLiteStatement delete = db.compileStatement(sql);
 		delete.execute();
 		delete.close();
 	}
 
-	public void addColumn(String table, DataType type, String column, int defaultValue, boolean isDefault) {
-		String sql = null;
-		switch(type) {
-			case INTEGER:
-				if(!isDefault) {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " INTEGER";
-				}
-				else {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " INTEGER DEFAULT " + defaultValue + "";
-				}
-				break;
-			case TEXT:
-				if(!isDefault) {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " TEXT";
-				}
-				else {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " TEXT DEFAULT " + defaultValue + "";
-				}
-				break;
-		}
+	public void addColumn(String table, String column, String defValue) {
+		SQLiteQuery query = new SQLiteQuery();
+		String sql = query.addColumn(table, column, defValue);
 		SQLiteStatement alter = db.compileStatement(sql);
 		alter.execute();
 		alter.close();
 	}
 
-	public void addColumn(String table, DataType type, String column, String defaultValue, boolean isDefault) {
-		String sql = null;
-		switch(type) {
-			case INTEGER:
-				if(!isDefault) {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " INTEGER";
-				}
-				else {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " INTEGER DEFAULT " + defaultValue + "";
-				}
-				break;
-			case TEXT:
-				if(!isDefault) {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " TEXT";
-				}
-				else {
-					sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " TEXT DEFAULT " + defaultValue + "";
-				}
-				break;
-		}
+	public void addColumn(String table, String column, int defValue) {
+		SQLiteQuery query = new SQLiteQuery();
+		String sql = query.addColumn(table, column, defValue);
+		SQLiteStatement alter = db.compileStatement(sql);
+		alter.execute();
+		alter.close();
+	}
+
+	public void addColumn(String table, DataType type, String column) {
+		SQLiteQuery query = new SQLiteQuery();
+		String sql = query.addColumn(table, type, column);
 		SQLiteStatement alter = db.compileStatement(sql);
 		alter.execute();
 		alter.close();
 	}
 
 	public void dropTable(String table) {
-		String sql = "DROP TABLE IF EXISTS " + table;
+		SQLiteQuery query = new SQLiteQuery();
+		String sql = query.dropTable(table);
 		SQLiteStatement drop = db.compileStatement(sql);
 		drop.execute();
 		drop.close();
@@ -265,7 +126,8 @@ public class SQLiteBinder {
 	}
 
 	public void truncate(String table) {
-		String sql = "DELETE FROM " + table;
+		SQLiteQuery query = new SQLiteQuery();
+		String sql = query.delete(table);
 		SQLiteStatement statement = db.compileStatement(sql);
 		statement.execute();
 		statement.close();

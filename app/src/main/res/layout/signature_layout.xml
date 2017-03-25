@@ -45,7 +45,6 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_layer_rect_white_rad_five_str_green"
                 android:padding="@dimen/five"
-                android:src="@drawable/ic_about"
                 android:visibility="gone"/>
 
         </FrameLayout>

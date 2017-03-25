@@ -19,7 +19,7 @@ public class SquareImageView extends ImageView {
 
 	public void init(Context context, AttributeSet attrs) {
 		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.codePan);
-		reference = ta.getInt(R.styleable.codePan_reference, Reference.DEFAULT);
+		reference = ta.getInt(R.styleable.codePan_reference, Reference.DYNAMIC);
 		ta.recycle();
 	}
 
@@ -30,7 +30,7 @@ public class SquareImageView extends ImageView {
 		int height = getMeasuredHeight();
 		int dimension = 0;
 		switch(reference) {
-			case Reference.DEFAULT:
+			case Reference.DYNAMIC:
 				dimension = width > height ? width : height;
 				break;
 			case Reference.WIDTH:

@@ -35,7 +35,7 @@ import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Module.Action;
 import com.mobileoptima.constant.RequestCode;
 import com.mobileoptima.constant.Tab;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
@@ -60,7 +60,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	private ScrollView svMenuMain;
 	private RelativeLayout rlMain;
 	private DrawerLayout dlMain;
-	private int width, height;
 	private ViewPager vpMain;
 	private SQLiteAdapter db;
 
@@ -137,7 +136,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				break;
 			case R.id.llSyncDataMain:
 				dlMain.closeDrawer(svMenuMain);
-				int count = TarkieFormLib.getCountSyncTotal(db);
+				int count = TarkieLib.getCountSyncTotal(db);
 				if(count > 0) {
 					String transactions = count == 1 ? "transaction" : "transactions";
 					String message = "You have " + count + " unsaved " + transactions + ". " +
@@ -173,12 +172,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(this, "No data to be synced.", Toast.LENGTH_SHORT);
+					CodePanUtils.alertToast(this, "No data to be synced.", Toast.LENGTH_SHORT);
 				}
 				break;
 			case R.id.llUpdateMasterMain:
 				dlMain.closeDrawer(svMenuMain);
-				if(CodePanUtils.isInternetConnected(this)) {
+				if(CodePanUtils.hasInternet(this)) {
 					final AlertDialogFragment alert = new AlertDialogFragment();
 					alert.setDialogTitle("Update Master list");
 					alert.setDialogMessage("Do you want to download the latest master list?");
@@ -187,8 +186,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 						public void onClick(View view) {
 							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 							LoadingDialogFragment loading = new LoadingDialogFragment();
-							Bundle bundle = new Bundle();
-							loading.setArguments(bundle);
 							loading.setAction(Action.UPDATE_MASTERLIST);
 							loading.setOnRefreshCallback(MainActivity.this);
 							loading.setOnOverrideCallback(MainActivity.this);
@@ -214,7 +211,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(this, "Internet connection required.");
+					CodePanUtils.alertToast(this, "Internet connection required.");
 				}
 				break;
 			case R.id.llAboutMain:
@@ -229,7 +226,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 					@Override
 					public void onClick(View view) {
 						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
-						boolean result = TarkieFormLib.logout(db);
+						boolean result = TarkieLib.logout(db);
 						if(result) {
 							alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 							onRefresh();
@@ -268,9 +265,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		else {
 			SplashFragment splash = new SplashFragment();
 			splash.setOnInitializeCallback(this);
-			splash.setOnRefreshCallback(this);
-			splash.setOnOverrideCallback(this);
-			splash.setOnLoginCallback(this);
 			transaction = getSupportFragmentManager().beginTransaction();
 			transaction.add(R.id.rlMain, splash);
 			transaction.addToBackStack(null);
@@ -293,6 +287,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	public void onInitialize(SQLiteAdapter db) {
 		this.isInitialized = true;
 		this.db = db;
+		authenticate();
 		updateSyncCount();
 		updateUser();
 		updateLogo();
@@ -394,7 +389,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	}
 
 	public void authenticate() {
-		if(!TarkieFormLib.isAuthorized(db)) {
+		if(!TarkieLib.isAuthorized(db)) {
 			AuthorizationFragment authorization = new AuthorizationFragment();
 			authorization.setOnOverrideCallback(this);
 			authorization.setOnRefreshCallback(this);
@@ -404,7 +399,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 			transaction.commit();
 		}
 		else {
-			if(!TarkieFormLib.isLoggedIn(db)) {
+			if(!TarkieLib.isLoggedIn(db)) {
 				LoginFragment login = new LoginFragment();
 				login.setOnOverrideCallback(this);
 				login.setOnRefreshCallback(this);
@@ -415,21 +410,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 				transaction.commit();
 			}
 		}
-	}
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		this.width = rlMain.getWidth();
-		this.height = rlMain.getHeight();
-	}
-
-	public int getHeight() {
-		return this.height;
-	}
-
-	public int getWidth() {
-		return this.width;
 	}
 
 	public void reloadForms() {
@@ -473,9 +453,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	public void updateUser() {
 		if(isInitialized) {
-			String empID = TarkieFormLib.getEmployeeID(db);
-			String imageUrl = TarkieFormLib.getEmployeeUrl(db, empID);
-			String name = TarkieFormLib.getEmployeeName(db, empID);
+			String empID = TarkieLib.getEmployeeID(db);
+			String imageUrl = TarkieLib.getEmployeeUrl(db, empID);
+			String name = TarkieLib.getEmployeeName(db, empID);
 			tvEmployeeMain.setText(name);
 			if(imageUrl != null) {
 				CodePanUtils.displayImage(ivEmployeeMain, imageUrl,
@@ -486,7 +466,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	public void updateLogo() {
 		if(isInitialized) {
-			String logoUrl = TarkieFormLib.getCompanyLogo(db);
+			String logoUrl = TarkieLib.getCompanyLogo(db);
 			if(logoUrl != null) {
 				CodePanUtils.displayImage(ivLogoMain, logoUrl, this);
 			}
@@ -494,7 +474,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 	}
 
 	public void updateSyncCount() {
-		int count = TarkieFormLib.getCountSyncTotal(db);
+		int count = TarkieLib.getCountSyncTotal(db);
 		if(count > 0) {
 			tvSyncCountMain.setVisibility(View.VISIBLE);
 			tvSyncNotifMain.setVisibility(View.VISIBLE);

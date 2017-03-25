@@ -44,7 +44,7 @@ import com.mobileoptima.constant.App;
 import com.mobileoptima.constant.FieldType;
 import com.mobileoptima.constant.Tag;
 import com.mobileoptima.core.Data;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.AnswerObj;
 import com.mobileoptima.object.ChoiceObj;
 import com.mobileoptima.object.EntryObj;
@@ -439,11 +439,11 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 									else {
 										String title = "Invalid URL";
 										String message = "\"" + field.description + "\"";
-										TarkieFormLib.showAlertDialog(getActivity(), title, message);
+										TarkieLib.showAlertDialog(getActivity(), title, message);
 									}
 								}
 								else {
-									CodePanUtils.showAlertToast(getActivity(), "No inputted URL.");
+									CodePanUtils.alertToast(getActivity(), "No inputted URL.");
 								}
 							}
 						});
@@ -625,7 +625,7 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 							ArrayList<ImageObj> imageList = new ArrayList<>();
 							for(String photoID : array) {
 								ImageObj image = new ImageObj();
-								String fileName = TarkieFormLib.getFileName(db, photoID);
+								String fileName = TarkieLib.getFileName(db, photoID);
 								if(fileName != null && !fileName.isEmpty()) {
 									image.ID = photoID;
 									image.fileName = fileName;

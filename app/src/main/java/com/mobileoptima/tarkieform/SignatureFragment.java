@@ -18,7 +18,7 @@ import com.codepan.widget.SignatureView;
 import com.mobileoptima.callback.Interface.OnClearCallback;
 import com.mobileoptima.callback.Interface.OnSignCallback;
 import com.mobileoptima.constant.App;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.ImageObj;
 
 public class SignatureFragment extends Fragment implements View.OnClickListener {
@@ -65,7 +65,7 @@ public class SignatureFragment extends Fragment implements View.OnClickListener 
 		btnSaveSignature.setOnClickListener(this);
 		tvTitleSignature.setText(title);
 		if(photoID != null && !photoID.isEmpty()) {
-			String fileName = TarkieFormLib.getFileName(db, photoID);
+			String fileName = TarkieLib.getFileName(db, photoID);
 			Bitmap bitmap = CodePanUtils.getBitmapImage(getActivity(), App.FOLDER, fileName);
 			ivSignature.setImageBitmap(bitmap);
 			ivSignature.setVisibility(View.VISIBLE);
@@ -84,7 +84,7 @@ public class SignatureFragment extends Fragment implements View.OnClickListener 
 			case R.id.btnSaveSignature:
 				if(photoID != null) {
 					btnSaveSignature.setText(R.string.save);
-					boolean result = TarkieFormLib.deletePhoto(getActivity(), db, photoID);
+					boolean result = TarkieLib.deletePhoto(getActivity(), db, photoID);
 					if(result) {
 						ivSignature.setVisibility(View.GONE);
 						svSignature.setVisibility(View.VISIBLE);
@@ -95,20 +95,25 @@ public class SignatureFragment extends Fragment implements View.OnClickListener 
 					}
 				}
 				else {
-					String fileName = System.currentTimeMillis() + ".png";
-					String path = getActivity().getDir(App.FOLDER, Context.MODE_PRIVATE).getPath();
-					int width = svSignature.getWidth();
-					int height = svSignature.getHeight();
-					boolean result = svSignature.exportFile(path, fileName, width, height);
-					if(result && signCallback != null) {
-						ImageObj image = new ImageObj();
-						image.fileName = fileName;
-						image.dDate = CodePanUtils.getDate();
-						image.dTime = CodePanUtils.getTime();
-						image.isSignature = true;
-						image.ID = TarkieFormLib.savePhoto(db, image);
-						getActivity().getSupportFragmentManager().popBackStack();
-						signCallback.onSign(image);
+					if(!svSignature.isEmpty()) {
+						String fileName = System.currentTimeMillis() + ".png";
+						String path = getActivity().getDir(App.FOLDER, Context.MODE_PRIVATE).getPath();
+						int width = svSignature.getWidth();
+						int height = svSignature.getHeight();
+						boolean result = svSignature.exportFile(path, fileName, width, height);
+						if(result && signCallback != null) {
+							ImageObj image = new ImageObj();
+							image.fileName = fileName;
+							image.dDate = CodePanUtils.getDate();
+							image.dTime = CodePanUtils.getTime();
+							image.isSignature = true;
+							image.ID = TarkieLib.savePhoto(db, image);
+							getActivity().getSupportFragmentManager().popBackStack();
+							signCallback.onSign(image);
+						}
+					}
+					else {
+						CodePanUtils.alertToast(getActivity(), "Please affix your signature.");
 					}
 				}
 				break;

@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.codepan.callback.Interface.OnBackPressedCallback;
+import com.codepan.callback.Interface.OnCameraErrorCallback;
 import com.codepan.callback.Interface.OnCaptureCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.camera.CameraSurfaceView;
@@ -32,15 +33,18 @@ import com.mobileoptima.callback.Interface.OnCameraDoneCallback;
 import com.mobileoptima.callback.Interface.OnDeletePhotoCallback;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.App;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.ImageObj;
 
 import java.util.ArrayList;
 
 public class CameraFragment extends Fragment implements OnClickListener, OnCaptureCallback,
-		OnBackPressedCallback, OnFragmentCallback, OnDeletePhotoCallback {
+		OnBackPressedCallback, OnFragmentCallback, OnDeletePhotoCallback,
+		OnCameraErrorCallback {
 
 	private final String flashMode = Camera.Parameters.FLASH_MODE_OFF;
+	private final long TRANS_DELAY = 300;
+	private final long FADE_DELAY = 750;
 
 	private CodePanButton btnBackCamera, btnOptionsCamera, btnCaptureCamera,
 			btnDoneCamera, btnSwitchCamera, btnClearCamera;
@@ -60,9 +64,9 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	private LayoutTransition transition;
 	private boolean inOtherFragment;
 	private FrameLayout flCamera;
-	private ViewGroup parent;
-	private String fileName;
 	private SQLiteAdapter db;
+	private String fileName;
+	private View vCamera;
 
 	@Override
 	public void onStart() {
@@ -79,20 +83,16 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	@Override
 	public void onResume() {
 		super.onResume();
-		if(surfaceView.getCamera() == null) {
-			surfaceView = new CameraSurfaceView(getActivity(), cameraSelection, flashMode,
-					App.FOLDER, maxWidth, maxHeight);
-			surfaceView.setOnCaptureCallback(this);
-			surfaceView.setFocusIndicatorView(dvCamera);
-			flCamera.addView(surfaceView, 0);
+		if(surfaceView != null && surfaceView.getCamera() == null) {
+			resetCamera(0);
 		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		maxWidth = ((MainActivity) getActivity()).getWidth();
-		maxHeight = ((MainActivity) getActivity()).getHeight();
+		maxWidth = CodePanUtils.getMaxWidth(getActivity());
+		maxHeight = CodePanUtils.getMaxHeight(getActivity());
 		((MainActivity) getActivity()).setOnBackPressedCallback(this);
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
@@ -116,6 +116,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 		btnCaptureCamera = (CodePanButton) view.findViewById(R.id.btnCaptureCamera);
 		dvCamera = (FocusIndicatorView) view.findViewById(R.id.dvCamera);
 		flCamera = (FrameLayout) view.findViewById(R.id.flCamera);
+		vCamera = view.findViewById(R.id.vCamera);
 		btnBackCamera.setOnClickListener(this);
 		btnOptionsCamera.setOnClickListener(this);
 		btnCaptureCamera.setOnClickListener(this);
@@ -123,15 +124,6 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 		btnSwitchCamera.setOnClickListener(this);
 		btnClearCamera.setOnClickListener(this);
 		rlOptionsCamera.setOnClickListener(this);
-		surfaceView = new CameraSurfaceView(getActivity(), cameraSelection, flashMode,
-				App.FOLDER, maxWidth, maxHeight);
-		surfaceView.setOnCaptureCallback(this);
-		surfaceView.setFocusIndicatorView(dvCamera);
-		float ratio = surfaceView.getAspectRatio(maxWidth, maxHeight);
-		final float height = (float) maxWidth * ratio;
-		flCamera.getLayoutParams().height = (int) height;
-		flCamera.getLayoutParams().width = maxWidth;
-		flCamera.addView(surfaceView, 0);
 		transition = llPhotoGridCamera.getLayoutTransition();
 		transition.addTransitionListener(new LayoutTransition.TransitionListener() {
 			@Override
@@ -145,10 +137,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 				hsvPhotoGridCamera.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
 			}
 		});
-		if(surfaceView.getNoOfCamera() == 1) {
-			llSwitchCamera.setVisibility(View.GONE);
-		}
-		this.parent = container;
+		resetCamera(TRANS_DELAY);
 		return view;
 	}
 
@@ -181,27 +170,13 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 				getActivity().getSupportFragmentManager().popBackStack();
 				break;
 			case R.id.btnSwitchCamera:
-				rlOptionsCamera.performClick();
-				if(rlOptionsCamera.getVisibility() == View.VISIBLE) {
-					CodePanUtils.fadeOut(rlOptionsCamera);
-				}
 				if(cameraSelection == Camera.CameraInfo.CAMERA_FACING_FRONT) {
 					cameraSelection = Camera.CameraInfo.CAMERA_FACING_BACK;
 				}
 				else {
 					cameraSelection = Camera.CameraInfo.CAMERA_FACING_FRONT;
 				}
-				surfaceView.stopCamera();
-				surfaceView = new CameraSurfaceView(getActivity(), cameraSelection, flashMode,
-						App.FOLDER, maxWidth, maxHeight);
-				surfaceView.setOnCaptureCallback(this);
-				surfaceView.setFocusIndicatorView(dvCamera);
-				float ratio = surfaceView.getAspectRatio(maxWidth, maxHeight);
-				final float height = (float) maxWidth * ratio;
-				flCamera.getLayoutParams().height = (int) height;
-				flCamera.getLayoutParams().width = maxWidth;
-				flCamera.removeViewAt(0);
-				flCamera.addView(surfaceView, 0);
+				resetCamera(0);
 				break;
 			case R.id.btnClearCamera:
 				rlOptionsCamera.performClick();
@@ -234,7 +209,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(getActivity(), "No photos to be cleared.");
+					CodePanUtils.alertToast(getActivity(), "No photos to be cleared.");
 				}
 				break;
 			case R.id.rlOptionsCamera:
@@ -265,7 +240,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 		obj.dDate = CodePanUtils.getDate();
 		obj.dTime = CodePanUtils.getTime();
 		obj.fileName = fileName;
-		obj.ID = TarkieFormLib.savePhoto(db, obj);
+		obj.ID = TarkieLib.savePhoto(db, obj);
 		imageList.add(obj);
 		if(surfaceView != null && surfaceView.isCaptured()) {
 			surfaceView.reset();
@@ -278,33 +253,37 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	}
 
 	public void updatePhotoGrid(final int position) {
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View view = inflater.inflate(R.layout.photo_grid_item, parent, false);
-		CodePanButton btnPhotoGrid = (CodePanButton) view.findViewById(R.id.btnPhotoGrid);
-		ImageView ivPhotoGrid = (ImageView) view.findViewById(R.id.ivPhotoGrid);
-		int size = CodePanUtils.getWidth(view);
-		Bitmap bitmap = CodePanUtils.getBitmapThumbnails(getActivity(), App.FOLDER, fileName, size);
-		ivPhotoGrid.setImageBitmap(bitmap);
-		imageList.get(position).bitmap = bitmap;
-		btnPhotoGrid.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onPhotoGridItemClick(position);
+		View view = getView();
+		if(view != null) {
+			ViewGroup container = (ViewGroup) view.getParent();
+			LayoutInflater inflater = getActivity().getLayoutInflater();
+			View child = inflater.inflate(R.layout.photo_grid_item, container, false);
+			CodePanButton btnPhotoGrid = (CodePanButton) child.findViewById(R.id.btnPhotoGrid);
+			ImageView ivPhotoGrid = (ImageView) child.findViewById(R.id.ivPhotoGrid);
+			int size = CodePanUtils.getWidth(child);
+			Bitmap bitmap = CodePanUtils.getBitmapThumbnails(getActivity(), App.FOLDER, fileName, size);
+			ivPhotoGrid.setImageBitmap(bitmap);
+			imageList.get(position).bitmap = bitmap;
+			btnPhotoGrid.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onPhotoGridItemClick(position);
+				}
+			});
+			if(position == 0) {
+				llPhotoGridCamera.removeAllViews();
+				llPhotoGridCamera.setLayoutTransition(null);
 			}
-		});
-		if(position == 0) {
-			llPhotoGridCamera.removeAllViews();
-			llPhotoGridCamera.setLayoutTransition(null);
+			else {
+				llPhotoGridCamera.setLayoutTransition(transition);
+			}
+			llPhotoGridCamera.addView(child);
+			if(rlPhotoGridCamera.getVisibility() == View.GONE) {
+				CodePanUtils.expandView(rlPhotoGridCamera, true);
+			}
+			String taken = String.valueOf(imageList.size());
+			tvPhotosTakenCamera.setText(taken);
 		}
-		else {
-			llPhotoGridCamera.setLayoutTransition(transition);
-		}
-		llPhotoGridCamera.addView(view);
-		if(rlPhotoGridCamera.getVisibility() == View.GONE) {
-			CodePanUtils.expandView(rlPhotoGridCamera, true);
-		}
-		String taken = String.valueOf(imageList.size());
-		tvPhotosTakenCamera.setText(taken);
 	}
 
 	@Override
@@ -388,7 +367,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 			public void run() {
 				Looper.prepare();
 				try {
-					boolean result = TarkieFormLib.deletePhotos(getActivity(), db, deleteList);
+					boolean result = TarkieLib.deletePhotos(getActivity(), db, deleteList);
 					if(result) {
 						imageList.clear();
 						clearPhotosHandler.sendMessage(clearPhotosHandler.obtainMessage());
@@ -405,7 +384,7 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	Handler clearPhotosHandler = new Handler(new Handler.Callback() {
 		@Override
 		public boolean handleMessage(Message msg) {
-			CodePanUtils.showAlertToast(getActivity(), "Photos cleared.");
+			CodePanUtils.alertToast(getActivity(), "Photos cleared.");
 			llPhotoGridCamera.removeAllViews();
 			CodePanUtils.collapseView(rlPhotoGridCamera, true);
 			tvPhotosTakenCamera.setText("0");
@@ -451,5 +430,50 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 
 	public void setOnBackPressedCallback(OnBackPressedCallback backPressedCallback) {
 		this.backPressedCallback = backPressedCallback;
+	}
+
+	public void resetCamera(long delay) {
+		if(vCamera != null) vCamera.setVisibility(View.VISIBLE);
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if(surfaceView != null) surfaceView.stopCamera();
+				surfaceView = new CameraSurfaceView(getActivity(), CameraFragment.this,
+						cameraSelection, flashMode, App.FOLDER, maxWidth, maxHeight);
+				surfaceView.setOnCaptureCallback(CameraFragment.this);
+				surfaceView.setFocusIndicatorView(dvCamera);
+				surfaceView.fullScreenToContainer(flCamera);
+				if(flCamera.getChildCount() > 1) {
+					flCamera.removeViewAt(0);
+				}
+				flCamera.addView(surfaceView, 0);
+				CodePanUtils.fadeOut(vCamera, FADE_DELAY);
+				if(surfaceView.getNoOfCamera() == 1) {
+					llSwitchCamera.setVisibility(View.GONE);
+				}
+			}
+		}, delay);
+	}
+
+	@Override
+	public void onCameraError() {
+		final AlertDialogFragment alert = new AlertDialogFragment();
+		alert.setDialogTitle("Camera Failed");
+		alert.setDialogMessage("Unable to load camera, please try to restart " +
+				"your device and try again.");
+		alert.setPositiveButton("Ok", new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+			}
+		});
+		transaction = getActivity().getSupportFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+				R.anim.fade_in, R.anim.fade_out);
+		transaction.add(R.id.rlMain, alert);
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 }

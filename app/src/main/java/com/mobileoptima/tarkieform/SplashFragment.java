@@ -7,37 +7,32 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.codepan.callback.Interface.OnCreateDatabaseCallback;
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.callback.Interface.OnPermissionGrantedCallback;
-import com.codepan.callback.Interface.OnRefreshCallback;
-import com.codepan.callback.Interface.OnUpgradeDatabaseCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.cache.SQLiteCache;
 import com.mobileoptima.callback.Interface.OnInitializeCallback;
-import com.mobileoptima.callback.Interface.OnLoginCallback;
-import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.App;
+import com.mobileoptima.constant.DialogTag;
 import com.mobileoptima.constant.RequestCode;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 
-public class SplashFragment extends Fragment implements OnCreateDatabaseCallback,
-		OnUpgradeDatabaseCallback, OnPermissionGrantedCallback, OnFragmentCallback {
+public class SplashFragment extends Fragment implements OnPermissionGrantedCallback,
+		OnFragmentCallback {
 
 	private final int DELAY = 2000;
-	private boolean isPause, isPending, isRequired;
 	private OnInitializeCallback initializeCallback;
-	private OnOverrideCallback overrideCallback;
-	private OnRefreshCallback refreshCallback;
 	private FragmentTransaction transaction;
-	private OnLoginCallback loginCallback;
+	private FragmentManager manager;
 	private SQLiteAdapter db;
+	private boolean isPause;
 
 	@Override
 	public void onPause() {
@@ -50,10 +45,6 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		super.onResume();
 		if(isPause) {
 			checkPermission();
-			if(isPending) {
-				authenticate();
-				isPending = false;
-			}
 		}
 		isPause = false;
 	}
@@ -61,6 +52,7 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		manager = getActivity().getSupportFragmentManager();
 		checkPermission();
 	}
 
@@ -75,12 +67,9 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 			public void run() {
 				try {
 					db = SQLiteCache.getDatabase(getActivity(), App.DB);
-					db.setOnCreateDatabaseCallback(SplashFragment.this);
-					db.setOnUpgradeDatabaseCallback(SplashFragment.this);
 					db.openConnection();
-					TarkieFormLib.createTables(db);
-					TarkieFormLib.alterTables(db, 0, 0);
-					TarkieFormLib.loadCredentials(db);
+					TarkieLib.createTables(db);
+					TarkieLib.updateTables(db, 0, 0);
 					Thread.sleep(DELAY);
 					handler.sendMessage(handler.obtainMessage());
 				}
@@ -95,14 +84,9 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 	Handler handler = new Handler(new Handler.Callback() {
 		@Override
 		public boolean handleMessage(Message msg) {
+			manager.popBackStack();
 			if(initializeCallback != null) {
 				initializeCallback.onInitialize(db);
-			}
-			if(!isPause) {
-				authenticate();
-			}
-			else {
-				isPending = true;
 			}
 			return true;
 		}
@@ -112,24 +96,16 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		this.initializeCallback = initializeCallback;
 	}
 
-	public void setOnRefreshCallback(OnRefreshCallback refreshCallback) {
-		this.refreshCallback = refreshCallback;
-	}
-
-	public void setOnOverrideCallback(OnOverrideCallback overrideCallback) {
-		this.overrideCallback = overrideCallback;
-	}
-
 	public void checkPermission() {
 		if(CodePanUtils.isPermissionGranted(getActivity())) {
-			if(isRequired) {
-				getActivity().getSupportFragmentManager().popBackStack();
+			if(CodePanUtils.isOnBackStack(getActivity(), DialogTag.PERMISSION)) {
+				manager.popBackStack();
 			}
 			init();
 		}
 		else {
 			if(CodePanUtils.isPermissionHidden(getActivity())) {
-				if(!isRequired) {
+				if(!CodePanUtils.isOnBackStack(getActivity(), DialogTag.PERMISSION)) {
 					showPermissionNote();
 				}
 			}
@@ -141,16 +117,6 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 	}
 
 	@Override
-	public void onCreateDatabase(SQLiteAdapter db) {
-		TarkieFormLib.createTables(db);
-	}
-
-	@Override
-	public void onUpgradeDatabase(SQLiteAdapter db, int oldVersion, int newVersion) {
-		TarkieFormLib.alterTables(db, oldVersion, newVersion);
-	}
-
-	@Override
 	public void onFragment(boolean status) {
 	}
 
@@ -158,40 +124,16 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 	public void onPermissionGranted(boolean isPermissionGranted) {
 	}
 
-	public void authenticate() {
-		getActivity().getSupportFragmentManager().popBackStack();
-		if(!TarkieFormLib.isAuthorized(db)) {
-			AuthorizationFragment authorization = new AuthorizationFragment();
-			authorization.setOnOverrideCallback(overrideCallback);
-			authorization.setOnRefreshCallback(refreshCallback);
-			transaction = getActivity().getSupportFragmentManager().beginTransaction();
-			transaction.replace(R.id.rlMain, authorization);
-			transaction.addToBackStack(null);
-			transaction.commit();
-		}
-		else {
-			if(!TarkieFormLib.isLoggedIn(db)) {
-				LoginFragment login = new LoginFragment();
-				login.setOnOverrideCallback(overrideCallback);
-				login.setOnRefreshCallback(refreshCallback);
-				login.setOnLoginCallback(loginCallback);
-				transaction = getActivity().getSupportFragmentManager().beginTransaction();
-				transaction.replace(R.id.rlMain, login);
-				transaction.addToBackStack(null);
-				transaction.commit();
-			}
-		}
-	}
-
 	public void showPermissionNote() {
+		String name = getString(R.string.app_name);
 		final AlertDialogFragment alert = new AlertDialogFragment();
 		alert.setOnFragmentCallback(this);
 		alert.setDialogTitle("Permissions Required");
-		alert.setDialogMessage("Please enable the required permissions to continue using sevie.");
+		alert.setDialogMessage("Please enable the required permissions to continue using " + name + ".");
 		alert.setPositiveButton("Settings", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				manager.popBackStack();
 				Intent intent = new Intent();
 				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
 				intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
@@ -201,19 +143,15 @@ public class SplashFragment extends Fragment implements OnCreateDatabaseCallback
 		alert.setNegativeButton("Exit", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				manager.popBackStack();
 				getActivity().finish();
 			}
 		});
 		transaction = getActivity().getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 				R.anim.fade_in, R.anim.fade_out);
-		transaction.add(R.id.rlMain, alert);
+		transaction.add(R.id.rlMain, alert, DialogTag.PERMISSION);
 		transaction.addToBackStack(null);
 		transaction.commit();
-	}
-
-	public void setOnLoginCallback(OnLoginCallback loginCallback) {
-		this.loginCallback = loginCallback;
 	}
 }

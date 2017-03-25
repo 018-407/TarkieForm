@@ -26,7 +26,7 @@ public class AlertDialogFragment extends Fragment {
 	private CodePanLabel tvMessageAlertDialog, tvTitleAlertDialog;
 	private int positiveButtonVisibility = View.GONE;
 	private int negativeButtonVisibility = View.GONE;
-	private int dialogMessageVisbility = View.VISIBLE;
+	private int dialogMessageVisibility = View.VISIBLE;
 	private OnFragmentCallback fragmentCallback;
 	private SpannableStringBuilder ssb;
 	private boolean isOnBackStack = false;
@@ -64,7 +64,7 @@ public class AlertDialogFragment extends Fragment {
 		btnNegativeAlertDialog.setOnClickListener(negativeButtonOnClick);
 		btnPositiveAlertDialog.setVisibility(positiveButtonVisibility);
 		btnNegativeAlertDialog.setVisibility(negativeButtonVisibility);
-		tvMessageAlertDialog.setVisibility(dialogMessageVisbility);
+		tvMessageAlertDialog.setVisibility(dialogMessageVisibility);
 		return view;
 	}
 
@@ -77,7 +77,7 @@ public class AlertDialogFragment extends Fragment {
 	}
 
 	public void hideDialogMessage() {
-		this.dialogMessageVisbility = View.GONE;
+		this.dialogMessageVisibility = View.GONE;
 	}
 
 	public void setSpannableList(ArrayList<SpannableMap> list) {

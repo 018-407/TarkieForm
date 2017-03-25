@@ -21,7 +21,7 @@ import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.callback.Interface.OnOverrideCallback;
 import com.mobileoptima.constant.Tab;
 import com.mobileoptima.core.Data;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.FormObj;
@@ -107,6 +107,9 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 					R.anim.slide_in_ltr, R.anim.slide_out_ltr);
 			transaction.add(R.id.flForm, first, page.tag);
 			transaction.commit();
+			if(pageList.size() == 1) {
+				btnNextForm.setText(R.string.finish);
+			}
 		}
 		if(entry == null) {
 			llDeleteForm.setVisibility(View.GONE);
@@ -277,12 +280,12 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		}
 		boolean result = false;
 		if(entry != null) {
-			result = TarkieFormLib.updateEntry(db, entry.ID, fieldList, isSubmit);
-			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully updated.");
+			result = TarkieLib.updateEntry(db, entry.ID, fieldList, isSubmit);
+			CodePanUtils.alertToast(getActivity(), "Entry has been has successfully updated.");
 		}
 		else {
-			result = TarkieFormLib.saveEntry(db, form.ID, fieldList, isSubmit);
-			CodePanUtils.showAlertToast(getActivity(), "Entry has been has successfully saved.");
+			result = TarkieLib.saveEntry(db, form.ID, fieldList, isSubmit);
+			CodePanUtils.alertToast(getActivity(), "Entry has been has successfully saved.");
 		}
 		if(result) {
 			((MainActivity) getActivity()).reloadEntries();
@@ -326,7 +329,7 @@ public class FormFragment extends Fragment implements OnClickListener, OnBackPre
 		alert.setPositiveButton("Yes", new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				TarkieFormLib.deleteEntry(db, entry.ID);
+				TarkieLib.deleteEntry(db, entry.ID);
 				((MainActivity) getActivity()).reloadEntries();
 				((MainActivity) getActivity()).reloadPhotos();
 				((MainActivity) getActivity()).switchTab(Tab.ENTRIES);

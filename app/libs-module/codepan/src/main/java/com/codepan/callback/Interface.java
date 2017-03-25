@@ -20,6 +20,10 @@ public class Interface {
 		void onCapture(String fileName);
 	}
 
+	public interface OnCameraErrorCallback {
+		void onCameraError();
+	}
+
 	public interface OnSingleTapCallback {
 		void onSingleTap();
 	}
@@ -70,5 +74,14 @@ public class Interface {
 
 	public interface OnBackPressedCallback {
 		void onBackPressed();
+	}
+
+	public interface OnErrorCallback {
+		void onError(String error, String params,
+					 String response, boolean showError);
+	}
+
+	public interface OnSignCallback {
+		void onSign(String fileName);
 	}
 }

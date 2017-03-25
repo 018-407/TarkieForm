@@ -13,7 +13,8 @@ public class Condition {
 		GREATER_THAN_OR_EQUALS,
 		LESS_THAN_OR_EQUALS,
 		BETWEEN,
-		IS_NULL
+		IS_NULL,
+		LIKE
 	}
 
 	public Operator operator;

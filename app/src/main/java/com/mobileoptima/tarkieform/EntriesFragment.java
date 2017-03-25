@@ -57,7 +57,7 @@ public class EntriesFragment extends Fragment {
 					transaction.commit();
 				}
 				else {
-					CodePanUtils.showAlertToast(getActivity(), "This entry has already been submitted.");
+					CodePanUtils.alertToast(getActivity(), "This entry has already been submitted.");
 				}
 			}
 		});

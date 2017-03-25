@@ -11,6 +11,7 @@ import android.view.View;
 import com.codepan.database.FieldValue;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.database.SQLiteBinder;
+import com.codepan.database.SQLiteQuery;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.constant.AnswerType;
 import com.mobileoptima.constant.App;
@@ -22,7 +23,6 @@ import com.mobileoptima.object.FieldObj;
 import com.mobileoptima.object.GpsObj;
 import com.mobileoptima.object.ImageObj;
 import com.mobileoptima.schema.Tables;
-import com.mobileoptima.session.Session;
 import com.mobileoptima.tarkieform.AlertDialogFragment;
 import com.mobileoptima.tarkieform.R;
 
@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.codepan.database.SQLiteBinder.DataType.INTEGER;
-import static com.codepan.database.SQLiteBinder.DataType.TEXT;
 import static com.mobileoptima.schema.Tables.TB;
 import static com.mobileoptima.schema.Tables.TB.ANSWERS;
 import static com.mobileoptima.schema.Tables.TB.COMPANY;
@@ -45,7 +43,7 @@ import static com.mobileoptima.schema.Tables.TB.FIELDS;
 import static com.mobileoptima.schema.Tables.TB.PHOTO;
 import static com.mobileoptima.schema.Tables.TB.SYNC_BATCH;
 
-public class TarkieFormLib {
+public class TarkieLib {
 	public static void createTables(SQLiteAdapter db) {
 		db.execQuery(Tables.create(TB.API_KEY));
 		db.execQuery(Tables.create(TB.SYNC_BATCH));
@@ -60,41 +58,8 @@ public class TarkieFormLib {
 		db.execQuery(Tables.create(TB.ANSWERS));
 	}
 
-	public static void loadCredentials(SQLiteAdapter db) {
-		Session.API_KEY = getAPIKey(db);
-		Session.EMP_ID = getEmployeeID(db);
-	}
-
-	public static void alterTables(SQLiteAdapter db, int oldVersion, int newVersion) {
-		SQLiteBinder binder = new SQLiteBinder(db);
-		String table = Tables.getName(ENTRIES);
-		if(!db.isColumnExists(db, table, "dateSubmitted")) {
-			binder.addColumn(table, TEXT, "dateSubmitted", 0, false);
-		}
-		if(!db.isColumnExists(db, table, "timeSubmitted")) {
-			binder.addColumn(table, INTEGER, "timeSubmitted", 0, false);
-		}
-		table = Tables.getName(TB.PHOTO);
-		if(!db.isColumnExists(db, table, "isSignature")) {
-			binder.addColumn(table, INTEGER, "isSignature", 0, true);
-		}
-		table = Tables.getName(TB.COMPANY);
-		if(!db.isColumnExists(db, table, "logoUrl")) {
-			binder.addColumn(table, TEXT, "logoUrl", 0, false);
-		}
-		table = Tables.getName(TB.FORMS);
-		if(!db.isColumnExists(db, table, "logoUrl")) {
-			binder.addColumn(table, TEXT, "logoUrl", 0, false);
-		}
-		table = Tables.getName(TB.FORMS);
-		if(!db.isColumnExists(db, table, "isActive")) {
-			binder.addColumn(table, INTEGER, "isActive", 1, true);
-		}
-		table = Tables.getName(TB.FIELDS);
-		if(!db.isColumnExists(db, table, "isActive")) {
-			binder.addColumn(table, INTEGER, "isActive", 1, true);
-		}
-		binder.finish();
+	public static void updateTables(SQLiteAdapter db, int o, int n) {
+		//TODO for updating tables
 	}
 
 	public static boolean isAuthorized(SQLiteAdapter db) {
@@ -166,6 +131,13 @@ public class TarkieFormLib {
 		return db.getInt(query);
 	}
 
+	public static int getFirstOrderNo(SQLiteAdapter db, String formID) {
+		String table = Tables.getName(FIELDS);
+		String query = "SELECT orderNo FROM " + table + " WHERE formID = '" + formID + "' " +
+				"ORDER BY orderNo LIMIT 1";
+		return db.getInt(query);
+	}
+
 	public static GpsObj getGPS(Context context, Location location,
 								long lastLocationUpdate, long interval, float requiredAccuracy) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -219,24 +191,24 @@ public class TarkieFormLib {
 		SQLiteBinder binder = new SQLiteBinder(db);
 		String syncBatchID = getSyncBatchID(db);
 		String empID = getEmployeeID(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("fileName", obj.fileName));
-		fieldValueList.add(new FieldValue("dDate", obj.dDate));
-		fieldValueList.add(new FieldValue("dTime", obj.dTime));
-		fieldValueList.add(new FieldValue("isSignature", obj.isSignature));
-		fieldValueList.add(new FieldValue("empID", empID));
-		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
-		String photoID = binder.insert(Tables.getName(PHOTO), fieldValueList);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("fileName", obj.fileName));
+		query.add(new FieldValue("dDate", obj.dDate));
+		query.add(new FieldValue("dTime", obj.dTime));
+		query.add(new FieldValue("isSignature", obj.isSignature));
+		query.add(new FieldValue("empID", empID));
+		query.add(new FieldValue("syncBatchID", syncBatchID));
+		String photoID = binder.insert(Tables.getName(PHOTO), query);
 		binder.finish();
 		return photoID;
 	}
 
 	public static boolean deletePhoto(Context context, SQLiteAdapter db, String photoID) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isDelete", true));
-		binder.update(Tables.getName(PHOTO), fieldValueList, photoID);
-		String fileName = TarkieFormLib.getFileName(db, photoID);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isDelete", true));
+		binder.update(Tables.getName(PHOTO), query, photoID);
+		String fileName = TarkieLib.getFileName(db, photoID);
 		String path = context.getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() + "/" + fileName;
 		CodePanUtils.deleteFile(path);
 		return binder.finish();
@@ -244,9 +216,9 @@ public class TarkieFormLib {
 
 	public static boolean deletePhoto(Context context, SQLiteAdapter db, ImageObj obj) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isDelete", true));
-		binder.update(Tables.getName(PHOTO), fieldValueList, obj.ID);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isDelete", true));
+		binder.update(Tables.getName(PHOTO), query, obj.ID);
 		String path = context.getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() + "/" + obj.fileName;
 		CodePanUtils.deleteFile(path);
 		return binder.finish();
@@ -254,11 +226,11 @@ public class TarkieFormLib {
 
 	public static boolean deletePhotos(Context context, SQLiteAdapter db, ArrayList<ImageObj> deleteList) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
+		SQLiteQuery query = new SQLiteQuery();
 		for(ImageObj obj : deleteList) {
-			fieldValueList.clear();
-			fieldValueList.add(new FieldValue("isDelete", true));
-			binder.update(Tables.getName(PHOTO), fieldValueList, obj.ID);
+			query.clearAll();
+			query.add(new FieldValue("isDelete", true));
+			binder.update(Tables.getName(PHOTO), query, obj.ID);
 			String path = context.getDir(App.FOLDER, Context.MODE_PRIVATE).getPath() + "/" + obj.fileName;
 			CodePanUtils.deleteFile(path);
 		}
@@ -277,18 +249,18 @@ public class TarkieFormLib {
 		String dTime = CodePanUtils.getTime();
 		String empID = getEmployeeID(db);
 		String syncBatchID = getSyncBatchID(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("formID", formID));
-		fieldValueList.add(new FieldValue("dDate", dDate));
-		fieldValueList.add(new FieldValue("dTime", dTime));
-		fieldValueList.add(new FieldValue("empID", empID));
-		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
-		fieldValueList.add(new FieldValue("syncBatchID", syncBatchID));
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("formID", formID));
+		query.add(new FieldValue("dDate", dDate));
+		query.add(new FieldValue("dTime", dTime));
+		query.add(new FieldValue("empID", empID));
+		query.add(new FieldValue("isSubmit", isSubmit));
+		query.add(new FieldValue("syncBatchID", syncBatchID));
 		if(isSubmit) {
-			fieldValueList.add(new FieldValue("dateSubmitted", dDate));
-			fieldValueList.add(new FieldValue("timeSubmitted", dTime));
+			query.add(new FieldValue("dateSubmitted", dDate));
+			query.add(new FieldValue("timeSubmitted", dTime));
 		}
-		String entryID = binder.insert(Tables.getName(ENTRIES), fieldValueList);
+		String entryID = binder.insert(Tables.getName(ENTRIES), query);
 		for(FieldObj field : fieldList) {
 			if(field.isQuestion) {
 				AnswerObj answer = field.answer;
@@ -327,11 +299,11 @@ public class TarkieFormLib {
 						value = answer.isCheck ? AnswerType.CHECK : AnswerType.UNCHECK;
 						break;
 				}
-				fieldValueList.clear();
-				fieldValueList.add(new FieldValue("entryID", entryID));
-				fieldValueList.add(new FieldValue("fieldID", field.ID));
-				fieldValueList.add(new FieldValue("value", value));
-				binder.insert(Tables.getName(ANSWERS), fieldValueList);
+				query.clearAll();
+				query.add(new FieldValue("entryID", entryID));
+				query.add(new FieldValue("fieldID", field.ID));
+				query.add(new FieldValue("value", value));
+				binder.insert(Tables.getName(ANSWERS), query);
 			}
 		}
 		return binder.finish();
@@ -339,15 +311,15 @@ public class TarkieFormLib {
 
 	public static boolean updateEntry(SQLiteAdapter db, String entryID, ArrayList<FieldObj> fieldList, boolean isSubmit) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isSubmit", isSubmit));
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isSubmit", isSubmit));
 		if(isSubmit) {
 			String date = CodePanUtils.getDate();
 			String time = CodePanUtils.getTime();
-			fieldValueList.add(new FieldValue("dateSubmitted", date));
-			fieldValueList.add(new FieldValue("timeSubmitted", time));
+			query.add(new FieldValue("dateSubmitted", date));
+			query.add(new FieldValue("timeSubmitted", time));
 		}
-		binder.update(Tables.getName(ENTRIES), fieldValueList, entryID);
+		binder.update(Tables.getName(ENTRIES), query, entryID);
 		for(FieldObj field : fieldList) {
 			if(field.isQuestion) {
 				AnswerObj answer = field.answer;
@@ -386,18 +358,19 @@ public class TarkieFormLib {
 						value = answer.isCheck ? AnswerType.CHECK : AnswerType.UNCHECK;
 						break;
 				}
-				fieldValueList.clear();
-				fieldValueList.add(new FieldValue("value", value));
+				query.clearAll();
+				query.add(new FieldValue("value", value));
 				String table = Tables.getName(TB.ANSWERS);
-				String query = "SELECT ID FROM " + table + " WHERE fieldID = '" + field.ID + "' AND entryID = '" + entryID + "'";
-				if(db.isRecordExists(query)) {
-					String answerID = db.getString(query);
-					binder.update(table, fieldValueList, answerID);
+				String sql = "SELECT ID FROM " + table + " WHERE fieldID = '" + field.ID + "' " +
+						"AND entryID = '" + entryID + "'";
+				if(db.isRecordExists(sql)) {
+					String answerID = db.getString(sql);
+					binder.update(table, query, answerID);
 				}
 				else {
-					fieldValueList.add(new FieldValue("entryID", entryID));
-					fieldValueList.add(new FieldValue("fieldID", field.ID));
-					binder.insert(table, fieldValueList);
+					query.add(new FieldValue("entryID", entryID));
+					query.add(new FieldValue("fieldID", field.ID));
+					binder.insert(table, query);
 				}
 			}
 		}
@@ -406,9 +379,9 @@ public class TarkieFormLib {
 
 	public static boolean deleteEntry(SQLiteAdapter db, String entryID) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isDelete", true));
-		binder.update(Tables.getName(ENTRIES), fieldValueList, entryID);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isDelete", true));
+		binder.update(Tables.getName(ENTRIES), query, entryID);
 		return binder.finish();
 	}
 
@@ -452,23 +425,23 @@ public class TarkieFormLib {
 	public static boolean logout(SQLiteAdapter db) {
 		SQLiteBinder binder = new SQLiteBinder(db);
 		String table = Tables.getName(CREDENTIALS);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<FieldValue>();
-		fieldValueList.add(new FieldValue("isLogOut", true));
-		binder.update(table, fieldValueList, 1);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isLogOut", true));
+		binder.update(table, query, 1);
 		return binder.finish();
 	}
 
 	public static void showAlertDialog(FragmentActivity activity, String title, String message) {
+		final FragmentManager manager = activity.getSupportFragmentManager();
 		final AlertDialogFragment alert = new AlertDialogFragment();
 		alert.setDialogTitle(title);
 		alert.setDialogMessage(message);
 		alert.setPositiveButton("Ok", new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				alert.getDialogActivity().getSupportFragmentManager().popBackStack();
+				manager.popBackStack();
 			}
 		});
-		FragmentManager manager = activity.getSupportFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
 				R.anim.fade_in, R.anim.fade_out);
@@ -495,17 +468,17 @@ public class TarkieFormLib {
 
 	public static boolean updateStatusUpload(SQLiteAdapter db, String ID, String table) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isUpload", true));
-		binder.update(table, fieldValueList, ID);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isUpload", true));
+		binder.update(table, query, ID);
 		return binder.finish();
 	}
 
 	public static boolean updateStatusSync(SQLiteAdapter db, String ID, String table) {
 		SQLiteBinder binder = new SQLiteBinder(db);
-		ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-		fieldValueList.add(new FieldValue("isSync", true));
-		binder.update(table, fieldValueList, ID);
+		SQLiteQuery query = new SQLiteQuery();
+		query.add(new FieldValue("isSync", true));
+		binder.update(table, query, ID);
 		return binder.finish();
 	}
 }

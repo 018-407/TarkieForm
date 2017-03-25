@@ -16,7 +16,7 @@ import com.codepan.widget.CodePanButton;
 import com.codepan.widget.CodePanLabel;
 import com.mobileoptima.adapter.ImagePreviewAdapter;
 import com.mobileoptima.callback.Interface.OnDeletePhotoCallback;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.ImageObj;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class ImagePreviewFragment extends Fragment implements OnClickListener {
 					public void onClick(View v) {
 						alert.getDialogActivity().getSupportFragmentManager().popBackStack();
 						ImageObj obj = imageList.get(position);
-						boolean result = TarkieFormLib.deletePhoto(getActivity(), db, obj);
+						boolean result = TarkieLib.deletePhoto(getActivity(), db, obj);
 						if(result) {
 							if(deletePhotoCallback != null) {
 								deletePhotoCallback.onDeletePhoto(position);

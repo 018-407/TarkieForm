@@ -20,7 +20,7 @@ public class Data {
 
 	public static ArrayList<FormObj> loadForms(SQLiteAdapter db, String search) {
 		ArrayList<FormObj> formList = new ArrayList<>();
-		String groupID = TarkieFormLib.getGroupID(db);
+		String groupID = TarkieLib.getGroupID(db);
 		String table = Tables.getName(TB.FORMS);
 		String condition = search != null ? "name LIKE '%" + search + "%' AND " : "";
 		String query = "SELECT ID, name, logoUrl FROM " + table + " WHERE " + condition +
@@ -61,17 +61,27 @@ public class Data {
 			pageList.add(obj);
 		}
 		if(!pageList.isEmpty()) {
-			int orderNo = TarkieFormLib.getLastOrderNo(db, formID);
+			int end = TarkieLib.getLastOrderNo(db, formID);
 			int index = pageList.size() - 1;
 			PageObj last = pageList.get(index);
-			if(orderNo > last.orderNo) {
+			if(end > last.orderNo) {
 				PageObj obj = new PageObj();
-				obj.tag = String.valueOf(orderNo + 1);
+				obj.tag = String.valueOf(end + 1);
 				obj.start = last.end + 2;
-				obj.orderNo = orderNo;
-				obj.end = orderNo;
+				obj.orderNo = end;
+				obj.end = end;
 				pageList.add(obj);
 			}
+		}
+		else {
+			int start = TarkieLib.getFirstOrderNo(db, formID);
+			int end = TarkieLib.getLastOrderNo(db, formID);
+			PageObj obj = new PageObj();
+			obj.tag = String.valueOf(end + 1);
+			obj.start = start;
+			obj.orderNo = end;
+			obj.end = end;
+			pageList.add(obj);
 		}
 		cursor.close();
 		return pageList;
@@ -101,7 +111,7 @@ public class Data {
 					break;
 				default:
 					field.isQuestion = true;
-					field.answer = TarkieFormLib.getAnswer(db, entry, field);
+					field.answer = TarkieLib.getAnswer(db, entry, field);
 					break;
 			}
 			fieldList.add(field);
@@ -128,7 +138,7 @@ public class Data {
 
 	public static ArrayList<ImageObj> loadPhotos(SQLiteAdapter db) {
 		ArrayList<ImageObj> imageList = new ArrayList<>();
-		String empID = TarkieFormLib.getEmployeeID(db);
+		String empID = TarkieLib.getEmployeeID(db);
 		String table = Tables.getName(TB.PHOTO);
 		String query = "SELECT ID, fileName FROM " + table + " WHERE empID = '" + empID + "' AND " +
 				"isDelete = 0 AND isSignature = 0 ORDER BY ID DESC";
@@ -145,7 +155,7 @@ public class Data {
 
 	public static ArrayList<EntryObj> loadEntries(SQLiteAdapter db) {
 		ArrayList<EntryObj> entryList = new ArrayList<>();
-		String empID = TarkieFormLib.getEmployeeID(db);
+		String empID = TarkieLib.getEmployeeID(db);
 		String query = "SELECT e.ID, e.dDate, e.dTime, e.isSubmit, f.ID, f.name, f.logoUrl FROM " +
 				Tables.getName(TB.ENTRIES) + " e , " + Tables.getName(TB.FORMS) + " f " +
 				"WHERE e.empID = '" + empID + "' AND e.isDelete = 0 AND f.ID = e.formID " +
@@ -186,7 +196,7 @@ public class Data {
 		return imageList;
 	}
 
-	public static ArrayList<EntryObj> loadEntrySync(SQLiteAdapter db) {
+	public static ArrayList<EntryObj> loadEntriesSync(SQLiteAdapter db) {
 		ArrayList<EntryObj> entryList = new ArrayList<>();
 		String query = "SELECT ID, dDate, dTime, dateSubmitted, timeSubmitted, syncBatchID, formID " +
 				"FROM " + Tables.getName(TB.ENTRIES) + " WHERE isSync = 0 AND isSubmit = 1 AND " +
@@ -219,7 +229,7 @@ public class Data {
 				switch(field.type) {
 					case FieldType.PHOTO:
 					case FieldType.SIG:
-						answer.value = TarkieFormLib.getWebPhotoIDs(db, value);
+						answer.value = TarkieLib.getWebPhotoIDs(db, value);
 						break;
 					default:
 						answer.value = value;

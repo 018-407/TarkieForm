@@ -77,7 +77,7 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 			case R.id.btnAuthorization:
 				String authorizationCode = etCodeAuthorization.getText().toString().trim();
 				if(!authorizationCode.isEmpty()) {
-					if(CodePanUtils.isInternetConnected(getActivity())) {
+					if(CodePanUtils.hasInternet(getActivity())) {
 						LoadingDialogFragment loading = new LoadingDialogFragment();
 						Bundle bundle = new Bundle();
 						bundle.putString(Key.AUTH_CODE, authorizationCode);
@@ -92,11 +92,11 @@ public class AuthorizationFragment extends Fragment implements OnClickListener, 
 						transaction.commit();
 					}
 					else {
-						CodePanUtils.showAlertToast(getActivity(), "Internet connection required.");
+						CodePanUtils.alertToast(getActivity(), "Internet connection required.");
 					}
 				}
 				else{
-					CodePanUtils.showAlertToast(getActivity(), "Please input authorization code.");
+					CodePanUtils.alertToast(getActivity(), "Please input authorization code.");
 				}
 				break;
 		}

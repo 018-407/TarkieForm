@@ -31,6 +31,7 @@ import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -38,10 +39,13 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.Settings.Secure;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -50,6 +54,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,6 +75,7 @@ import android.widget.Toast;
 
 import com.codepan.R;
 import com.codepan.database.SQLiteAdapter;
+import com.codepan.model.GpsObj;
 import com.codepan.widget.CodePanLabel;
 import com.codepan.widget.CustomTypefaceSpan;
 import com.google.android.gms.common.ConnectionResult;
@@ -99,6 +105,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -115,6 +122,8 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -127,6 +136,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -172,15 +182,15 @@ public class CodePanUtils {
 		view.startAnimation(anim);
 	}
 
-	public static Drawable convertBitmapToDrawable(Context context, Bitmap bitmap) {
+	public static Drawable bitmapToDrawable(Context context, Bitmap bitmap) {
 		return new BitmapDrawable(context.getResources(), bitmap);
 	}
 
-	public static long convertDateToMillis(String date) {
-		return convertDateTimeToMillis(date, "00:00:00");
+	public static long dateToMillis(String date) {
+		return dateTimeToMillis(date, "00:00:00");
 	}
 
-	public static long convertDateTimeToMillis(String date, String time) {
+	public static long dateTimeToMillis(String date, String time) {
 		long millis = 0;
 		if(date == null || time == null || date.isEmpty() || time.isEmpty()) {
 			return millis;
@@ -199,60 +209,79 @@ public class CodePanUtils {
 		return millis;
 	}
 
-	public static String convertMilitaryToNormalTime(String militaryTime, boolean hasSecond) {
-		String normalTime = "";
-		String dDesc = "";
-		if(militaryTime == null || militaryTime.isEmpty()) {
-			return normalTime;
+	public static String millisToHours(long millis) {
+		String total = null;
+		final int spm = 60;
+		final int mph = 60;
+		final int mps = 1000;
+		long sec = millis / mps;
+		total = sec + "s";
+		if(sec > spm) {
+			long secExcess = sec % spm;
+			long min = sec / spm;
+			total = min + "m " + secExcess + "s";
+			if(min > mph) {
+				long minExcess = min % mph;
+				long hours = min / mph;
+				total = hours + "h " + minExcess + "m";
+			}
 		}
+		return total;
+	}
+
+	public static String getNormalTime(String militaryTime, boolean hasSecond) {
+		if(militaryTime == null || militaryTime.isEmpty()) {
+			return militaryTime;
+		}
+		String period = null;
 		String[] timeArray = militaryTime.split(":");
 		int hour_24 = Integer.parseInt(timeArray[0]);
 		int hour = 0;
 		if(hour_24 > 12) {
 			hour = hour_24 - 12;
-			dDesc = "pm";
+			period = "PM";
 		}
 		else if(hour_24 == 0) {
 			hour = 12;
-			dDesc = "am";
+			period = "AM";
 		}
 		else if(hour_24 == 12) {
 			hour = 24 - hour_24;
-			dDesc = "pm";
+			period = "PM";
 		}
 		else {
 			hour = hour_24;
-			dDesc = "am";
+			period = "AM";
 		}
-		String sHour = String.format(Locale.ENGLISH, "%02d", hour);
 		if(!hasSecond) {
-			normalTime = sHour + ":" + timeArray[1] + " " + dDesc;
+			return hour + ":" + timeArray[1] + " " + period;
 		}
 		else {
-			normalTime = sHour + ":" + timeArray[1] + ":" + timeArray[2];
+			return hour + ":" + timeArray[1] + ":" +
+					timeArray[2] + " " + period;
 		}
-		return normalTime;
 	}
 
-	public static String convertMinutesToTime(int minutes) {
+	public static String minutesToTime(int minutes) {
 		int hour = minutes / 60;
 		int min = minutes % 60;
 		int sec = 0;
-		String time = String.format(Locale.ENGLISH, "%02d", hour) + ":" + String.format(Locale.ENGLISH, "%02d", min) + ":" + String.format(Locale.ENGLISH, "%02d", sec);
-		return time;
+		return String.format(Locale.ENGLISH, "%02d", hour) + ":" +
+				String.format(Locale.ENGLISH, "%02d", min) + ":" +
+				String.format(Locale.ENGLISH, "%02d", sec);
 	}
 
 
-	public static String convertSecondsToTime(int seconds) {
+	public static String secondsToTime(int seconds) {
 		int hour = seconds / 3600;
 		int min = (seconds % 3600) / 60;
 		int sec = (seconds % 3600) % 60;
-		;
-		String time = String.format(Locale.ENGLISH, "%02d", hour) + ":" + String.format(Locale.ENGLISH, "%02d", min) + ":" + String.format(Locale.ENGLISH, "%02d", sec);
-		return time;
+		return String.format(Locale.ENGLISH, "%02d", hour) + ":" +
+				String.format(Locale.ENGLISH, "%02d", min) + ":" +
+				String.format(Locale.ENGLISH, "%02d", sec);
 	}
 
-	public static int convertTimeToMinutes(String militarytime) {
+	public static int timeToMinutes(String militarytime) {
 		int totalMinutes = 0;
 		if(militarytime == null || militarytime.isEmpty()) {
 			return totalMinutes;
@@ -264,20 +293,18 @@ public class CodePanUtils {
 		return totalMinutes;
 	}
 
-	public static int convertTimeToSeconds(String militarytime) {
-		int totaSeconds = 0;
+	public static int timeToSeconds(String militarytime) {
 		if(militarytime.isEmpty()) {
-			return totaSeconds;
+			return 0;
 		}
 		String[] timeArray = militarytime.split(":");
 		int timeHour = Integer.parseInt(timeArray[0]);
 		int timeMin = Integer.parseInt(timeArray[1]);
 		int timeSec = Integer.parseInt(timeArray[2]);
-		totaSeconds = (((timeHour * 60) + timeMin) * 60) + timeSec;
-		return totaSeconds;
+		return (((timeHour * 60) + timeMin) * 60) + timeSec;
 	}
 
-	public static String convertUnicodeToString(String text) {
+	public static String unicodeToString(String text) {
 		String utf8 = "";
 		try {
 			byte[] convertToBytes = text.getBytes("UTF-8");
@@ -296,11 +323,12 @@ public class CodePanUtils {
 		try {
 			inChannel.transferTo(0, inChannel.size(), outChannel);
 		}
+		catch(FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		finally {
-			if(inChannel != null)
-				inChannel.close();
-			if(outChannel != null)
-				outChannel.close();
+			inChannel.close();
+			outChannel.close();
 		}
 	}
 
@@ -366,6 +394,11 @@ public class CodePanUtils {
 			result = file.delete();
 		}
 		return result;
+	}
+
+	public static boolean deleteFile(Context context, String folder, String fileName) {
+		String path = context.getDir(folder, Context.MODE_PRIVATE).getPath() + "/" + fileName;
+		return deleteFile(path);
 	}
 
 	public static void deleteFiles(String path) {
@@ -622,22 +655,22 @@ public class CodePanUtils {
 		return key;
 	}
 
-	public static String getCalendarDate(String date, boolean isAbbrev, boolean withYear) {
-		String alphaDate = "";
+	public static String getCalendarDate(String date, boolean isAbbreviated, boolean withYear) {
+		String calendarDate = "";
 		if(date != null && !date.isEmpty()) {
 			String[] array = date.split("\\-");
 			int year = Integer.parseInt(array[0]);
 			int month = Integer.parseInt(array[1]);
 			int day = Integer.parseInt(array[2]);
-			String nameOfMonths = getNameOfMonths(month, isAbbrev, false);
+			String nameOfMonths = getNameOfMonths(month, isAbbreviated, false);
 			if(withYear) {
-				alphaDate = nameOfMonths + " " + String.format(Locale.ENGLISH, "%02d", day) + ", " + year;
+				calendarDate = nameOfMonths + " " + day + ", " + year;
 			}
 			else {
-				alphaDate = nameOfMonths + " " + String.format(Locale.ENGLISH, "%02d", day);
+				calendarDate = nameOfMonths + " " + day;
 			}
 		}
-		return alphaDate;
+		return calendarDate;
 	}
 
 	public static int getBackStackCount(FragmentActivity activity) {
@@ -670,7 +703,7 @@ public class CodePanUtils {
 
 	public static String getDateAfter(String date, int noOfDays) {
 		if(date != null) {
-			long millis = convertDateTimeToMillis(date, "00:00:00");
+			long millis = dateTimeToMillis(date, "00:00:00");
 			long output = millis + (noOfDays * 86400000);
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(output);
@@ -737,35 +770,69 @@ public class CodePanUtils {
 		return cursor.getString(column_index);
 	}
 
-	public static String getHttpResponse(String spec, String params, int timeOut) {
+	public static String doHttpGet(String url, JSONObject paramsObj, int timeOut) {
+		String params = "?";
+		Iterator<String> iterator = paramsObj.keys();
+		try {
+			int i = 0;
+			while(iterator.hasNext()) {
+				String key = iterator.next();
+				String value = paramsObj.getString(key);
+				String encoded = URLEncoder.encode(value, "UTF-8");
+				if(i != 0) {
+					params += "&" + key + "=" + encoded;
+				}
+				else {
+					params += key + "=" + encoded;
+				}
+				i++;
+			}
+		}
+		catch(JSONException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return getHttpResponse(url, params, timeOut, "GET");
+	}
+
+	public static String doHttpPost(String url, JSONObject paramsObj, int timeOut) {
+		return getHttpResponse(url, paramsObj.toString(), timeOut, "POST");
+	}
+
+	private static String getHttpResponse(String host, String params, int timeOut, String method) {
 		boolean result = false;
 		StringBuilder response = new StringBuilder();
 		String exception = null;
 		String message = null;
 		HttpURLConnection connection = null;
+		boolean doOutput = method != null && method.equals("POST");
+		String uri = method != null && method.equals("GET") ? host + params : host;
+		String contentType = method != null && method.equals("GET") ?
+				"application/x-www-form-urlencoded" : "application/json";
 		try {
-			URL url = new URL(spec);
+			URL url = new URL(uri);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setConnectTimeout(timeOut);
 			connection.setReadTimeout(timeOut);
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-//			connection.setRequestProperty("Content-2", String.valueOf(params.length()));
+			connection.setRequestMethod(method);
+			connection.setRequestProperty("Content-Type", contentType);
 			connection.setRequestProperty("Content-Language", "en-US");
 			connection.setRequestProperty("connection", "close");
 			connection.setRequestProperty("Accept-Encoding", "");
 			connection.setDoInput(true);
-			connection.setDoOutput(true);
+			connection.setDoOutput(doOutput);
 			connection.setUseCaches(false);
 			connection.connect();
-			Writer out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-			BufferedWriter writer = new BufferedWriter(out);
-			writer.write(params);
-			writer.flush();
-			writer.close();
+			Log.e("URL", uri);
+			if(method != null && method.equals("POST")) {
+				Writer out = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
+				BufferedWriter writer = new BufferedWriter(out);
+				writer.write(params);
+				writer.flush();
+				writer.close();
+			}
 			if(connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
 				if(!url.getHost().equals(connection.getURL().getHost())) {
-					message = "WiFi authentication required. Please check on your web browser. ";
+					message = "WiFi authentication required. Please check on your web browser.";
 				}
 				else {
 					Reader in = new InputStreamReader(connection.getInputStream());
@@ -784,6 +851,10 @@ public class CodePanUtils {
 			exception = ste.toString();
 			message = "Connection timed out, the server is taking too long to respond. " +
 					"Please check your internet connection and try again.";
+		}
+		catch(UnknownHostException he) {
+			exception = he.toString();
+			message = he.getMessage();
 		}
 		catch(IOException ioe) {
 			ioe.printStackTrace();
@@ -921,7 +992,7 @@ public class CodePanUtils {
 		return password;
 	}
 
-	public static String getNameOfMonths(int month, boolean isAbbrev, boolean isUpperCase) {
+	public static String getNameOfMonths(int month, boolean isAbbreviated, boolean isUpperCase) {
 		String nameOfMonths = "";
 		switch(month) {
 			case 1:
@@ -961,7 +1032,7 @@ public class CodePanUtils {
 				nameOfMonths = "December";
 				break;
 		}
-		if(isAbbrev) {
+		if(isAbbreviated) {
 			nameOfMonths = nameOfMonths.substring(0, 3);
 		}
 		if(isUpperCase) {
@@ -984,7 +1055,7 @@ public class CodePanUtils {
 	}
 
 	public static String getDay(String date, String time) {
-		long timestamp = convertDateTimeToMillis(date, time);
+		long timestamp = dateTimeToMillis(date, time);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp);
 		return String.format(Locale.ENGLISH, "%tA", cal);
@@ -1081,7 +1152,7 @@ public class CodePanUtils {
 		return result;
 	}
 
-	public static boolean isInternetConnected(Context context) {
+	public static boolean hasInternet(Context context) {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo network = cm.getActiveNetworkInfo();
 		if(network != null) {
@@ -1152,8 +1223,8 @@ public class CodePanUtils {
 	public static boolean isTimeEqual(int allowanceMin, String dateToCompare, String timeToCompare,
 									  String baseDate, String baseTime) {
 		boolean result = false;
-		long millisToCompare = convertDateTimeToMillis(dateToCompare, timeToCompare);
-		long millisBase = convertDateTimeToMillis(baseDate, baseTime);
+		long millisToCompare = dateTimeToMillis(dateToCompare, timeToCompare);
+		long millisBase = dateTimeToMillis(baseDate, baseTime);
 		long millisAllowance = allowanceMin * 60000;
 		long difference = millisToCompare > millisBase ? millisToCompare - millisBase : millisBase - millisToCompare;
 		if(difference <= millisAllowance) {
@@ -1420,7 +1491,7 @@ public class CodePanUtils {
 		return result;
 	}
 
-	public static void showAlertToast(FragmentActivity activity, String message, int duration) {
+	public static void alertToast(FragmentActivity activity, String message, int duration) {
 		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
 		LayoutInflater inflater = activity.getLayoutInflater();
 		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
@@ -1433,7 +1504,7 @@ public class CodePanUtils {
 		toast.show();
 	}
 
-	public static void showAlertToast(FragmentActivity activity, String message) {
+	public static void alertToast(FragmentActivity activity, String message) {
 		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
 		LayoutInflater inflater = activity.getLayoutInflater();
 		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
@@ -1446,7 +1517,20 @@ public class CodePanUtils {
 		toast.show();
 	}
 
-	public static void showAlertToast(FragmentActivity activity, String message, int duration, ArrayList<SpannableMap> list, Typeface typeface) {
+	public static void alertToast(FragmentActivity activity, int res) {
+		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
+		LayoutInflater inflater = activity.getLayoutInflater();
+		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
+		CodePanLabel text = (CodePanLabel) layout.findViewById(R.id.tvMessageAlertToast);
+		text.setText(res);
+		Toast toast = new Toast(activity);
+		toast.setGravity(Gravity.BOTTOM, 0, offsetY);
+		toast.setDuration(Toast.LENGTH_SHORT);
+		toast.setView(layout);
+		toast.show();
+	}
+
+	public static void alertToast(FragmentActivity activity, String message, int duration, ArrayList<SpannableMap> list, Typeface typeface) {
 		int offsetY = activity.getResources().getDimensionPixelSize(R.dimen.one_hundred);
 		LayoutInflater inflater = activity.getLayoutInflater();
 		View layout = inflater.inflate(R.layout.alert_toast_layout, (ViewGroup) activity.findViewById(R.id.rlAlertToast));
@@ -1570,12 +1654,22 @@ public class CodePanUtils {
 		}
 	}
 
-	public static int convertPixelToDp(Context context, int numCol) {
+	public static int getMaxWidth(Context context) {
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+		return metrics.widthPixels;
+	}
+
+	public static int getMaxHeight(Context context) {
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+		return metrics.heightPixels;
+	}
+
+	public static int pxToDp(Context context, int numCol) {
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		return (numCol * (int) metrics.density);
 	}
 
-	public static int convertPixelToDpOffset(Context context, int numCol) {
+	public static int pxToDpOffset(Context context, int numCol) {
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		return (int) (numCol * metrics.density);
 	}
@@ -1642,10 +1736,47 @@ public class CodePanUtils {
 		view.startAnimation(fadeIn);
 	}
 
+	public static void fadeIn(final View view, long duration) {
+		view.setVisibility(View.VISIBLE);
+		Animation fadeIn = new AlphaAnimation(0.00f, 1.00f);
+		fadeIn.setDuration(duration);
+		fadeIn.setInterpolator(new DecelerateInterpolator());
+		fadeIn.setAnimationListener(new AnimationListener() {
+			public void onAnimationStart(Animation animation) {
+			}
+
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			public void onAnimationEnd(Animation animation) {
+				view.setEnabled(true);
+			}
+		});
+		view.startAnimation(fadeIn);
+	}
+
 	public static void fadeOut(final View view) {
 		view.setEnabled(false);
 		Animation fadeOut = new AlphaAnimation(1.00f, 0.00f);
 		fadeOut.setDuration(250);
+		fadeOut.setAnimationListener(new AnimationListener() {
+			public void onAnimationStart(Animation animation) {
+			}
+
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.GONE);
+			}
+		});
+		view.startAnimation(fadeOut);
+	}
+
+	public static void fadeOut(final View view, long duration) {
+		view.setEnabled(false);
+		Animation fadeOut = new AlphaAnimation(1.00f, 0.00f);
+		fadeOut.setDuration(duration);
 		fadeOut.setAnimationListener(new AnimationListener() {
 			public void onAnimationStart(Animation animation) {
 			}
@@ -1666,7 +1797,7 @@ public class CodePanUtils {
 			result = text.replace("'", "''").
 					replace("u0027", "''").
 					replace("u0022", "\"");
-			result = convertUnicodeToString(result);
+			result = unicodeToString(result);
 		}
 		return result;
 	}
@@ -1922,6 +2053,91 @@ public class CodePanUtils {
 					.cacheOnDisk(true)
 					.build();
 			imageLoader.displayImage(uri, view, options, listener);
+		}
+	}
+
+	public static GpsObj getGps(Context context, Location location,
+								long lastLocationUpdate, long interval, float requiredAccuracy) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+		long millis = 0;
+		double latitude = 0d;
+		double longitude = 0d;
+		float accuracy = 0f;
+		float speed = 0f;
+		boolean isEnabled = false;
+		boolean withHistory = false;
+		boolean isValid = false;
+		String gpsTime = "00:00:00";
+		String gpsDate = "0000-00-00";
+		if(isGpsEnabled(context)) {
+			if(location != null) {
+				millis = location.getTime();
+				latitude = location.getLatitude();
+				longitude = location.getLongitude();
+				accuracy = location.getAccuracy();
+				speed = location.getSpeed();
+				long timeElapsed = SystemClock.elapsedRealtime() - lastLocationUpdate;
+				long allowance = speed >= 20 ? 0 : 15000;
+				if(timeElapsed <= interval + allowance && accuracy <= requiredAccuracy) {
+					if(longitude != 0 && latitude != 0) {
+						isValid = true;
+					}
+				}
+				java.util.Date gps = new java.util.Date(millis);
+				gpsTime = timeFormat.format(gps);
+				gpsDate = dateFormat.format(gps);
+				withHistory = true;
+			}
+			isEnabled = true;
+		}
+		GpsObj gps = new GpsObj();
+		gps.longitude = longitude;
+		gps.latitude = latitude;
+		gps.accuracy = accuracy;
+		gps.millis = millis;
+		gps.time = gpsTime;
+		gps.date = gpsDate;
+		gps.isEnabled = isEnabled;
+		gps.withHistory = withHistory;
+		gps.speed = speed;
+		gps.isValid = isValid;
+		return gps;
+	}
+
+	public static boolean isOnBackStack(FragmentActivity activity, String tag) {
+		FragmentManager manager = activity.getSupportFragmentManager();
+		Fragment fragment = manager.findFragmentByTag(tag);
+		return fragment != null && fragment.isVisible();
+	}
+
+	public static String formatDate(String date) {
+		if(date != null && !date.isEmpty()) {
+			String array[] = date.split("-");
+			int m = Integer.valueOf(array[1]);
+			int d = Integer.valueOf(array[2]);
+			String month = String.format(Locale.ENGLISH, "%02d", m);
+			String day = String.format(Locale.ENGLISH, "%02d", d);
+			return array[0] + "-" + month + "-" + day;
+		}
+		else {
+			return null;
+		}
+	}
+
+	public static String formatTime(String time) {
+		if(time != null && !time.isEmpty()) {
+			String array[] = time.split(":");
+			int h = Integer.valueOf(array[0]);
+			int m = Integer.valueOf(array[1]);
+			int s = Integer.valueOf(array[2]);
+			String hour = String.format(Locale.ENGLISH, "%02d", h);
+			String min = String.format(Locale.ENGLISH, "%02d", m);
+			String sec = String.format(Locale.ENGLISH, "%02d", s);
+			return hour + ":" + min + ":" + sec;
+		}
+		else {
+			return null;
 		}
 	}
 }

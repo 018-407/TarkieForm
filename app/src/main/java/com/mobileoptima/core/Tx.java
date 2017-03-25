@@ -3,11 +3,12 @@ package com.mobileoptima.core;
 import android.content.Context;
 import android.util.Log;
 
+import com.codepan.callback.Interface.OnErrorCallback;
 import com.codepan.database.FieldValue;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.database.SQLiteBinder;
+import com.codepan.database.SQLiteQuery;
 import com.codepan.utils.CodePanUtils;
-import com.mobileoptima.callback.Interface.OnErrorCallback;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.object.EntryObj;
 import com.mobileoptima.object.FieldObj;
@@ -20,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class Tx {
 
@@ -28,15 +28,15 @@ public class Tx {
 		boolean result = false;
 		boolean hasData = false;
 		final int INDENT = 4;
-		String action = "sync-photos";
-		String url = App.API_V11 + action;
+		String action = "add-photos";
+		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
 		try {
 			JSONObject paramsObj = new JSONObject();
-			String apiKey = TarkieFormLib.getAPIKey(db);
-			String empID = TarkieFormLib.getEmployeeID(db);
-			String groupID = TarkieFormLib.getGroupID(db);
+			String apiKey = TarkieLib.getAPIKey(db);
+			String empID = TarkieLib.getEmployeeID(db);
+			String groupID = TarkieLib.getGroupID(db);
 			paramsObj.put("api_key", apiKey);
 			paramsObj.put("employee_id", empID);
 			paramsObj.put("team_id", groupID);
@@ -49,7 +49,7 @@ public class Tx {
 			String table = Tables.getName(TB.PHOTO);
 			File file = new File(path);
 			if(!file.exists() || file.isDirectory()) {
-				return TarkieFormLib.updateStatusUpload(db, image.ID, table);
+				return TarkieLib.updateStatusUpload(db, image.ID, table);
 			}
 			response = CodePanUtils.uploadFile(url, params, "image", file);
 			Log.e("uploadPhoto PARAMS", params);
@@ -85,11 +85,11 @@ public class Tx {
 				JSONArray dataArray = responseObj.getJSONArray("data");
 				for(int i = 0; i < dataArray.length(); i++) {
 					try {
+						SQLiteQuery query = new SQLiteQuery();
 						JSONObject dataObj = dataArray.getJSONObject(i);
-						ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-						fieldValueList.add(new FieldValue("webPhotoID", dataObj.getString("photo_id")));
-						fieldValueList.add(new FieldValue("isUpload", true));
-						binder.update(table, fieldValueList, image.ID);
+						query.add(new FieldValue("webPhotoID", dataObj.getString("photo_id")));
+						query.add(new FieldValue("isUpload", true));
+						binder.update(table, query, image.ID);
 					}
 					catch(Exception e) {
 						e.printStackTrace();
@@ -122,9 +122,9 @@ public class Tx {
 		String params = null;
 		try {
 			JSONObject paramsObj = new JSONObject();
-			String apiKey = TarkieFormLib.getAPIKey(db);
-			String empID = TarkieFormLib.getEmployeeID(db);
-			String groupID = TarkieFormLib.getGroupID(db);
+			String apiKey = TarkieLib.getAPIKey(db);
+			String empID = TarkieLib.getEmployeeID(db);
+			String groupID = TarkieLib.getGroupID(db);
 			paramsObj.put("api_key", apiKey);
 			paramsObj.put("employee_id", empID);
 			paramsObj.put("team_id", groupID);
@@ -147,7 +147,7 @@ public class Tx {
 			}
 			paramsObj.put("question_answers", detailsArray);
 			params = paramsObj.toString(INDENT);
-			response = CodePanUtils.getHttpResponse(url, params, TIMEOUT);
+			response = CodePanUtils.doHttpPost(url, paramsObj, TIMEOUT);
 			Log.e("syncEntry PARAMS", params);
 			Log.e("syncEntry RESPONSE", response);
 			JSONObject responseObj = new JSONObject(response);
@@ -182,11 +182,11 @@ public class Tx {
 				JSONArray dataArray = responseObj.getJSONArray("data");
 				for(int i = 0; i < dataArray.length(); i++) {
 					try {
+						SQLiteQuery query = new SQLiteQuery();
 						JSONObject dataObj = dataArray.getJSONObject(i);
-						ArrayList<FieldValue> fieldValueList = new ArrayList<>();
-						fieldValueList.add(new FieldValue("webEntryID", dataObj.getString("form_answer_id")));
-						fieldValueList.add(new FieldValue("isSync", true));
-						binder.update(Tables.getName(TB.ENTRIES), fieldValueList, entry.ID);
+						query.add(new FieldValue("webEntryID", dataObj.getString("form_answer_id")));
+						query.add(new FieldValue("isSync", true));
+						binder.update(Tables.getName(TB.ENTRIES), query, entry.ID);
 					}
 					catch(Exception e) {
 						e.printStackTrace();

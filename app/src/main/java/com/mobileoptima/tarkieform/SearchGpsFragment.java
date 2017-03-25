@@ -26,7 +26,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.mobileoptima.callback.Interface.OnGpsFixedCallback;
-import com.mobileoptima.core.TarkieFormLib;
+import com.mobileoptima.core.TarkieLib;
 import com.mobileoptima.object.GpsObj;
 
 public class SearchGpsFragment extends Fragment implements LocationListener, ConnectionCallbacks,
@@ -102,13 +102,11 @@ public class SearchGpsFragment extends Fragment implements LocationListener, Con
 				Looper.prepare();
 				try {
 					while(runThread) {
-						GpsObj obj = TarkieFormLib.getGPS(getActivity(), location, lastLocationUpdate, UPDATE_INTERVAL, ACCURACY);
+						GpsObj obj = TarkieLib.getGPS(getActivity(), location, lastLocationUpdate, UPDATE_INTERVAL, ACCURACY);
 						if(obj.isValid) {
 							isGpsFixed = true;
 							gps = obj;
 						}
-						Log.e("ISVALID", ""+obj.isValid);
-						Log.e("ISCONNECTED", ""+googleApiClient.isConnected());
 						loaderHandler.sendMessage(loaderHandler.obtainMessage());
 						Thread.sleep(1000);
 					}

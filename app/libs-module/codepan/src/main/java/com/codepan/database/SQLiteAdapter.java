@@ -16,8 +16,8 @@ import java.io.File;
 
 public class SQLiteAdapter {
 
-	private OnCreateDatabaseCallback createDatabaseCallback;
 	private OnUpgradeDatabaseCallback upgradeDatabaseCallback;
+	private OnCreateDatabaseCallback createDatabaseCallback;
 	private SQLiteDatabase sqLiteDatabase;
 	private final String TAG = "DB-Error";
 	private String temp = "temp";
@@ -116,7 +116,7 @@ public class SQLiteAdapter {
 	}
 
 	public float getFloat(String query) {
-		float value = 0;
+		float value = 0F;
 		Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 		while(cursor.moveToNext()) {
 			value = cursor.getFloat(0);
@@ -126,7 +126,7 @@ public class SQLiteAdapter {
 	}
 
 	public long getLong(String query) {
-		long value = 0;
+		long value = 0L;
 		Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 		while(cursor.moveToNext()) {
 			value = cursor.getLong(0);
@@ -136,7 +136,7 @@ public class SQLiteAdapter {
 	}
 
 	public double getDouble(String query) {
-		double value = 0;
+		double value = 0D;
 		Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 		while(cursor.moveToNext()) {
 			value = cursor.getDouble(0);
@@ -155,10 +155,10 @@ public class SQLiteAdapter {
 		return result;
 	}
 
-	public boolean isColumnExists(SQLiteAdapter db, String table, String column) {
+	public boolean isColumnExists(String table, String column) {
 		boolean result = false;
 		String query = "PRAGMA table_info(" + table + ")";
-		Cursor cursor = db.read(query);
+		Cursor cursor = read(query);
 		while(cursor.moveToNext()) {
 			if(column.equals(cursor.getString(1))) {
 				result = true;

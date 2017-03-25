@@ -36,6 +36,7 @@
         <attr name="enableStatePressed" format="boolean"/>
         <attr name="autoHideKeyboard" format="boolean"/>
         <attr name="autoClearFocus" format="boolean"/>
+        <attr name="setScrollable" format="boolean"/>
         <attr name="reference" format="enum">
             <enum name="dynamic" value="0"/>
             <enum name="width" value="1"/>

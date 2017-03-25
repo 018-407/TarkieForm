@@ -11,15 +11,27 @@ import android.view.View;
 
 public class BlurBuilder {
 
-	private static final float BITMAP_SCALE = 0.5f;
-	private static final float BLUR_RADIUS = 10.5f;
+	private static final float BITMAP_SCALE = 0.2f;
+	private static final float BLUR_RADIUS = 7.5f;
 
 	public static Bitmap blur(View v) {
-		return blur(v.getContext(), getScreenshot(v));
+		try {
+			return blur(v.getContext(), getScreenshot(v));
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static Bitmap blur(View v, int width, int height) {
-		return blur(v.getContext(), getScreenshot(v, width, height));
+		try {
+			return blur(v.getContext(), getScreenshot(v, width, height));
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static Bitmap blur(Context context, Bitmap image) {

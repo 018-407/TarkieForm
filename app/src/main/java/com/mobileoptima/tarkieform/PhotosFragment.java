@@ -35,7 +35,7 @@ public class PhotosFragment extends Fragment {
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
 		numCol = CodePanUtils.getSupportedNoOfCol(getActivity(), numCol);
-		spacing = CodePanUtils.convertPixelToDp(getActivity(), numCol);
+		spacing = CodePanUtils.pxToDp(getActivity(), numCol);
 	}
 
 	@Override

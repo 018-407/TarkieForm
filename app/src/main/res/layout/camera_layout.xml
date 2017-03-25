@@ -7,18 +7,29 @@
     android:background="@color/white"
     android:clickable="true">
 
-    <FrameLayout
-        android:id="@+id/flCamera"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/flCamera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.codepan.widget.FocusIndicatorView
+                android:id="@+id/dvCamera"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/vCamera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true">
-
-        <com.codepan.widget.FocusIndicatorView
-            android:id="@+id/dvCamera"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </FrameLayout>
+        android:background="@color/black"/>
 
     <RelativeLayout
         android:id="@+id/rlHeaderCamera"

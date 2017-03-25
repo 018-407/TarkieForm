@@ -1,5 +1,8 @@
 package com.mobileoptima.schema;
 
+import com.codepan.database.Field;
+import com.codepan.database.SQLiteQuery;
+import com.codepan.database.SQLiteQuery.DataType;
 public class Tables {
 
 	public enum TB {
@@ -17,77 +20,123 @@ public class Tables {
 	}
 
 	public static String create(TB tb) {
-		String table = getName(tb);
-		String statement = null;
+		SQLiteQuery query = new SQLiteQuery();
 		switch(tb) {
 			case API_KEY:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, apiKey TEXT, " +
-						"authorizationCode TEXT, deviceID TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("apiKey", DataType.TEXT));
+				query.add(new Field("authorizationCode", DataType.TEXT));
+				query.add(new Field("deviceID", DataType.TEXT));
 				break;
 			case SYNC_BATCH:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"syncBatchID TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("dDate", DataType.TEXT));
+				query.add(new Field("dTime", DataType.TEXT));
+				query.add(new Field("syncBatchID", DataType.TEXT));
 				break;
 			case CREDENTIALS:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, dDate TEXT, dTime TEXT, " +
-						"empID INTEGER, isLogOut INTEGER DEFAULT 0, isNewUser INTEGER DEFAULT 0 )";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("dDate", DataType.TEXT));
+				query.add(new Field("dTime", DataType.TEXT));
+				query.add(new Field("empID", DataType.INTEGER));
+				query.add(new Field("isLogOut", 0));
+				query.add(new Field("isNewUser", 0));
 				break;
 			case COMPANY:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, " +
-						"address TEXT, email TEXT, contactNo TEXT, imageUrl TEXT, " +
-						"logoUrl TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("name", DataType.TEXT));
+				query.add(new Field("code", DataType.TEXT));
+				query.add(new Field("address", DataType.TEXT));
+				query.add(new Field("email", DataType.TEXT));
+				query.add(new Field("mobile", DataType.TEXT));
+				query.add(new Field("landline", DataType.TEXT));
+				query.add(new Field("logoUrl", DataType.TEXT));
+				query.add(new Field("expirationDate", DataType.TEXT));
 				break;
 			case EMPLOYEE:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, employeeNo TEXT, " +
-						"firstName TEXT, lastName TEXT, email TEXT, groupID INTEGER, " +
-						"isActive INTEGER, imageUrl TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("employeeNo", DataType.TEXT));
+				query.add(new Field("firstName", DataType.TEXT));
+				query.add(new Field("lastName", DataType.TEXT));
+				query.add(new Field("email", DataType.TEXT));
+				query.add(new Field("mobile", DataType.TEXT));
+				query.add(new Field("groupID", DataType.INTEGER));
+				query.add(new Field("isActive", DataType.INTEGER));
+				query.add(new Field("imageUrl", DataType.TEXT));
 				break;
 			case PHOTO:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"fileName TEXT, dDate TEXT, dTime TEXT, empID INTEGER, " +
-						"isDelete INTEGER DEFAULT 0, isUpload INTEGER DEFAULT 0, " +
-						"isActive INTEGER DEFAULT 0, webPhotoID INTEGER, " +
-						"isSignature INTEGER DEFAULT 0, syncBatchID TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("dDate", DataType.TEXT));
+				query.add(new Field("dTime", DataType.TEXT));
+				query.add(new Field("empID", DataType.INTEGER));
+				query.add(new Field("fileName", DataType.TEXT));
+				query.add(new Field("webPhotoID", DataType.INTEGER));
+				query.add(new Field("syncBatchID", DataType.TEXT));
+				query.add(new Field("isSignature", 0));
+				query.add(new Field("isDelete", 0));
+				query.add(new Field("isUpload", 0));
+				query.add(new Field("isActive", 0));
 				break;
 			case FORMS:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"name TEXT, description TEXT, dateCreated TEXT, timeCreated TEXT, " +
-						"groupID INTEGER, logoUrl TEXT, isActive INTEGER DEFAULT 1)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("name", DataType.TEXT));
+				query.add(new Field("description", DataType.TEXT));
+				query.add(new Field("dateCreated", DataType.TEXT));
+				query.add(new Field("timeCreated", DataType.TEXT));
+				query.add(new Field("groupID", DataType.INTEGER));
+				query.add(new Field("logoUrl", DataType.TEXT));
+				query.add(new Field("isActive", 1));
 				break;
 			case FIELDS:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, formID INTEGER, " +
-						"name TEXT, description TEXT, type TEXT, orderNo INTEGER, " +
-						"isRequired INTEGER, isActive INTEGER DEFAULT 1)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("name", DataType.TEXT));
+				query.add(new Field("description", DataType.TEXT));
+				query.add(new Field("type", DataType.TEXT));
+				query.add(new Field("formID", DataType.INTEGER));
+				query.add(new Field("orderNo", DataType.INTEGER));
+				query.add(new Field("isRequired", DataType.INTEGER));
+				query.add(new Field("isActive", 1));
 				break;
 			case CHOICES:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"fieldID INTEGER, code TEXT, name TEXT)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("name", DataType.TEXT));
+				query.add(new Field("code", DataType.TEXT));
+				query.add(new Field("fieldID", DataType.INTEGER));
 				break;
 			case ENTRIES:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, empID INTEGER, " +
-						"formID INTEGER, dDate TEXt, dTime TEXT, dateSubmitted TEXT, " +
-						"timeSubmitted TEXT, isSync INTEGER DEFAULT 0, syncBatchID TEXT, " +
-						"isSubmit INTEGER DEFAULT 0, webEntryID INTEGER, " +
-						"isDelete INTEGER DEFAULT 0)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("dDate", DataType.TEXT));
+				query.add(new Field("dTime", DataType.TEXT));
+				query.add(new Field("empID", DataType.INTEGER));
+				query.add(new Field("formID", DataType.INTEGER));
+				query.add(new Field("dateSubmitted", DataType.TEXT));
+				query.add(new Field("timeSubmitted", DataType.TEXT));
+				query.add(new Field("syncBatchID", DataType.TEXT));
+				query.add(new Field("webEntryID", DataType.INTEGER));
+				query.add(new Field("isDelete", 0));
+				query.add(new Field("isSubmit", 0));
+				query.add(new Field("isSync", 0));
 				break;
 			case ANSWERS:
-				statement = "CREATE TABLE IF NOT EXISTS " + table +
-						"(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-						"entryID INTEGER, fieldID INTEGER, value TEXT, " +
-						"isUpdate INTEGER DEFAULT 0)";
+				query.clearAll();
+				query.add(new Field("ID", true));
+				query.add(new Field("value", DataType.TEXT));
+				query.add(new Field("entryID", DataType.INTEGER));
+				query.add(new Field("fieldID", DataType.INTEGER));
+				query.add(new Field("isUpdate", 0));
 				break;
 		}
-		return statement;
+		return query.createTable(getName(tb));
 	}
 
 	public static String getName(TB tb) {

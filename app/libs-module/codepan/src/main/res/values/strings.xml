@@ -1,7 +1,4 @@
 <resources>
-
-    <string name="app_name">CodePan</string>
-
     <string name="helvetica_neue_bold">fonts/Helvetica-Neue-Bold.otf</string>
     <string name="helvetica_neue_mid">fonts/Helvetica-Neue-Mid.otf</string>
     <string name="helvetica_neue_light">fonts/Helvetica-Neue-Light.otf</string>
@@ -12,18 +9,17 @@
     <string name="nexa_black">fonts/Nexa-Black.otf</string>
     <string name="proxima_nova_bold">fonts/Proxima-Nova-Bold.otf</string>
     <string name="proxima_nova_light">fonts/Proxima-Nova-Light.otf</string>
+    <string name="proxima_nova_mid">fonts/Proxima-Nova-Mid.otf</string>
+    <string name="proxima_nova_semi_bold">fonts/Proxima-Nova-Semi-Bold.otf</string>
     <string name="cal_title">Calendar</string>
     <string name="cal_cancel">CANCEL</string>
     <string name="cal_save">SAVE</string>
-
     <string name="toast_font">@string/helvetica_neue_light</string>
-
     <string name="cal_title_font">@string/proxima_nova_bold</string>
     <string name="cal_month_font">@string/proxima_nova_bold</string>
     <string name="cal_week_font">@string/proxima_nova_light</string>
     <string name="cal_day_font">@string/proxima_nova_light</string>
     <string name="cal_date_font">@string/proxima_nova_light</string>
-
     <string name="cal_sunday">S</string>
     <string name="cal_monday">M</string>
     <string name="cal_tuesday">T</string>
@@ -31,5 +27,4 @@
     <string name="cal_thursday">T</string>
     <string name="cal_friday">F</string>
     <string name="cal_saturday">S</string>
-
 </resources>
