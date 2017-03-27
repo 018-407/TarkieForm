@@ -86,9 +86,9 @@ public class EntriesAdapter extends ArrayAdapter<EntryObj> {
 	}
 
 	private class ViewHolder {
-		public CodePanLabel tvNameEntries;
-		public CodePanLabel tvStatusEntries;
-		public CodePanLabel tvDateEntries;
-		public ImageView ivLogoEntries;
+		private CodePanLabel tvNameEntries;
+		private CodePanLabel tvStatusEntries;
+		private CodePanLabel tvDateEntries;
+		private ImageView ivLogoEntries;
 	}
 }

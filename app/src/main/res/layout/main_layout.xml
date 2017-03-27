@@ -382,40 +382,16 @@
 
                         </FrameLayout>
 
-                        <RelativeLayout
+                        <com.codepan.widget.CodePanLabel
+                            android:id="@+id/tvSyncDataMain"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <com.codepan.widget.CodePanLabel
-                                android:id="@+id/tvSyncDataMain"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="@dimen/twenty"
-                                android:layout_marginStart="@dimen/twenty"
-                                android:text="@string/sync_data"
-                                android:textColor="@color/gray_pri"
-                                android:textSize="@dimen/eighteen"
-                                codePan:typeface="@string/proxima_nova_light"/>
-
-                            <com.codepan.widget.CodePanLabel
-                                android:id="@+id/tvSyncNotifMain"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginLeft="@dimen/twenty"
-                                android:layout_marginStart="@dimen/twenty"
-                                android:background="@drawable/bg_oval_gray_oct"
-                                android:gravity="center"
-                                android:padding="@dimen/three"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/fifteen"
-                                android:visibility="gone"
-                                codePan:reference="dynamic"
-                                codePan:setSquare="true"
-                                codePan:typeface="@string/proxima_nova_light"/>
-
-                        </RelativeLayout>
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/twenty"
+                            android:layout_marginStart="@dimen/twenty"
+                            android:text="@string/sync_data"
+                            android:textColor="@color/gray_pri"
+                            android:textSize="@dimen/eighteen"
+                            codePan:typeface="@string/proxima_nova_light"/>
 
                     </LinearLayout>
 

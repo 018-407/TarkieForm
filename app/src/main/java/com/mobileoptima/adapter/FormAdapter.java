@@ -66,7 +66,7 @@ public class FormAdapter extends ArrayAdapter<FormObj> {
 	}
 
 	private class ViewHolder {
-		public CodePanLabel tvNameForm;
-		public ImageView ivLogoForm;
+		private CodePanLabel tvNameForm;
+		private ImageView ivLogoForm;
 	}
 }

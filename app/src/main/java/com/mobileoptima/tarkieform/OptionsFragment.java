@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.codepan.callback.Interface.OnFragmentCallback;
 import com.codepan.database.SQLiteAdapter;
 import com.codepan.widget.CodePanLabel;
+import com.mobileoptima.adapter.OptionsAdapter;
 import com.mobileoptima.callback.Interface.OnOptionSelectedCallback;
 import com.mobileoptima.object.ChoiceObj;
 
@@ -24,7 +26,8 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 	private CodePanLabel tvTitleOptions;
 	private ArrayList<ChoiceObj> items;
 	private RelativeLayout rlOptions;
-	private LinearLayout llOptions;
+	private OptionsAdapter adapter;
+	private ListView lvOptions;
 	private SQLiteAdapter db;
 	private String title;
 
@@ -51,31 +54,23 @@ public class OptionsFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.options_layout, container, false);
 		rlOptions = (RelativeLayout) view.findViewById(R.id.rlOptions);
-		llOptions = (LinearLayout) view.findViewById(R.id.llOptions);
+		lvOptions = (ListView) view.findViewById(R.id.lvOptions);
 		tvTitleOptions = (CodePanLabel) view.findViewById(R.id.tvTitleOptions);
 		tvTitleOptions.setText(title);
 		rlOptions.setOnClickListener(this);
 		if(items != null) {
-			for(final ChoiceObj obj : items) {
-				View v = inflater.inflate(R.layout.options_list_row, container, false);
-				CodePanLabel tvItemOptions = (CodePanLabel) v.findViewById(R.id.tvItemOptions);
-				View vDividerOptions = v.findViewById(R.id.vDividerOptions);
-				tvItemOptions.setText(obj.name);
-				tvItemOptions.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						getActivity().getSupportFragmentManager().popBackStack();
-						if(optionSelectedCallback != null) {
-							optionSelectedCallback.onOptionSelected(obj);
-						}
+			adapter = new OptionsAdapter(getActivity(), items);
+			lvOptions.setAdapter(adapter);
+			lvOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+					ChoiceObj choice = items.get(i);
+					if(optionSelectedCallback != null) {
+						optionSelectedCallback.onOptionSelected(choice);
 					}
-				});
-				if(items.indexOf(obj) == items.size() - 1) {
-					vDividerOptions.setVisibility(View.GONE);
-					tvItemOptions.setBackgroundResource(R.drawable.state_rect_trans_rad_five_bot);
+					getActivity().getSupportFragmentManager().popBackStack();
 				}
-				llOptions.addView(v);
-			}
+			});
 		}
 		return view;
 	}

@@ -91,12 +91,12 @@ public class CameraFragment extends Fragment implements OnClickListener, OnCaptu
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		imageList = new ArrayList<>();
 		maxWidth = CodePanUtils.getMaxWidth(getActivity());
 		maxHeight = CodePanUtils.getMaxHeight(getActivity());
 		((MainActivity) getActivity()).setOnBackPressedCallback(this);
 		db = ((MainActivity) getActivity()).getDatabase();
 		db.openConnection();
-		imageList = new ArrayList<>();
 	}
 
 	@Override

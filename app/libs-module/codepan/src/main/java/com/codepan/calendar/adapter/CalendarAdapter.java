@@ -1,7 +1,6 @@
 package com.codepan.calendar.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 
 public class CalendarAdapter extends ArrayAdapter<DayObj> {
 
-	private int inActive, active, today;
+	private int inActive, active, selected;
 	private ArrayList<DayObj> items;
 	private LayoutInflater inflater;
 	private ViewGroup parent;
@@ -25,7 +24,7 @@ public class CalendarAdapter extends ArrayAdapter<DayObj> {
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.inActive = context.getResources().getColor(R.color.cal_day_inactive);
 		this.active = context.getResources().getColor(R.color.cal_day_active);
-		this.today = context.getResources().getColor(R.color.cal_day_today);
+		this.selected = context.getResources().getColor(R.color.cal_day_selected);
 		this.items = items;
 	}
 
@@ -50,8 +49,8 @@ public class CalendarAdapter extends ArrayAdapter<DayObj> {
 			if(holder.tvDay != null) {
 				holder.tvDay.setText(String.valueOf(obj.day));
 				if(obj.isSelect) {
-					holder.tvDay.setTextColor(Color.WHITE);
 					holder.tvDay.setBackgroundResource(R.drawable.state_oval_cal_selected);
+					holder.tvDay.setTextColor(selected);
 				}
 				else {
 					holder.tvDay.setBackgroundResource(R.drawable.state_oval_trans_dark);

@@ -10,6 +10,7 @@ import com.codepan.database.SQLiteQuery;
 import com.codepan.utils.CodePanUtils;
 import com.mobileoptima.constant.App;
 import com.mobileoptima.schema.Tables;
+import com.mobileoptima.schema.Tables.TB;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +67,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.API_KEY);
+				String table = Tables.getName(TB.API_KEY);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -151,7 +152,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.SYNC_BATCH);
+				String table = Tables.getName(TB.SYNC_BATCH);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -233,7 +234,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.COMPANY);
+				String table = Tables.getName(TB.COMPANY);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -327,7 +328,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.CREDENTIALS);
+				String table = Tables.getName(TB.CREDENTIALS);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -413,7 +414,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.EMPLOYEE);
+				String table = Tables.getName(TB.EMPLOYEE);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -511,7 +512,7 @@ public class Rx {
 			}
 			if(hasData) {
 				SQLiteBinder binder = new SQLiteBinder(db);
-				String table = Tables.getName(Tables.TB.FORMS);
+				String table = Tables.getName(TB.FORMS);
 				try {
 					SQLiteQuery query = new SQLiteQuery();
 					JSONArray dataArray = responseObj.getJSONArray("data");
@@ -626,7 +627,7 @@ public class Rx {
 						query.add(new FieldValue("orderNo", dataObj.getString("field_order_number")));
 						query.add(new FieldValue("isRequired", dataObj.getInt("field_is_required")));
 						query.add(new FieldValue("isActive", dataObj.getInt("field_is_active")));
-						String table = Tables.getName(Tables.TB.FIELDS);
+						String table = Tables.getName(TB.FIELDS);
 						String sql = "SELECT ID FROM " + table + " WHERE ID = '" + fieldID + "'";
 						if(!db.isRecordExists(sql)) {
 							binder.insert(table, query);
@@ -644,7 +645,7 @@ public class Rx {
 								query.add(new FieldValue("code", code));
 								query.add(new FieldValue("name", choice));
 								query.add(new FieldValue("fieldID", fieldID));
-								table = Tables.getName(Tables.TB.CHOICES);
+								table = Tables.getName(TB.CHOICES);
 								sql = "SELECT ID FROM " + table + " WHERE code = '" + code + "'";
 								if(!db.isRecordExists(sql)) {
 									binder.insert(table, query);
@@ -731,22 +732,16 @@ public class Rx {
 					for(int d = 0; d < dataArray.length(); d++) {
 						JSONObject dataObj = dataArray.getJSONObject(d);
 						String webEntryID = dataObj.getString("enterdata_id");
-						String date = dataObj.getString("date_created");
-						String time = dataObj.getString("time_created");
-						String formID = dataObj.getString("form_id");
-						String referenceNo = dataObj.getString("reference_number");
 						query.clearAll();
-						query.add(new FieldValue("dDate", date));
-						query.add(new FieldValue("dTime", time));
 						query.add(new FieldValue("empID", employeeID));
-						query.add(new FieldValue("formID", formID));
-						query.add(new FieldValue("referenceNo", referenceNo));
+						query.add(new FieldValue("formID", dataObj.getString("form_id")));
+						query.add(new FieldValue("dDate", dataObj.getString("date_created")));
+						query.add(new FieldValue("dTime", dataObj.getString("time_created")));
+						query.add(new FieldValue("referenceNo", dataObj.getString("reference_number")));
 						query.add(new FieldValue("webEntryID", webEntryID));
-						query.add(new FieldValue("isFromWeb", 1));
-
-						String table = Tables.getName(Tables.TB.ENTRIES);
+						query.add(new FieldValue("isFromWeb", true));
+						String table = Tables.getName(TB.ENTRIES);
 						String sql = "SELECT ID FROM " + table + " WHERE webEntryID = '" + webEntryID + "'";
-
 						String entryID;
 						if(!db.isRecordExists(sql)) {
 							entryID = binder.insert(table, query);
@@ -755,7 +750,6 @@ public class Rx {
 							entryID = db.getString(sql);
 							binder.update(table, query, entryID);
 						}
-
 						if(!dataObj.isNull("enterdata_details")) {
 							JSONArray detailsArray = dataObj.getJSONArray("enterdata_details");
 							for(int c = 0; c < detailsArray.length(); c++) {
@@ -766,8 +760,9 @@ public class Rx {
 								query.add(new FieldValue("value", value));
 								query.add(new FieldValue("entryID", entryID));
 								query.add(new FieldValue("fieldID", fieldID));
-								table = Tables.getName(Tables.TB.ANSWERS);
-								sql = "SELECT ID FROM " + table + " WHERE isUpdate = 0 AND fieldID = '" + fieldID + "' AND entryID = '" + entryID + "'";
+								table = Tables.getName(TB.ANSWERS);
+								sql = "SELECT ID FROM " + table + " WHERE isUpdate = 0 AND fieldID = '" + fieldID + "' " +
+										"AND entryID = '" + entryID + "'";
 								if(!db.isRecordExists(sql)) {
 									binder.insert(table, query);
 								}

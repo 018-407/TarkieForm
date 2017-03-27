@@ -32,19 +32,16 @@
             android:layout_below="@+id/tvTitleOptions"
             android:background="@color/green"/>
 
-        <ScrollView
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/lvOptions"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/vDividerOptions"
-            android:scrollbarThumbVertical="@null">
-
-            <LinearLayout
-                android:id="@+id/llOptions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"/>
-
-        </ScrollView>
+            android:divider="@color/gray_qui"
+            android:dividerHeight="@dimen/one"
+            android:listSelector="@color/transparent"
+            android:scrollbarSize="0dp"
+            android:scrollbarThumbVertical="@color/transparent"/>
 
     </RelativeLayout>
 

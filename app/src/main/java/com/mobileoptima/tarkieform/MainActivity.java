@@ -46,8 +46,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
 	private LinearLayout llSettingsMain, llSyncDataMain, llUpdateMasterMain,
 			llAboutMain, llLogoutMain;
-	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain,
-			tvEmployeeMain, tvSyncNotifMain;
+	private CodePanLabel tvSyncCountMain, tvHomeMain, tvEntriesMain, tvPhotosMain, tvEmployeeMain;
 	private ImageView ivHomeMain, ivEntriesMain, ivPhotosMain, ivLogoMain, ivEmployeeMain;
 	private CodePanButton btnHomeMain, btnEntriesMain, btnPhotosMain, btnMenuMain;
 	private OnPermissionGrantedCallback permissionGrantedCallback;
@@ -77,7 +76,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		btnPhotosMain = (CodePanButton) findViewById(R.id.btnPhotosMain);
 		btnSyncMain = (CodePanButton) findViewById(R.id.btnSyncMain);
 		tvSyncCountMain = (CodePanLabel) findViewById(R.id.tvSyncCountMain);
-		tvSyncNotifMain = (CodePanLabel) findViewById(R.id.tvSyncNotifMain);
 		btnMenuMain = (CodePanButton) findViewById(R.id.btnMenuMain);
 		ivEmployeeMain = (ImageView) findViewById(R.id.ivEmployeeMain);
 		ivHomeMain = (ImageView) findViewById(R.id.ivHomeMain);
@@ -477,9 +475,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		int count = TarkieLib.getCountSyncTotal(db);
 		if(count > 0) {
 			tvSyncCountMain.setVisibility(View.VISIBLE);
-			tvSyncNotifMain.setVisibility(View.VISIBLE);
 			tvSyncCountMain.setText(String.valueOf(count));
-			tvSyncNotifMain.setText(String.valueOf(count));
 			if(count > 99) {
 				float textSize = getResources().getDimension(R.dimen.nine);
 				tvSyncCountMain.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
@@ -487,7 +483,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 		}
 		else {
 			tvSyncCountMain.setVisibility(View.GONE);
-			tvSyncNotifMain.setVisibility(View.GONE);
 		}
 	}
 

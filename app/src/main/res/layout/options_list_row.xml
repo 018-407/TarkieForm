@@ -16,10 +16,4 @@
         android:textSize="@dimen/seventeen"
         codePan:typeface="@string/proxima_nova_light"/>
 
-    <View
-        android:id="@+id/vDividerOptions"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/one"
-        android:background="@color/gray_qui"/>
-
 </LinearLayout>

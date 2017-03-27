@@ -247,16 +247,16 @@
             android:id="@+id/vpCalendar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/vDivider"/>
+            android:layout_below="@+id/vDivider"
+            android:layout_centerHorizontal="true"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/vpCalendar"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/ten"
-            android:layout_marginTop="@dimen/ten"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="@dimen/ten">
 
             <com.codepan.widget.CodePanButton
                 android:id="@+id/btnCancelCalendar"

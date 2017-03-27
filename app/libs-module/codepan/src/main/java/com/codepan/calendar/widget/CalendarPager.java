@@ -11,8 +11,6 @@ import com.codepan.calendar.adapter.CalendarAdapter;
 
 public class CalendarPager extends ViewPager {
 
-	private final int numCol = 7;
-	private final int numRow = 6;
 	private boolean isSet;
 
 	public CalendarPager(Context context, AttributeSet attrs) {
@@ -28,6 +26,8 @@ public class CalendarPager extends ViewPager {
 			if(child instanceof GridView) {
 				GridView gvCalendarGrid = (GridView) child;
 				CalendarAdapter adapter = (CalendarAdapter) gvCalendarGrid.getAdapter();
+				int numCol = getResources().getInteger(R.integer.num_col);
+				int numRow = getResources().getInteger(R.integer.num_row);
 				int width = (adapter.getParent().getMeasuredWidth() + spacing) * numCol;
 				int height = (adapter.getParent().getMeasuredHeight() + spacing) * numRow;
 				getLayoutParams().width = width - spacing;
