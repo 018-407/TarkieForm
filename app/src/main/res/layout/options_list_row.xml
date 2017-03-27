@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:codePan="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <com.codepan.widget.CodePanLabel
         android:id="@+id/tvItemOptions"
@@ -16,4 +15,4 @@
         android:textSize="@dimen/seventeen"
         codePan:typeface="@string/proxima_nova_light"/>
 
-</LinearLayout>
+</RelativeLayout>
