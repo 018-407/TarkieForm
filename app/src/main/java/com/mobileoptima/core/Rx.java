@@ -675,4 +675,126 @@ public class Rx {
 		}
 		return result;
 	}
+
+	public static boolean getEntries(SQLiteAdapter db, OnErrorCallback errorCallback) {
+		boolean result = false;
+		boolean hasData = false;
+		final int INDENT = 4;
+		final int TIMEOUT = 5000;
+		String action = "get-enter-data";
+		String url = App.API_V10 + action;
+		String response = null;
+		String params = null;
+		try {
+			JSONObject paramsObj = new JSONObject();
+			String apiKey = TarkieLib.getAPIKey(db);
+			String employeeID = TarkieLib.getEmployeeID(db);
+			paramsObj.put("api_key", apiKey);
+			paramsObj.put("employee_id", employeeID);
+			paramsObj.put("get_details", "yes");
+			params = paramsObj.toString(INDENT);
+			response = CodePanUtils.doHttpGet(url, paramsObj, TIMEOUT);
+			Log.e("getEntries PARAMS", params);
+			Log.e("getEntries RESPONSE", response);
+			JSONObject responseObj = new JSONObject(response);
+			if(responseObj.isNull("error")) {
+				JSONArray initArray = responseObj.getJSONArray("init");
+				for(int i = 0; i < initArray.length(); i++) {
+					JSONObject initObj = initArray.getJSONObject(i);
+					String status = initObj.getString("status");
+					String message = initObj.getString("message");
+					int recNo = initObj.getInt("recno");
+					if(status.equals("ok")) {
+						hasData = recNo > 0;
+						result = recNo == 0;
+					}
+					else {
+						if(errorCallback != null) {
+							errorCallback.onError(message, params, response, true);
+						}
+						return false;
+					}
+				}
+			}
+			else {
+				JSONObject errorObj = responseObj.getJSONObject("error");
+				String message = errorObj.getString("message");
+				if(errorCallback != null) {
+					errorCallback.onError(message, params, response, true);
+				}
+			}
+			if(hasData) {
+				SQLiteBinder binder = new SQLiteBinder(db);
+				try {
+					SQLiteQuery query = new SQLiteQuery();
+					JSONArray dataArray = responseObj.getJSONArray("data");
+					for(int d = 0; d < dataArray.length(); d++) {
+						JSONObject dataObj = dataArray.getJSONObject(d);
+						String webEntryID = dataObj.getString("enterdata_id");
+						String date = dataObj.getString("date_created");
+						String time = dataObj.getString("time_created");
+						String formID = dataObj.getString("form_id");
+						String referenceNo = dataObj.getString("reference_number");
+						query.clearAll();
+						query.add(new FieldValue("dDate", date));
+						query.add(new FieldValue("dTime", time));
+						query.add(new FieldValue("empID", employeeID));
+						query.add(new FieldValue("formID", formID));
+						query.add(new FieldValue("referenceNo", referenceNo));
+						query.add(new FieldValue("webEntryID", webEntryID));
+						query.add(new FieldValue("isFromWeb", 1));
+
+						String table = Tables.getName(Tables.TB.ENTRIES);
+						String sql = "SELECT ID FROM " + table + " WHERE webEntryID = '" + webEntryID + "'";
+
+						String entryID;
+						if(!db.isRecordExists(sql)) {
+							entryID = binder.insert(table, query);
+						}
+						else {
+							entryID = db.getString(sql);
+							binder.update(table, query, entryID);
+						}
+
+						if(!dataObj.isNull("enterdata_details")) {
+							JSONArray detailsArray = dataObj.getJSONArray("enterdata_details");
+							for(int c = 0; c < detailsArray.length(); c++) {
+								JSONObject detailsObj = detailsArray.getJSONObject(c);
+								String fieldID = detailsObj.getString("field_id");
+								String value = CodePanUtils.handleUniCode(detailsObj.getString("field_data_value"));
+								query.clearAll();
+								query.add(new FieldValue("value", value));
+								query.add(new FieldValue("entryID", entryID));
+								query.add(new FieldValue("fieldID", fieldID));
+								table = Tables.getName(Tables.TB.ANSWERS);
+								sql = "SELECT ID FROM " + table + " WHERE isUpdate = 0 AND fieldID = '" + fieldID + "' AND entryID = '" + entryID + "'";
+								if(!db.isRecordExists(sql)) {
+									binder.insert(table, query);
+								}
+								else {
+									String answerID = db.getString(sql);
+									binder.update(table, query, answerID);
+								}
+							}
+						}
+					}
+					result = binder.finish();
+				}
+				catch(JSONException je) {
+					je.printStackTrace();
+					if(errorCallback != null) {
+						errorCallback.onError(je.getMessage(), params, response, false);
+					}
+					binder.finish();
+				}
+			}
+		}
+		catch(JSONException je) {
+			je.printStackTrace();
+			if(errorCallback != null) {
+				errorCallback.onError(je.getMessage(), params, response, false);
+			}
+		}
+		return result;
+	}
 }

@@ -303,6 +303,7 @@ public class TarkieLib {
 				query.add(new FieldValue("entryID", entryID));
 				query.add(new FieldValue("fieldID", field.ID));
 				query.add(new FieldValue("value", value));
+				query.add(new FieldValue("isUpdate", true));
 				binder.insert(Tables.getName(ANSWERS), query);
 			}
 		}

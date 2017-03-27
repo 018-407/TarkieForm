@@ -464,14 +464,16 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						}
 						if(answer.value != null) {
 							String array[] = answer.value.split(",");
-							String status = "Location Acquired";
-							String latitude = "Latitude: " + array[0];
-							String longitude = "Longitude: " + array[1];
-							tvStatusGps.setText(status);
-							tvLatitudeGps.setText(latitude);
-							tvLongitudeGps.setText(longitude);
-							tvLatitudeGps.setVisibility(View.VISIBLE);
-							tvLongitudeGps.setVisibility(View.VISIBLE);
+							if(array.length == 2) {
+								String status = "Location Acquired";
+								String latitude = "Latitude: " + array[0];
+								String longitude = "Longitude: " + array[1];
+								tvStatusGps.setText(status);
+								tvLatitudeGps.setText(latitude);
+								tvLongitudeGps.setText(longitude);
+								tvLatitudeGps.setVisibility(View.VISIBLE);
+								tvLongitudeGps.setVisibility(View.VISIBLE);
+							}
 						}
 						btnGetGps.setOnClickListener(new OnClickListener() {
 							@Override
@@ -592,9 +594,11 @@ public class PageFragment extends Fragment implements OnFragmentCallback {
 						}
 						if(answer.value != null) {
 							String array[] = answer.value.split(",");
-							String result = "Time: " + array[0] + " " + array[1];
-							tvResultTime.setText(result);
-							tvResultTime.setVisibility(View.VISIBLE);
+							if(array.length == 2) {
+								String result = "Time: " + array[0] + " " + array[1];
+								tvResultTime.setText(result);
+								tvResultTime.setVisibility(View.VISIBLE);
+							}
 						}
 						btnGetTime.setOnClickListener(new OnClickListener() {
 							@Override

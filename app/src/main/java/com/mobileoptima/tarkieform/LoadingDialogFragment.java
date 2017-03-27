@@ -105,7 +105,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				authorizeDevice(db, authorizationCode, deviceID);
 				break;
 			case LOGIN:
-				setMax(4);
+				setMax(5);
 				successMsg = "Login successful.";
 				failedMsg = "Failed to login.";
 				title = "Validating Account";
@@ -115,7 +115,7 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 				login(db, username, password);
 				break;
 			case UPDATE_MASTERLIST:
-				setMax(4);
+				setMax(5);
 				successMsg = "Update master list successful.";
 				failedMsg = "Failed to update master list.";
 				title = "Updating Master List";
@@ -193,6 +193,11 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}
+					if(result) {
+						result = Rx.getEntries(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
 				}
 				catch(Exception e) {
 					e.printStackTrace();
@@ -224,6 +229,11 @@ public class LoadingDialogFragment extends Fragment implements OnErrorCallback,
 					}
 					if(result) {
 						result = Rx.getFields(db, getErrorCallback());
+						Thread.sleep(250);
+						handler.sendMessage(handler.obtainMessage());
+					}
+					if(result) {
+						result = Rx.getEntries(db, getErrorCallback());
 						Thread.sleep(250);
 						handler.sendMessage(handler.obtainMessage());
 					}

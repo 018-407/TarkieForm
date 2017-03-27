@@ -119,10 +119,12 @@ public class Tables {
 				query.add(new Field("dTime", DataType.TEXT));
 				query.add(new Field("empID", DataType.INTEGER));
 				query.add(new Field("formID", DataType.INTEGER));
+				query.add(new Field("referenceNo", DataType.TEXT));
 				query.add(new Field("dateSubmitted", DataType.TEXT));
 				query.add(new Field("timeSubmitted", DataType.TEXT));
 				query.add(new Field("syncBatchID", DataType.TEXT));
 				query.add(new Field("webEntryID", DataType.INTEGER));
+				query.add(new Field("isFromWeb", 0));
 				query.add(new Field("isDelete", 0));
 				query.add(new Field("isSubmit", 0));
 				query.add(new Field("isSync", 0));

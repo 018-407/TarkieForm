@@ -7,6 +7,7 @@ public class EntryObj {
 	public String ID;
 	public String dDate;
 	public String dTime;
+	public String referenceNo;
 	public String dateSubmitted;
 	public String timeSubmitted;
 	public String syncBatchID;

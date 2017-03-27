@@ -116,7 +116,7 @@ public class Tx {
 		boolean hasData = false;
 		final int INDENT = 4;
 		final int TIMEOUT = 5000;
-		String action = "sync-forms-answers";
+		String action = "add-form-answers";
 		String url = App.API_V10 + action;
 		String response = null;
 		String params = null;
@@ -129,6 +129,7 @@ public class Tx {
 			paramsObj.put("employee_id", empID);
 			paramsObj.put("team_id", groupID);
 			paramsObj.put("form_id", entry.form.ID);
+			paramsObj.put("reference_number", entry.referenceNo);
 			paramsObj.put("date_created", entry.dDate);
 			paramsObj.put("time_created", entry.dTime);
 			paramsObj.put("date_submitted", entry.dateSubmitted);
@@ -184,7 +185,8 @@ public class Tx {
 					try {
 						SQLiteQuery query = new SQLiteQuery();
 						JSONObject dataObj = dataArray.getJSONObject(i);
-						query.add(new FieldValue("webEntryID", dataObj.getString("form_answer_id")));
+						query.add(new FieldValue("webEntryID", dataObj.getString("form_record_id")));
+//						query.add(new FieldValue("referenceNo", dataObj.getString("reference_number")));//PAUL api adrian
 						query.add(new FieldValue("isSync", true));
 						binder.update(Tables.getName(TB.ENTRIES), query, entry.ID);
 					}
