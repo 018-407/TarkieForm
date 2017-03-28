@@ -198,7 +198,7 @@ public class Data {
 
 	public static ArrayList<EntryObj> loadEntriesSync(SQLiteAdapter db) {
 		ArrayList<EntryObj> entryList = new ArrayList<>();
-		String query = "SELECT ID, dDate, dTime, referenceNo, dateSubmitted, timeSubmitted, syncBatchID, formID " +
+		String query = "SELECT ID, dDate, dTime, referenceNo, dateSubmitted, timeSubmitted, syncBatchID, isFromWeb, formID " +
 				"FROM " + Tables.getName(TB.ENTRIES) + " WHERE isSync = 0 AND isSubmit = 1 AND " +
 				"isDelete = 0";
 		Cursor cursor = db.read(query);
@@ -211,8 +211,9 @@ public class Data {
 			entry.dateSubmitted = cursor.getString(4);
 			entry.timeSubmitted = cursor.getString(5);
 			entry.syncBatchID = cursor.getString(6);
+			entry.isFromWeb = cursor.getInt(7) == 1;
 			FormObj form = new FormObj();
-			form.ID = cursor.getString(7);
+			form.ID = cursor.getString(8);
 			entry.form = form;
 			ArrayList<FieldObj> fieldList = new ArrayList<>();
 			query = "SELECT f.ID, f.type, a.ID, a.value FROM " + Tables.getName(TB.ANSWERS) + " a, " +

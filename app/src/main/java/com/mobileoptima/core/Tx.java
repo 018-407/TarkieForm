@@ -185,8 +185,10 @@ public class Tx {
 					try {
 						SQLiteQuery query = new SQLiteQuery();
 						JSONObject dataObj = dataArray.getJSONObject(i);
-						query.add(new FieldValue("webEntryID", dataObj.getString("form_record_id")));
-//						query.add(new FieldValue("referenceNo", dataObj.getString("reference_number")));//PAUL api adrian
+						query.add(new FieldValue("webEntryID", dataObj.getString("form_answer_id")));
+						if(!entry.isFromWeb) {
+							query.add(new FieldValue("referenceNo", dataObj.getString("reference_number")));
+						}
 						query.add(new FieldValue("isSync", true));
 						binder.update(Tables.getName(TB.ENTRIES), query, entry.ID);
 					}

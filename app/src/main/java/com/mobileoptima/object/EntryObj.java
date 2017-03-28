@@ -13,5 +13,6 @@ public class EntryObj {
 	public String syncBatchID;
 	public FormObj form;
 	public ArrayList<FieldObj> fieldList;
+	public boolean isFromWeb;
 	public boolean isSubmit;
 }
