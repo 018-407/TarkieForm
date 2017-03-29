@@ -28,8 +28,8 @@ public class Tx {
 		boolean result = false;
 		boolean hasData = false;
 		final int INDENT = 4;
-		String action = "add-photos";
-		String url = App.API_V10 + action;
+		String action = "upload-form-photo";
+		String url = App.FILES_V10 + action;
 		String response = null;
 		String params = null;
 		try {
@@ -53,6 +53,7 @@ public class Tx {
 			}
 			response = CodePanUtils.uploadFile(url, params, "image", file);
 			Log.e("uploadPhoto PARAMS", params);
+			Log.e("uploadPhoto IMAGE", image.fileName);
 			Log.e("uploadPhoto RESPONSE", response);
 			JSONObject responseObj = new JSONObject(response);
 			if(responseObj.isNull("error")) {

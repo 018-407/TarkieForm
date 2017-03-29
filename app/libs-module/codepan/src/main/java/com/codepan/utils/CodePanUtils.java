@@ -91,6 +91,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -900,7 +901,8 @@ public class CodePanUtils {
 			MultipartEntityBuilder entity = MultipartEntityBuilder.create();
 			entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 			entity.addTextBody("params", params);
-			entity.addPart(name, new FileBody(file));
+//			entity.addPart(name, new FileBody(file));
+			entity.addBinaryBody(name, file, ContentType.create("image/png"), file.getName());
 			httppost.setEntity(entity.build());
 			HttpResponse httpResponse = httpclient.execute(httppost);
 			HttpEntity httpEntity = httpResponse.getEntity();
