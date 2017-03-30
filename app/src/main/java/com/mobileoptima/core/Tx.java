@@ -51,7 +51,7 @@ public class Tx {
 			if(!file.exists() || file.isDirectory()) {
 				return TarkieLib.updateStatusUpload(db, image.ID, table);
 			}
-			response = CodePanUtils.uploadFile(url, params, "image", file);
+			response = CodePanUtils.uploadFile(url, params, "image", file, "image/png");
 			Log.e("uploadPhoto PARAMS", params);
 			Log.e("uploadPhoto IMAGE", image.fileName);
 			Log.e("uploadPhoto RESPONSE", response);

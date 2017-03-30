@@ -901,8 +901,51 @@ public class CodePanUtils {
 			MultipartEntityBuilder entity = MultipartEntityBuilder.create();
 			entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 			entity.addTextBody("params", params);
-//			entity.addPart(name, new FileBody(file));
-			entity.addBinaryBody(name, file, ContentType.create("image/png"), file.getName());
+			entity.addPart(name, new FileBody(file));
+			httppost.setEntity(entity.build());
+			HttpResponse httpResponse = httpclient.execute(httppost);
+			HttpEntity httpEntity = httpResponse.getEntity();
+			response = EntityUtils.toString(httpEntity);
+			result = true;
+		}
+		catch(ClientProtocolException cpe) {
+			exception = cpe.toString();
+			message = cpe.getMessage();
+		}
+		catch(IOException ioe) {
+			exception = ioe.toString();
+			message = "You are getting weak internet connection. " +
+					"Please find a reliable source to continue.";
+		}
+		if(!result) {
+			try {
+				JSONObject error = new JSONObject();
+				JSONObject field = new JSONObject();
+				field.put("message", message);
+				field.put("exception", exception);
+				error.put("error", field);
+				response = error.toString(INDENT);
+			}
+			catch(JSONException je) {
+				je.printStackTrace();
+			}
+		}
+		return response;
+	}
+
+	public static String uploadFile(String url, String params, String name, File file, String mimeType) {
+		String response = null;
+		String message = null;
+		String exception = null;
+		final int INDENT = 4;
+		boolean result = false;
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpPost httppost = new HttpPost(url);
+		try {
+			MultipartEntityBuilder entity = MultipartEntityBuilder.create();
+			entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			entity.addTextBody("params", params);
+			entity.addBinaryBody(name, file, ContentType.create(mimeType), file.getName());
 			httppost.setEntity(entity.build());
 			HttpResponse httpResponse = httpclient.execute(httppost);
 			HttpEntity httpEntity = httpResponse.getEntity();
